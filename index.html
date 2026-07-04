@@ -513,16 +513,48 @@ footer{text-align:center;padding:26px 20px;font-size:.72rem;color:var(--faint);b
               <div class="add-area">
                 <select class="add-sel" id="newUT">
                   <option value="">— Pilih unit proses yang akan ditambahkan —</option>
-                  <option value="grease_trap">Grease Trap</option>
-                  <option value="equalization">Equalization Tank</option>
-                  <option value="presed_konv">Pre-sedimentasi Konvensional</option>
-                  <option value="presed_lamella">Pre-sedimentasi dengan Lamella</option>
-                  <option value="anaerobic">Unit Anaerobik</option>
-                  <option value="aerobic">Unit Aerobik</option>
-                  <option value="secondary_clarifier">Secondary Clarifier Konvensional</option>
-                  <option value="secondary_clarifier_lamella">Secondary Clarifier dengan Lamella</option>
-                  <option value="filtrasi">Unit Filtrasi</option>
-                  <option value="disinfeksi">Unit Desinfeksi</option>
+                  <optgroup label="── Pre-Treatment ──">
+                    <option value="grease_trap">Grease Trap</option>
+                    <option value="equalization">Equalization Tank</option>
+                    <option value="presed_konv">Pre-sedimentasi Konvensional</option>
+                    <option value="presed_lamella">Pre-sedimentasi dengan Lamella</option>
+                  </optgroup>
+                  <optgroup label="── Pengolahan Anaerobik ──">
+                    <option value="anaerobic_lagoon">Kolam Anaerobik (Anaerobic Lagoon)</option>
+                    <option value="anaerobic_digester">Reaktor Anaerobik (Digester)</option>
+                    <option value="septic_tank">Tangki Septik (Septic Tank)</option>
+                    <option value="baffled_reactor">Baffled Reactor (ABR)</option>
+                    <option value="anaerobic_filter">Anaerobic Filter (AF)</option>
+                  </optgroup>
+                  <optgroup label="── Pengolahan Aerobik ──">
+                    <option value="activated_sludge">Lumpur Aktif — Extended Aeration</option>
+                    <option value="sbr">Sequencing Batch Reactor (SBR)</option>
+                    <option value="mbr">Membrane Bioreactor (MBR)</option>
+                    <option value="mbbr">MBBR (Moving Bed Biofilm Reactor)</option>
+                    <option value="biofilter">Biofilter (Fixed/Floating Media)</option>
+                  </optgroup>
+                  <optgroup label="── Secondary Clarifier ──">
+                    <option value="secondary_clarifier">Secondary Clarifier Konvensional</option>
+                    <option value="secondary_clarifier_lamella">Secondary Clarifier dengan Lamella</option>
+                  </optgroup>
+                  <optgroup label="── Stabilization Pond ──">
+                    <option value="pond_anaerobic">Anaerobic Pond</option>
+                    <option value="pond_facultative">Facultative Pond</option>
+                    <option value="pond_maturation">Maturation Pond</option>
+                  </optgroup>
+                  <optgroup label="── Constructed Wetland ──">
+                    <option value="cw_fws">CW — Free Water Surface (FWS)</option>
+                    <option value="cw_ssf_h">CW — SSF Horizontal</option>
+                    <option value="cw_ssf_v">CW — SSF Vertikal</option>
+                  </optgroup>
+                  <optgroup label="── Filtrasi ──">
+                    <option value="filtrasi_lambat">Filtrasi Lambat (Slow Sand)</option>
+                    <option value="filtrasi_cepat">Filtrasi Cepat (Rapid Sand)</option>
+                    <option value="filtrasi_tekanan">Filtrasi Bertekanan (Pressure)</option>
+                  </optgroup>
+                  <optgroup label="── Desinfeksi ──">
+                    <option value="disinfeksi">Unit Desinfeksi</option>
+                  </optgroup>
                 </select>
                 <button class="btn-add" onclick="addUnit();updateSummary()">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>Tambah Unit
@@ -731,7 +763,26 @@ const UL={
   anaerobic:'Unit Anaerobik',aerobic:'Unit Aerobik',
   secondary_clarifier:'Secondary Clarifier Konvensional',
   secondary_clarifier_lamella:'Secondary Clarifier dengan Lamella',
-  filtrasi:'Unit Filtrasi',disinfeksi:'Unit Desinfeksi'
+  filtrasi:'Unit Filtrasi',disinfeksi:'Unit Desinfeksi',
+  anaerobic_lagoon:'Kolam Anaerobik (Anaerobic Lagoon)',
+  anaerobic_digester:'Reaktor Anaerobik (Anaerobic Digester)',
+  septic_tank:'Tangki Septik (Septic Tank)',
+  baffled_reactor:'Baffled Reactor (ABR)',
+  anaerobic_filter:'Anaerobic Filter (AF)',
+  activated_sludge:'Lumpur Aktif — Extended Aeration',
+  sbr:'Sequencing Batch Reactor (SBR)',
+  mbr:'Membrane Bioreactor (MBR)',
+  mbbr:'MBBR (Moving Bed Biofilm Reactor)',
+  biofilter:'Biofilter (Fixed/Floating Media)',
+  pond_anaerobic:'Kolam Stabilisasi — Anaerobic Pond',
+  pond_facultative:'Kolam Stabilisasi — Facultative Pond',
+  pond_maturation:'Kolam Stabilisasi — Maturation Pond',
+  cw_fws:'Constructed Wetland — Free Water Surface (FWS)',
+  cw_ssf_h:'Constructed Wetland — SSF Horizontal',
+  cw_ssf_v:'Constructed Wetland — SSF Vertikal',
+  filtrasi_lambat:'Filtrasi Lambat (Slow Sand Filter)',
+  filtrasi_cepat:'Filtrasi Cepat (Rapid Sand Filter)',
+  filtrasi_tekanan:'Filtrasi Bertekanan (Pressure Filter)',
 };
 
 // ── KRITERIA ───────────────────────────────────────
@@ -775,7 +826,201 @@ const KR={
   disinfeksi:{
     buang:[{p:'wk',l:'Waktu Kontak',u:'menit',min:null,max:null,note:'Tidak ada minimum untuk jalur pembuangan',r:'Lampiran III'}],
     manfaat:[{p:'wk',l:'Waktu Kontak',u:'menit',min:30,max:null,r:'Vigneswaran & Visvanathan 1995'}]
-  }
+  },
+  // ── ANAEROBIK SPESIFIK ──────────────────────────────────────
+  anaerobic_lagoon:{
+    buang:[
+      {p:'olr',l:'Organic Loading Rate (VLR)',u:'kg BOD/m³.hari',min:1.0,max:2.0,r:'Metcalf & Eddy 2003'},
+      {p:'hrt_hari',l:'HRT',u:'hari',min:5,max:30,r:'Metcalf & Eddy 2003'},
+    ],
+    manfaat:[
+      {p:'olr',l:'Organic Loading Rate (VLR)',u:'kg BOD/m³.hari',min:1.0,max:2.0,r:'Metcalf & Eddy 2003'},
+      {p:'hrt_hari',l:'HRT',u:'hari',min:5,max:30,r:'Metcalf & Eddy 2003'},
+    ]
+  },
+  anaerobic_digester:{
+    buang:[
+      {p:'olr',l:'Organic Loading Rate',u:'kg COD/m³.hari',min:1.6,max:4.8,r:'Metcalf & Eddy 2003; Davis 2010'},
+      {p:'hrt_hari',l:'HRT',u:'hari',min:10,max:30,r:'Davis 2010'},
+    ],
+    manfaat:[
+      {p:'olr',l:'Organic Loading Rate',u:'kg COD/m³.hari',min:1.6,max:4.8,r:'Metcalf & Eddy 2003; Davis 2010'},
+      {p:'hrt_hari',l:'HRT',u:'hari',min:10,max:30,r:'Davis 2010'},
+    ]
+  },
+  septic_tank:{
+    buang:[
+      {p:'hrt_hari',l:'HRT (Waktu Tinggal)',u:'hari',min:3,max:null,r:'SNI 2398:2017'},
+      {p:'kedap',l:'Konstruksi Kedap Air',u:'',min:null,max:null,note:'Wajib kedap air — pastikan tidak ada resapan',r:'Lampiran III'},
+    ],
+    manfaat:[
+      {p:'hrt_hari',l:'HRT (Waktu Tinggal)',u:'hari',min:3,max:null,r:'SNI 2398:2017'},
+    ]
+  },
+  baffled_reactor:{
+    buang:[
+      {p:'olr',l:'Organic Loading Rate',u:'kg COD/m³.hari',min:null,max:3.0,r:'Kemen PUPR 2018'},
+      {p:'hrt_jam',l:'HRT',u:'jam',min:4,max:null,r:'Kemen PUPR 2018'},
+    ],
+    manfaat:[
+      {p:'olr',l:'Organic Loading Rate',u:'kg BOD/m³.hari',min:null,max:3.0,r:'Kemen PUPR 2018'},
+      {p:'hrt_jam',l:'HRT',u:'jam',min:4,max:null,r:'Kemen PUPR 2018'},
+    ]
+  },
+  anaerobic_filter:{
+    buang:[
+      {p:'olr',l:'Organic Loading Rate',u:'kg COD/m³.hari',min:0.5,max:2.5,r:'Metcalf & Eddy 2003'},
+      {p:'hrt_jam',l:'HRT',u:'jam',min:6,max:null,r:'Metcalf & Eddy 2003'},
+    ],
+    manfaat:[
+      {p:'olr',l:'Organic Loading Rate',u:'kg BOD/m³.hari',min:0.25,max:0.75,r:'Chernicharo 2007'},
+      {p:'hrt_jam',l:'HRT',u:'jam',min:6,max:null,r:'Chernicharo 2007'},
+    ]
+  },
+  // ── AEROBIK SPESIFIK ──────────────────────────────────────
+  activated_sludge:{
+    buang:[
+      {p:'fm',l:'F/M Ratio',u:'kg BOD/kg MLVSS.hari',min:0.04,max:0.15,r:'Metcalf & Eddy 2003'},
+      {p:'hrt_jam',l:'HRT (Extended Aeration)',u:'jam',min:16,max:24,r:'von Sperling 2007'},
+    ],
+    manfaat:[
+      {p:'fm',l:'F/M Ratio',u:'kg BOD/kg MLVSS.hari',min:0.07,max:0.15,r:'von Sperling & Chernicharo 2005'},
+      {p:'hrt_jam',l:'HRT (Extended Aeration)',u:'jam',min:18,max:36,r:'Kemen PUPR 2018'},
+    ]
+  },
+  sbr:{
+    buang:[
+      {p:'fm',l:'F/M Ratio',u:'kg BOD/kg MLVSS.hari',min:0.04,max:0.15,r:'Metcalf & Eddy 2003'},
+      {p:'hrt_jam',l:'HRT per siklus',u:'jam/siklus',min:6,max:8,r:'von Sperling & Chernicharo 2005'},
+    ],
+    manfaat:[
+      {p:'fm',l:'F/M Ratio',u:'kg BOD/kg MLVSS.hari',min:0.07,max:0.15,r:'von Sperling & Chernicharo 2005'},
+      {p:'hrt_jam',l:'HRT per siklus',u:'jam/siklus',min:6,max:8,r:'von Sperling & Chernicharo 2005'},
+    ]
+  },
+  mbr:{
+    buang:[
+      {p:'flux',l:'Flux Membran',u:'liter/m².jam',min:16,max:33,r:'Judd & Judd 2006'},
+      {p:'hrt_jam',l:'HRT',u:'jam',min:6,max:null,r:'Judd & Judd 2006'},
+    ],
+    manfaat:[
+      {p:'flux',l:'Flux Membran',u:'liter/m².jam',min:16,max:33,r:'Judd & Judd 2006'},
+      {p:'hrt_jam',l:'HRT',u:'jam',min:6,max:null,r:'Judd & Judd 2006'},
+    ]
+  },
+  mbbr:{
+    buang:[
+      {p:'bod_loading',l:'BOD Loading Rate',u:'g BOD/m².hari',min:7.5,max:25,r:'WEF 2011'},
+      {p:'nh3_loading',l:'Nitrogen Loading Rate',u:'g NH₃-N/m².hari',min:0.45,max:1.0,r:'WEF 2011'},
+      {p:'media_pct',l:'Persentase Volume Media',u:'%',min:null,max:70,r:'van Handeel & van der Lubbe 2012'},
+    ],
+    manfaat:[
+      {p:'bod_loading',l:'BOD Loading Rate',u:'g BOD/m².hari',min:7.5,max:25,r:'WEF 2011'},
+      {p:'nh3_loading',l:'Nitrogen Loading Rate',u:'g NH₃-N/m².hari',min:0.45,max:1.0,r:'WEF 2011'},
+      {p:'media_pct',l:'Persentase Volume Media',u:'%',min:null,max:70,r:'van Handeel & van der Lubbe 2012'},
+    ]
+  },
+  biofilter:{
+    buang:[
+      {p:'bod_loading_vol',l:'BOD Loading Rate (Volumetrik)',u:'kg BOD/m³-media/hari',min:0.5,max:4.0,r:'Said & Yudo 2006'},
+      {p:'surface_area',l:'Luas Permukaan Spesifik Media',u:'m²/m³',min:150,max:null,r:'Lampiran III'},
+    ],
+    manfaat:[
+      {p:'bod_loading_vol',l:'BOD Loading Rate (Volumetrik)',u:'kg BOD/m³-media/hari',min:1.5,max:6.0,r:'WEF 2011'},
+      {p:'surface_area',l:'Luas Permukaan Spesifik Media',u:'m²/m³',min:150,max:null,r:'Lampiran III'},
+    ]
+  },
+  // ── STABILIZATION POND ──────────────────────────────────────
+  pond_anaerobic:{
+    buang:[
+      {p:'olr',l:'VLR (Volumetric Loading Rate)',u:'kg BOD/m³.hari',min:null,max:0.35,r:'Marcos von Sperling 2007'},
+      {p:'hrt_hari',l:'HRT',u:'hari',min:3,max:6,r:'Marcos von Sperling 2007'},
+      {p:'kedalaman',l:'Kedalaman',u:'m',min:3,max:5,r:'Marcos von Sperling 2007'},
+      {p:'rasio_pl',l:'Rasio Panjang/Lebar',u:'',min:1,max:3,r:'Marcos von Sperling 2007'},
+    ],
+    manfaat:[
+      {p:'olr',l:'VLR',u:'kg BOD/m³.hari',min:null,max:0.35,r:'Marcos von Sperling 2007'},
+      {p:'hrt_hari',l:'HRT',u:'hari',min:3,max:6,r:'Marcos von Sperling 2007'},
+      {p:'kedalaman',l:'Kedalaman',u:'m',min:3,max:5,r:'Marcos von Sperling 2007'},
+    ]
+  },
+  pond_facultative:{
+    buang:[
+      {p:'slr_surf',l:'Organic Surface Loading Rate (Ls)',u:'kg BOD/hektar.hari',min:240,max:350,r:'Marcos von Sperling 2007'},
+      {p:'hrt_hari',l:'HRT',u:'hari',min:15,max:45,r:'Marcos von Sperling 2007'},
+      {p:'kedalaman',l:'Kedalaman',u:'m',min:1.5,max:2.0,r:'Marcos von Sperling 2007'},
+      {p:'rasio_pl',l:'Rasio Panjang/Lebar',u:'',min:2,max:4,r:'Marcos von Sperling 2007'},
+    ],
+    manfaat:[
+      {p:'slr_surf',l:'Organic Surface Loading Rate (Ls)',u:'kg BOD/hektar.hari',min:240,max:350,r:'Marcos von Sperling 2007'},
+      {p:'hrt_hari',l:'HRT',u:'hari',min:15,max:45,r:'Marcos von Sperling 2007'},
+      {p:'kedalaman',l:'Kedalaman',u:'m',min:1.5,max:2.0,r:'Marcos von Sperling 2007'},
+    ]
+  },
+  pond_maturation:{
+    buang:[
+      {p:'hrt_hari',l:'HRT',u:'hari',min:3,max:30,r:'Marcos von Sperling 2007'},
+      {p:'kedalaman',l:'Kedalaman',u:'m',min:0.8,max:1.0,r:'Marcos von Sperling 2007'},
+    ],
+    manfaat:[
+      {p:'hrt_hari',l:'HRT',u:'hari',min:3,max:30,r:'Marcos von Sperling 2007'},
+      {p:'kedalaman',l:'Kedalaman',u:'m',min:0.8,max:1.0,r:'Marcos von Sperling 2007'},
+    ]
+  },
+  // ── CONSTRUCTED WETLAND ──────────────────────────────────────
+  cw_fws:{
+    buang:[
+      {p:'hrt_hari',l:'Detention Time',u:'hari',min:5,max:14,r:'Ronald W. Crites 1994'},
+      {p:'bod_loading',l:'Max BOD Loading Rate',u:'g/m².hari',min:null,max:8,r:'Ronald W. Crites 1994'},
+      {p:'kedalaman',l:'Kedalaman Air',u:'m',min:0.1,max:0.5,r:'Ronald W. Crites 1994'},
+      {p:'rasio_pl',l:'Aspect Ratio (P/L)',u:'',min:2,max:10,r:'Ronald W. Crites 1994'},
+      {p:'bed_slope',l:'Bed Bottom Slope',u:'%',min:0.5,max:3,r:'Ronald W. Crites 1994'},
+    ],
+    manfaat:[
+      {p:'hrt_hari',l:'Detention Time',u:'hari',min:5,max:14,r:'Ronald W. Crites 1994'},
+      {p:'bod_loading',l:'Max BOD Loading Rate',u:'g/m².hari',min:null,max:8,r:'Ronald W. Crites 1994'},
+      {p:'kedalaman',l:'Kedalaman Air',u:'m',min:0.1,max:0.5,r:'Ronald W. Crites 1994'},
+    ]
+  },
+  cw_ssf_h:{
+    buang:[
+      {p:'hrt_hari',l:'Detention Time',u:'hari',min:2,max:7,r:'Ronald W. Crites 1994'},
+      {p:'bod_loading',l:'Max BOD Loading Rate',u:'g/m².hari',min:null,max:7.5,r:'Ronald W. Crites 1994'},
+      {p:'cs_loading',l:'Cross-sectional Organic Loading',u:'g BOD₅/m².hari',min:null,max:250,r:'Langergraber et al 2020'},
+      {p:'kedalaman',l:'Kedalaman Substrat',u:'m',min:0.1,max:1.0,r:'Ronald W. Crites 1994'},
+      {p:'rasio_pl',l:'Aspect Ratio (P/L)',u:'',min:0.25,max:5,r:'Ronald W. Crites 1994'},
+      {p:'bed_slope',l:'Bed Bottom Slope',u:'%',min:0.5,max:3,r:'Ronald W. Crites 1994'},
+    ],
+    manfaat:[
+      {p:'hrt_hari',l:'Detention Time',u:'hari',min:2,max:7,r:'Ronald W. Crites 1994'},
+      {p:'bod_loading',l:'Max BOD Loading Rate',u:'g/m².hari',min:null,max:7.5,r:'Ronald W. Crites 1994'},
+      {p:'kedalaman',l:'Kedalaman Substrat',u:'m',min:0.1,max:1.0,r:'Ronald W. Crites 1994'},
+    ]
+  },
+  cw_ssf_v:{
+    buang:[
+      {p:'bod_loading',l:'Max BOD Loading Rate',u:'g/m².hari',min:4,max:6,r:'Ronald W. Crites 1994'},
+      {p:'kedalaman',l:'Kedalaman Substrat',u:'m',min:0.1,max:1.0,r:'Ronald W. Crites 1994'},
+      {p:'bed_slope',l:'Bed Bottom Slope',u:'%',min:0.5,max:3,r:'Ronald W. Crites 1994'},
+    ],
+    manfaat:[
+      {p:'bod_loading',l:'Max BOD Loading Rate',u:'g/m².hari',min:4,max:6,r:'Ronald W. Crites 1994'},
+      {p:'kedalaman',l:'Kedalaman Substrat',u:'m',min:0.1,max:1.0,r:'Ronald W. Crites 1994'},
+    ]
+  },
+  // ── FILTRASI SPESIFIK ──────────────────────────────────────
+  filtrasi_lambat:{
+    buang:[{p:'vf',l:'Kecepatan Aliran',u:'m/jam',min:0.1,max:0.3,r:'Metcalf & Eddy 2003'}],
+    manfaat:[{p:'vf',l:'Kecepatan Aliran',u:'m/jam',min:0.1,max:0.3,r:'Metcalf & Eddy 2003'}]
+  },
+  filtrasi_cepat:{
+    buang:[{p:'vf',l:'Kecepatan Aliran',u:'m/jam',min:7,max:10,r:'Metcalf & Eddy 2003'}],
+    manfaat:[{p:'vf',l:'Kecepatan Aliran',u:'m/jam',min:7,max:10,r:'Metcalf & Eddy 2003'}]
+  },
+  filtrasi_tekanan:{
+    buang:[{p:'vf',l:'Kecepatan Aliran',u:'m/jam',min:15,max:20,r:'Metcalf & Eddy 2003'}],
+    manfaat:[{p:'vf',l:'Kecepatan Aliran',u:'m/jam',min:15,max:20,r:'Metcalf & Eddy 2003'}]
+  },
 };
 
 const FIELDS={
@@ -788,7 +1033,26 @@ const FIELDS={
   secondary_clarifier:[{id:'sor',l:'SOR Rata-rata',u:'m/jam',type:'auto'},{id:'sor_pk',l:'SOR Beban Puncak',u:'m/jam',type:'auto'},{id:'hrt_jam',l:'HRT',u:'jam',type:'auto'}],
   secondary_clarifier_lamella:[{id:'proj_area',l:'Projected Area Lamella',u:'m²',type:'input',ph:'2,00',hint:'Luas proyeksi plate/tube lamella'},{id:'sor',l:'SOR (Projected Area)',u:'m³/m²/jam',type:'auto'},{id:'la',l:'Kemiringan Lamella',u:'derajat',type:'input',ph:'60',hint:'55–60°'},{id:'ll',l:'Panjang Lamella',u:'m',type:'input',ph:'0,90',hint:'0,6–1,2 m'}],
   filtrasi:[{id:'ft',l:'Jenis Filtrasi',u:'',type:'select',opts:['lambat','cepat','bertekanan']},{id:'vf',l:'Kecepatan Aliran',u:'m/jam',type:'auto'}],
-  disinfeksi:[{id:'wk',l:'Waktu Kontak',u:'menit',type:'auto'}]
+  disinfeksi:[{id:'wk',l:'Waktu Kontak',u:'menit',type:'auto'}],
+  anaerobic_lagoon:[{id:'olr',l:'Organic Loading Rate',u:'kg BOD/m³.hari',type:'auto'},{id:'hrt_hari',l:'HRT',u:'hari',type:'auto'}],
+  anaerobic_digester:[{id:'olr',l:'Organic Loading Rate',u:'kg COD/m³.hari',type:'auto'},{id:'hrt_hari',l:'HRT',u:'hari',type:'auto'}],
+  septic_tank:[{id:'hrt_hari',l:'HRT',u:'hari',type:'auto'}],
+  baffled_reactor:[{id:'olr',l:'Organic Loading Rate',u:'kg COD/m³.hari',type:'auto'},{id:'hrt_jam',l:'HRT',u:'jam',type:'auto'}],
+  anaerobic_filter:[{id:'olr',l:'Organic Loading Rate',u:'kg COD/m³.hari',type:'auto'},{id:'hrt_jam',l:'HRT',u:'jam',type:'auto'}],
+  activated_sludge:[{id:'fm',l:'F/M Ratio',u:'kg BOD/kg MLVSS.hari',type:'auto'},{id:'hrt_jam',l:'HRT',u:'jam',type:'auto'}],
+  sbr:[{id:'fm',l:'F/M Ratio',u:'kg BOD/kg MLVSS.hari',type:'auto'},{id:'hrt_jam',l:'HRT per siklus',u:'jam',type:'auto'}],
+  mbr:[{id:'flux',l:'Flux Membran',u:'liter/m².jam',type:'input',ph:'25'},{id:'hrt_jam',l:'HRT',u:'jam',type:'auto'}],
+  mbbr:[{id:'media_vol',l:'Volume Media',u:'m³',type:'input',ph:'1,00',hint:'Volume total media di reaktor'},{id:'bod_loading',l:'BOD Loading Rate',u:'g BOD/m².hari',type:'input',ph:'15'},{id:'nh3_loading',l:'Nitrogen Loading Rate',u:'g NH₃-N/m².hari',type:'input',ph:'0,5'},{id:'media_pct',l:'% Volume Media / Volume Reaktor',u:'%',type:'input',ph:'50',hint:'Maks 70%'}],
+  biofilter:[{id:'bod_loading_vol',l:'BOD Loading Rate',u:'kg BOD/m³-media/hari',type:'input',ph:'1,5'},{id:'surface_area',l:'Luas Permukaan Spesifik Media',u:'m²/m³',type:'input',ph:'200',hint:'Min 150 m²/m³'}],
+  pond_anaerobic:[{id:'olr',l:'VLR',u:'kg BOD/m³.hari',type:'auto'},{id:'hrt_hari',l:'HRT',u:'hari',type:'auto'},{id:'rasio_pl',l:'Rasio Panjang/Lebar',u:'',type:'input',ph:'2'}],
+  pond_facultative:[{id:'slr_surf',l:'Organic Surface Loading Rate',u:'kg BOD/hektar.hari',type:'input',ph:'280'},{id:'hrt_hari',l:'HRT',u:'hari',type:'auto'},{id:'rasio_pl',l:'Rasio Panjang/Lebar',u:'',type:'input',ph:'3'}],
+  pond_maturation:[{id:'hrt_hari',l:'HRT',u:'hari',type:'auto'}],
+  cw_fws:[{id:'bod_loading',l:'BOD Loading Rate',u:'g/m².hari',type:'input',ph:'6'},{id:'hrt_hari',l:'HRT',u:'hari',type:'auto'},{id:'rasio_pl',l:'Aspect Ratio (P/L)',u:'',type:'input',ph:'5'},{id:'bed_slope',l:'Bed Slope',u:'%',type:'input',ph:'1'}],
+  cw_ssf_h:[{id:'bod_loading',l:'BOD Loading Rate',u:'g/m².hari',type:'input',ph:'5'},{id:'cs_loading',l:'Cross-sectional Loading',u:'g BOD₅/m².hari',type:'input',ph:'150'},{id:'hrt_hari',l:'HRT',u:'hari',type:'auto'},{id:'rasio_pl',l:'Aspect Ratio (P/L)',u:'',type:'input',ph:'2'},{id:'bed_slope',l:'Bed Slope',u:'%',type:'input',ph:'1'}],
+  cw_ssf_v:[{id:'bod_loading',l:'BOD Loading Rate',u:'g/m².hari',type:'input',ph:'5'},{id:'hrt_hari',l:'HRT',u:'hari',type:'auto'},{id:'bed_slope',l:'Bed Slope',u:'%',type:'input',ph:'1'}],
+  filtrasi_lambat:[{id:'vf',l:'Kecepatan Aliran',u:'m/jam',type:'auto'}],
+  filtrasi_cepat:[{id:'vf',l:'Kecepatan Aliran',u:'m/jam',type:'auto'}],
+  filtrasi_tekanan:[{id:'vf',l:'Kecepatan Aliran',u:'m/jam',type:'auto'}],
 };
 
 // ── MULTI-IPAL STATE ───────────────────────────────
@@ -1056,6 +1320,46 @@ function autoCalc(uid){
     case 'secondary_clarifier_lamella':{ const pa=parseID(document.getElementById(`u${uid}_proj_area`)?.value); sa('sor',(!isNaN(pa)&&pa>0&&Qh)?Qh/pa:NaN,3); break;}
     case 'filtrasi': sa('vf',slr,3); break;
     case 'disinfeksi': sa('wk',hrt_min,1); break;
+    // ── Anaerobik spesifik ──
+    case 'anaerobic_lagoon':
+    case 'anaerobic_digester':
+    case 'septic_tank':
+      sa('olr',(vol&&!isNaN(Q)&&!isNaN(BOD))?(Q*BOD/1000)/vol:NaN,3);
+      sa('hrt_hari',hrt_jam?hrt_jam/24:NaN,2);
+      break;
+    case 'baffled_reactor':
+    case 'anaerobic_filter':
+      sa('olr',(vol&&!isNaN(Q)&&!isNaN(BOD))?(Q*BOD/1000)/vol:NaN,3);
+      sa('hrt_jam',hrt_jam,2);
+      break;
+    // ── Aerobik spesifik ──
+    case 'activated_sludge':
+    case 'sbr':
+      sa('fm',(vol&&!isNaN(Q)&&!isNaN(BOD)&&!isNaN(MLVSS)&&MLVSS>0)?(Q*BOD)/(MLVSS*vol):NaN,4);
+      sa('hrt_jam',hrt_jam,2);
+      break;
+    case 'mbr':
+      sa('hrt_jam',hrt_jam,2);
+      break;
+    // ── Kolam stabilisasi ──
+    case 'pond_anaerobic':
+    case 'pond_facultative':
+    case 'pond_maturation':
+      sa('olr',(vol&&!isNaN(Q)&&!isNaN(BOD))?(Q*BOD/1000)/vol:NaN,3);
+      sa('hrt_hari',hrt_jam?hrt_jam/24:NaN,2);
+      break;
+    // ── Constructed Wetland ──
+    case 'cw_fws':
+    case 'cw_ssf_h':
+    case 'cw_ssf_v':
+      sa('hrt_hari',hrt_jam?hrt_jam/24:NaN,2);
+      break;
+    // ── Filtrasi spesifik ──
+    case 'filtrasi_lambat':
+    case 'filtrasi_cepat':
+    case 'filtrasi_tekanan':
+      sa('vf',slr,3);
+      break;
   }
 }
 
@@ -1204,21 +1508,29 @@ function openFile(){
 
 function restoreUnitDims(){
   const ipal = getActiveIpal(); if(!ipal) return;
-  // Wait for DOM to render, then fill values
   setTimeout(()=>{
     ipal.units.forEach(u=>{
-      const set = (id, val) => { const el=document.getElementById(`u${u.id}_${id}`); if(el&&val!==undefined) el.value=val; };
+      const set = (id, val) => {
+        const el=document.getElementById(`u${u.id}_${id}`);
+        if(el && val!==undefined && val!==null) el.value=val;
+      };
       if(u.shape==='kotak'){ set('P',u._P); set('L',u._L); set('T',u._T); }
       else { set('D',u._D); set('T',u._T); }
-      ['proj_area','la','ll','ft'].forEach(p=>{ if(u['_'+p]!==undefined) set(p,u['_'+p]); });
+      // restore all named params
+      const namedParams = ['proj_area','la','ll','ft'];
+      namedParams.forEach(p=>{
+        if(u['_'+p]!==undefined){
+          const el=document.getElementById(`u${u.id}_${p}`);
+          if(el) el.value = u['_'+p];
+        }
+      });
+      // recalculate after restoring
       calcVol(u.id);
     });
-    if(typeof updateSummary==='function') updateSummary();
-  }, 80);
+  }, 50);
 }
 
-// ── PAGE ROUTING ───────────────────────────────────
-const PAGES = ['dashboard','data','hitung','hasil','laporan','referensi','pengaturan'];
+
 function showPage(name){
   if(!PAGES.includes(name)) return;
   // Persist current inputs BEFORE navigating away, so no data is lost
@@ -1231,7 +1543,7 @@ function showPage(name){
   });
   const summaryCol = document.getElementById('summaryCol');
   if(summaryCol) summaryCol.style.display = (name==='dashboard') ? '' : 'none';
-  if(name==='dashboard') restoreUnitDims();
+  if(name==='dashboard'){ renderUnits(); restoreUnitDims(); }
   if(name==='data') renderDataIpalPage();
   if(name==='hitung') renderHitungPage();
   if(name==='hasil') renderHasilPage();
