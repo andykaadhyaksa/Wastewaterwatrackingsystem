@@ -1221,40 +1221,89 @@ const REMOVAL_EFF = {
 //         null   -> unit tidak menghasilkan lumpur signifikan (mis. desinfeksi, equalisasi, filtrasi akhir)
 // gas:    true   -> unit anaerobik, berpotensi menghasilkan biogas (CH4 dari COD removal + TSS->gas)
 // sludgeCapture: efisiensi penyisihan padatan tersuspensi ke lumpur (sludge capture), default 100% dari TSS/BOD removed
+// ── SLUDGE_GAS_META ─────────────────────────────────────────────────────────
+// basis : 'TSS' = lumpur dari penyisihan padatan (unit fisik)
+//         'BOD' = lumpur biologis (unit biologis, berbasis produksi biomassa)
+//         null  = tidak menghasilkan lumpur signifikan
+// gas   : true  = unit anaerobik aktif → menghasilkan biogas (CH₄ + CO₂)
+//         false = tidak ada produksi biogas
+//
+// Referensi: Metcalf & Eddy (2003), Tchobanoglous et al. (2014), von Sperling (2007),
+//            Said & Yudo (2006), Kadlec & Wallace (2009), Sasse (1998)
 const SLUDGE_GAS_META = {
-  grease_trap:                { basis:'TSS', gas:false },
-  equalization:                { basis:null,  gas:false },
-  presed_konv:                 { basis:'TSS', gas:false },
-  presed_lamella:               { basis:'TSS', gas:false },
-  anaerobic:                    { basis:'BOD', gas:true  },
-  anaerobic_lagoon:             { basis:'BOD', gas:true  },
-  anaerobic_digester:           { basis:'BOD', gas:true  },
-  septic_tank:                  { basis:'BOD', gas:true  },
-  baffled_reactor:              { basis:'BOD', gas:true  },
-  anaerobic_filter:             { basis:'BOD', gas:true  },
-  aerobic:                      { basis:'BOD', gas:false },
-  activated_sludge:             { basis:'BOD', gas:false },
-  sbr:                          { basis:'BOD', gas:false },
-  mbr:                          { basis:'BOD', gas:false },
-  mbbr:                         { basis:'BOD', gas:false },
-  biofilter:                    { basis:'BOD', gas:false },
-  secondary_clarifier:          { basis:'TSS', gas:false },
-  secondary_clarifier_lamella:  { basis:'TSS', gas:false },
-  filtrasi:                     { basis:'TSS', gas:false },
-  filtrasi_lambat:              { basis:'TSS', gas:false },
-  filtrasi_cepat:               { basis:'TSS', gas:false },
-  filtrasi_tekanan:             { basis:'TSS', gas:false },
-  disinfeksi:                   { basis:null,  gas:false },
-  pond_anaerobic:               { basis:'BOD', gas:true  },
-  pond_fakultatif:              { basis:'BOD', gas:false },
-  pond_facultative:             { basis:'BOD', gas:false },
-  pond_maturasi:                { basis:'TSS', gas:false },
-  pond_maturation:              { basis:'TSS', gas:false },
-  wetland:                      { basis:'TSS', gas:false },
-  cw_fws:                       { basis:'TSS', gas:false },
-  cw_ssf_h:                     { basis:'TSS', gas:false },
-  cw_ssf_v:                     { basis:'TSS', gas:false },
-  sand_filter:                  { basis:'TSS', gas:false },
+  // ── Unit Fisik (penyisihan TSS) ──────────────────────────────────────────
+  grease_trap:                { basis:'TSS', gas:false,
+    note:'Menangkap lemak dan padatan ringan; lumpur dari TSS tersisihkan' },
+  equalization:               { basis:null,  gas:false,
+    note:'Tidak ada proses penyisihan — hanya pemerataan aliran' },
+  presed_konv:                { basis:'TSS', gas:false,
+    note:'Bak pengendapan awal: menangkap padatan gravitasi dari influen' },
+  presed_lamella:             { basis:'TSS', gas:false,
+    note:'Bak pengendapan lamella: padatan diendapkan oleh plate settler' },
+  secondary_clarifier:        { basis:'TSS', gas:false,
+    note:'Memisahkan lumpur aktif dari efluen — lumpur dikembalikan atau dibuang' },
+  secondary_clarifier_lamella:{ basis:'TSS', gas:false,
+    note:'Clarifier lamella: penyisihan TSS dari efluen biologis' },
+  filtrasi:                   { basis:'TSS', gas:false,
+    note:'Penyisihan padatan tersuspensi melalui media filter' },
+  filtrasi_lambat:            { basis:'TSS', gas:false,
+    note:'Sand filter lambat: penyisihan TSS' },
+  filtrasi_cepat:             { basis:'TSS', gas:false,
+    note:'Sand filter cepat: penyisihan TSS' },
+  filtrasi_tekanan:           { basis:'TSS', gas:false,
+    note:'Filter tekanan: penyisihan TSS' },
+  sand_filter:                { basis:'TSS', gas:false,
+    note:'Sand filter: penyisihan TSS' },
+  disinfeksi:                 { basis:null,  gas:false,
+    note:'Tidak menghasilkan lumpur; hanya membunuh patogen' },
+
+  // ── Unit Anaerobik (lumpur biologis anaerobik + biogas) ──────────────────
+  anaerobic:                  { basis:'BOD', gas:true,
+    note:'Reaktor anaerobik (UASB/kontak): produksi biomassa anaerobik + biogas CH₄' },
+  anaerobic_lagoon:           { basis:'BOD', gas:true,
+    note:'Lagoon anaerobik: degradasi BOD anaerobik + produksi biogas' },
+  anaerobic_digester:         { basis:'BOD', gas:true,
+    note:'Digester anaerobik: stabilisasi lumpur organik + produksi biogas signifikan' },
+  septic_tank:                { basis:'BOD', gas:true,
+    note:'Tangki septik: penguraian anaerobik + lumpur dasar; gas keluar melalui ventilasi' },
+  baffled_reactor:            { basis:'BOD', gas:true,
+    note:'ABR: baffled reactor anaerobik multi-kompartemen + produksi biogas' },
+  anaerobic_filter:           { basis:'BOD', gas:true,
+    note:'AF: degradasi anaerobik pada media tetap; biomassa tumbuh pada media + biogas' },
+  pond_anaerobic:             { basis:'BOD', gas:true,
+    note:'Pond anaerobik: degradasi BOD anaerobik di kolam + produksi biogas' },
+
+  // ── Unit Aerobik (lumpur biologis aerobik, TIDAK ada biogas) ─────────────
+  aerobic:                    { basis:'BOD', gas:false,
+    note:'Reaktor aerobik (aerasi): produksi biomassa aerobik (lumpur aktif); tidak ada biogas' },
+  activated_sludge:           { basis:'BOD', gas:false,
+    note:'Lumpur aktif extended aeration: produksi biomassa aerobik; lumpur berlebih (WAS)' },
+  sbr:                        { basis:'BOD', gas:false,
+    note:'SBR: lumpur aktif aerobik; tidak ada biogas' },
+  mbr:                        { basis:'BOD', gas:false,
+    note:'MBR: lumpur aktif + retensi membran; WAS sangat sedikit tapi ada' },
+  mbbr:                       { basis:'BOD', gas:false,
+    note:'MBBR: biofilm pada media bergerak; lumpur dari biofilm terlepas; tidak ada biogas' },
+  biofilter:                  { basis:'BOD', gas:false,
+    note:'Biofilter media tetap/apung: biofilm aerobik-anaerobik fakultatif; lumpur dari biofilm' },
+
+  // ── Unit Kolam/Lahan Basah ───────────────────────────────────────────────
+  pond_fakultatif:            { basis:'BOD', gas:false,
+    note:'Kolam fakultatif: zona aerobik dominan + sedikit anaerobik di dasar; biogas tidak signifikan' },
+  pond_facultative:           { basis:'BOD', gas:false,
+    note:'Kolam fakultatif (alias): zona aerobik dominan' },
+  pond_maturasi:              { basis:'TSS', gas:false,
+    note:'Kolam maturasi: penyisihan alga dan padatan; lumpur dari TSS organik' },
+  pond_maturation:            { basis:'TSS', gas:false,
+    note:'Kolam maturasi (alias)' },
+  wetland:                    { basis:'TSS', gas:false,
+    note:'Constructed wetland: penyisihan TSS melalui sedimentasi dan filtrasi tanah/media' },
+  cw_fws:                     { basis:'TSS', gas:false,
+    note:'CW aliran permukaan: penyisihan TSS dan BOD; lumpur dari sedimentasi' },
+  cw_ssf_h:                   { basis:'TSS', gas:false,
+    note:'CW aliran bawah horizontal: filtrasi padatan pada media' },
+  cw_ssf_v:                   { basis:'TSS', gas:false,
+    note:'CW aliran bawah vertikal: filtrasi padatan pada media' },
 };
 
 // [getRemovalEff removed — replaced by getParamPct/applyParamPreset/applyParamManual]
@@ -2654,10 +2703,13 @@ function saveFile(){
   // Flush ALL current DOM inputs into ipals[] before serialising
   captureAllIpalStates();
   const payload = {
-    version: '1.0',
+    version: '1.1',
     saved: new Date().toISOString(),
     ipals: JSON.parse(JSON.stringify(ipals)),
     activeIpalId,
+    removalInfluent:   JSON.parse(JSON.stringify(removalInfluent)),
+    removalOverrides:  JSON.parse(JSON.stringify(removalOverrides)),
+    klorinDoseOverrides: JSON.parse(JSON.stringify(klorinDoseOverrides)),
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
   const url  = URL.createObjectURL(blob);
@@ -2685,7 +2737,18 @@ function openFile(){
         // Restore state
         ipals = data.ipals;
         ipalCounter = Math.max(...ipals.map(x=>x.id), 0);
+        // Fix: recompute each IPAL's unit-id counter (uc) from its own units,
+        // otherwise a stale/missing uc can collide with existing unit ids and
+        // cause two units to share the same DOM element ids (e.g. Grease Trap
+        // silently reusing Equalization Tank's HRT value).
+        ipals.forEach(ip => {
+          ip.uc = Math.max(0, ...(ip.units||[]).map(u=>u.id));
+        });
         activeIpalId = data.activeIpalId || ipals[0]?.id;
+        // Restore removal influent & override data (v1.1+)
+        if(data.removalInfluent)     Object.assign(removalInfluent,     data.removalInfluent);
+        if(data.removalOverrides)    Object.assign(removalOverrides,     data.removalOverrides);
+        if(data.klorinDoseOverrides) Object.assign(klorinDoseOverrides,  data.klorinDoseOverrides);
         renderIpalTabs();
         loadActiveIpalState();
         // Restore dims for each unit of active IPAL
@@ -2885,7 +2948,8 @@ function scheduleAutosave(){
 function doAutosave(){
   try{
     saveActiveIpalState();
-    const payload = { version:'1.0', saved:new Date().toISOString(), ipals, activeIpalId };
+    const payload = { version:'1.1', saved:new Date().toISOString(), ipals, activeIpalId,
+      removalInfluent, removalOverrides, klorinDoseOverrides };
     localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(payload));
   }catch(e){ /* storage may be unavailable; fail silently */ }
 }
@@ -2899,7 +2963,16 @@ function tryRestoreAutosave(){
     // Silently restore — no confirm dialog. Data is always preserved.
     ipals = data.ipals;
     ipalCounter = Math.max(...ipals.map(x=>x.id), 0);
+    // Fix: recompute each IPAL's unit-id counter (uc) from its own units,
+    // to avoid id collisions between units after restoring old data.
+    ipals.forEach(ip => {
+      ip.uc = Math.max(0, ...(ip.units||[]).map(u=>u.id));
+    });
     activeIpalId = data.activeIpalId || ipals[0]?.id;
+    // Restore removal influent & overrides (v1.1+)
+    if(data.removalInfluent)     Object.assign(removalInfluent,     data.removalInfluent);
+    if(data.removalOverrides)    Object.assign(removalOverrides,     data.removalOverrides);
+    if(data.klorinDoseOverrides) Object.assign(klorinDoseOverrides,  data.klorinDoseOverrides);
     renderIpalTabs();
     loadActiveIpalState();
     restoreUnitDims();
@@ -36189,28 +36262,24 @@ function h1(text) {
 }
 function h2(text) {
   return new Paragraph({
-    children: [tx(text, { bold: true, size: 24, color: '000000', font: 'Times New Roman' })],
+    children: [new TextRun({ text, bold: true, underline: {}, size: 24, color: '000000', font: 'Times New Roman' })],
     heading: HeadingLevel.HEADING_2,
     spacing: { before: 280, after: 120 },
-    border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: '000000' } },
   });
 }
 function h3(text, seq) {
   return new Paragraph({
     children: [
-      tx(seq ? `${seq}.  ` : '', { bold: true, size: 22, color: C.teal }),
-      tx(text, { bold: true, size: 22, color: C.navy }),
+      new TextRun({ text: seq ? `${seq}.  ` : '', bold: true, underline: {}, size: 22, color: '000000', font: 'Times New Roman' }),
+      new TextRun({ text, bold: true, underline: {}, size: 22, color: '000000', font: 'Times New Roman' }),
     ],
     spacing: { before: 240, after: 100 },
-    border: { bottom: { style: BorderStyle.SINGLE, size: 8, color: C.teal } },
   });
 }
 function secLabel(text) {
   return new Paragraph({
-    children: [tx(text, { bold: true, size: 18, color: C.tealPale === 'EEEEEE' ? C.teal : C.teal, font: 'Times New Roman' })],
+    children: [new TextRun({ text, bold: true, underline: {}, size: 18, color: '000000', font: 'Times New Roman' })],
     spacing: { before: 160, after: 60 },
-    border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: C.borderLight } },
-    shading: { type: ShadingType.CLEAR, fill: 'FFFFFF' },
   });
 }
 
@@ -36330,7 +36399,7 @@ function kritStr(min, max, unit) {
 }
 
 // ── PER-UNIT SECTION BUILDER ─────────────────────────────────────────────────
-function buildUnitSection(u, tipe, Q, BOD, MLVSS, peakFF) {
+function buildUnitSection(u, tipe, Q, BOD, MLVSS, peakFF, COD) {
   const elems = [];
   const vol  = u.vol;
   const area = u.area;
@@ -36403,14 +36472,146 @@ function buildUnitSection(u, tipe, Q, BOD, MLVSS, peakFF) {
       resRows.push({ param:'Waktu Kontak', nilai:wk, dec:1, satuan:'menit',
         kriteria: tipe === 'manfaat' ? '≥ 30 menit' : 'Tidak ada minimum (jalur pembuangan)',
         status: tipe === 'manfaat' ? chkStatus(wk,30,null) : 'na' });
+
+    // ── Tipe tambahan — Lampiran III Permen LH 11/2025 ──────────────────────
+    } else if (u.type === 'septic_tank') {
+      // Lampiran III: HRT min 1 hari (buang), 2 hari (manfaat)
+      const hrtHari = hrt_jam / 24;
+      const [hMin] = tipe === 'buang' ? [1] : [2];
+      resRows.push({ param:'HRT', nilai:hrtHari, dec:2, satuan:'hari',
+        kriteria: kritStr(hMin, null, 'hari'), status: chkStatus(hrtHari, hMin, null) });
+      resRows.push({ param:'Volume Efektif (V)', nilai:vol, dec:3, satuan:'m³',
+        kriteria: 'Bergantung jumlah pengguna (lihat SNI 03-2398)', status:'na' });
+
+    } else if (u.type === 'baffled_reactor') {
+      // OLR dan HRT — Tchobanoglous / Metcalf & Eddy + Permen LH 11
+      const olr = (Q * BOD / 1000) / vol;
+      resRows.push({ param:'Organic Loading Rate (OLR)', nilai:olr, dec:3, satuan:'kg BOD/m³.hari',
+        kriteria: kritStr(0.5, 2.0, 'kg BOD/m³.hari'), status: chkStatus(olr, 0.5, 2.0) });
+      resRows.push({ param:'HRT', nilai:hrt_jam, dec:2, satuan:'jam',
+        kriteria: kritStr(4, 12, 'jam'), status: chkStatus(hrt_jam, 4, 12) });
+
+    } else if (u.type === 'anaerobic_filter') {
+      // OLR dan HRT — Metcalf & Eddy 2003 + Permen LH 11 Lampiran III
+      const olr = (Q * BOD / 1000) / vol;
+      resRows.push({ param:'Organic Loading Rate (OLR)', nilai:olr, dec:3, satuan:'kg BOD/m³.hari',
+        kriteria: kritStr(0.5, 4.0, 'kg BOD/m³.hari'), status: chkStatus(olr, 0.5, 4.0) });
+      resRows.push({ param:'HRT', nilai:hrt_jam, dec:2, satuan:'jam',
+        kriteria: kritStr(2, 8, 'jam'), status: chkStatus(hrt_jam, 2, 8) });
+
+    } else if (u.type === 'activated_sludge') {
+      // F/M Ratio + HRT — Extended Aeration, Metcalf & Eddy 2003
+      const fm = (Q * BOD) / (MLVSS * vol);
+      const [fMin,fMax,hMin,hMax] = tipe === 'buang' ? [0.04,0.10,18,30] : [0.05,0.15,18,36];
+      resRows.push({ param:'F/M Ratio', nilai:fm, dec:4, satuan:'kg BOD/kg MLVSS.hari',
+        kriteria: kritStr(fMin, fMax, ''), status: chkStatus(fm, fMin, fMax) });
+      resRows.push({ param:'HRT (Extended Aeration)', nilai:hrt_jam, dec:2, satuan:'jam',
+        kriteria: kritStr(hMin, hMax, 'jam'), status: chkStatus(hrt_jam, hMin, hMax) });
+
+    } else if (u.type === 'sbr') {
+      // F/M Ratio + HRT per siklus — Tchobanoglous 2014
+      const fm = (Q * BOD) / (MLVSS * vol);
+      const [fMin,fMax] = [0.04, 0.15];
+      resRows.push({ param:'F/M Ratio', nilai:fm, dec:4, satuan:'kg BOD/kg MLVSS.hari',
+        kriteria: kritStr(fMin, fMax, ''), status: chkStatus(fm, fMin, fMax) });
+      resRows.push({ param:'HRT per Siklus', nilai:hrt_jam, dec:2, satuan:'jam',
+        kriteria: kritStr(4, 24, 'jam'), status: chkStatus(hrt_jam, 4, 24) });
+
+    } else if (u.type === 'mbr') {
+      // Flux + HRT — Judd & Judd 2006 + Permen LH 11
+      const flux = u.params.flux || NaN;
+      resRows.push({ param:'Flux Membran', nilai:flux, dec:1, satuan:'L/m².jam',
+        kriteria: kritStr(10, 40, 'L/m².jam'), status: chkStatus(flux, 10, 40) });
+      resRows.push({ param:'HRT', nilai:hrt_jam, dec:2, satuan:'jam',
+        kriteria: kritStr(4, 12, 'jam'), status: chkStatus(hrt_jam, 4, 12) });
+
+    } else if (u.type === 'mbbr') {
+      // BOD Loading Rate + media % — Ødegaard 2006 + Permen LH 11
+      const bodLoad = u.params.bod_loading || NaN;
+      const mediaPct = u.params.media_pct || NaN;
+      resRows.push({ param:'BOD Loading Rate', nilai:bodLoad, dec:2, satuan:'g BOD/m².hari',
+        kriteria: kritStr(5, 30, 'g BOD/m².hari'), status: chkStatus(bodLoad, 5, 30) });
+      resRows.push({ param:'% Volume Media / Reaktor', nilai:mediaPct, dec:1, satuan:'%',
+        kriteria: kritStr(null, 70, '%'), status: chkStatus(mediaPct, null, 70) });
+      resRows.push({ param:'HRT', nilai:hrt_jam, dec:2, satuan:'jam',
+        kriteria: kritStr(4, 12, 'jam'), status: chkStatus(hrt_jam, 4, 12) });
+
+    } else if (u.type === 'biofilter') {
+      // BOD Loading Rate volume + Luas Permukaan Media — Said & Yudo 2006 + Permen LH 11
+      const bodLoadVol = u.params.bod_loading_vol || NaN;
+      const surfArea   = u.params.surface_area    || NaN;
+      resRows.push({ param:'BOD Loading Rate (Volume)', nilai:bodLoadVol, dec:3, satuan:'kg BOD/m³-media/hari',
+        kriteria: kritStr(0.2, 1.0, 'kg BOD/m³-media/hari'), status: chkStatus(bodLoadVol, 0.2, 1.0) });
+      resRows.push({ param:'Luas Permukaan Spesifik Media', nilai:surfArea, dec:0, satuan:'m²/m³',
+        kriteria: kritStr(150, null, 'm²/m³'), status: chkStatus(surfArea, 150, null) });
+      resRows.push({ param:'HRT', nilai:hrt_jam, dec:2, satuan:'jam',
+        kriteria: kritStr(4, 12, 'jam'), status: chkStatus(hrt_jam, 4, 12) });
+
+    } else if (u.type === 'anaerobic_lagoon' || u.type === 'pond_anaerobic') {
+      // VLR + HRT — von Sperling 2007 + Permen LH 11
+      const olr = (Q * BOD / 1000) / vol;
+      const hrtHari = vol / (Q / 24) / 24;
+      resRows.push({ param:'Organic Loading Rate (VLR)', nilai:olr, dec:3, satuan:'kg BOD/m³.hari',
+        kriteria: kritStr(0.1, 0.3, 'kg BOD/m³.hari'), status: chkStatus(olr, 0.1, 0.3) });
+      resRows.push({ param:'HRT', nilai:hrtHari, dec:1, satuan:'hari',
+        kriteria: kritStr(5, 30, 'hari'), status: chkStatus(hrtHari, 5, 30) });
+      const rasio = u.params.rasio_pl || NaN;
+      if (!isNaN(rasio))
+        resRows.push({ param:'Rasio Panjang/Lebar', nilai:rasio, dec:1, satuan:'',
+          kriteria: kritStr(2, 5, ''), status: chkStatus(rasio, 2, 5) });
+
+    } else if (u.type === 'pond_facultative' || u.type === 'pond_fakultatif') {
+      // Surface Loading Rate + HRT — Mara 2004 + Permen LH 11
+      const hrtHari = vol / (Q / 24) / 24;
+      const slrSurf = u.params.slr_surf || NaN;
+      resRows.push({ param:'Organic Surface Loading Rate', nilai:slrSurf, dec:0, satuan:'kg BOD/hektar.hari',
+        kriteria: kritStr(100, 400, 'kg BOD/hektar.hari'), status: chkStatus(slrSurf, 100, 400) });
+      resRows.push({ param:'HRT', nilai:hrtHari, dec:1, satuan:'hari',
+        kriteria: kritStr(5, 30, 'hari'), status: chkStatus(hrtHari, 5, 30) });
+      const rasio = u.params.rasio_pl || NaN;
+      if (!isNaN(rasio))
+        resRows.push({ param:'Rasio Panjang/Lebar', nilai:rasio, dec:1, satuan:'',
+          kriteria: kritStr(3, 10, ''), status: chkStatus(rasio, 3, 10) });
+
+    } else if (u.type === 'pond_maturation' || u.type === 'pond_maturasi') {
+      // HRT — von Sperling 2007
+      const hrtHari = vol / (Q / 24) / 24;
+      resRows.push({ param:'HRT', nilai:hrtHari, dec:1, satuan:'hari',
+        kriteria: kritStr(5, 30, 'hari'), status: chkStatus(hrtHari, 5, 30) });
+
+    } else if (u.type === 'wetland' || u.type === 'cw_fws' || u.type === 'cw_ssf_h' || u.type === 'cw_ssf_v') {
+      // BOD Loading Rate + HRT — Kadlec & Wallace 2009 + Permen LH 11
+      const bodLoad = u.params.bod_loading || NaN;
+      const hrtHari = vol && Q ? vol / (Q / 24) / 24 : NaN;
+      resRows.push({ param:'BOD Loading Rate', nilai:bodLoad, dec:1, satuan:'g BOD/m².hari',
+        kriteria: kritStr(null, 10, 'g BOD/m².hari'), status: chkStatus(bodLoad, null, 10) });
+      resRows.push({ param:'HRT', nilai:hrtHari, dec:1, satuan:'hari',
+        kriteria: kritStr(4, 10, 'hari'), status: chkStatus(hrtHari, 4, 10) });
+
+    } else if (u.type === 'sand_filter' || u.type === 'filtrasi_lambat' || u.type === 'filtrasi_cepat' || u.type === 'filtrasi_tekanan') {
+      // Kecepatan Aliran — Tchobanoglous 2014 + Permen LH 11
+      const vf = Qh / area;
+      const [vMin,vMax] = u.type === 'filtrasi_cepat' ? [7,15]
+                         : u.type === 'filtrasi_tekanan' ? [15,30]
+                         : [0.1, 0.3]; // lambat/sand_filter
+      resRows.push({ param:'Kecepatan Aliran Filtrasi', nilai:vf, dec:3, satuan:'m/jam',
+        kriteria: kritStr(vMin, vMax, 'm/jam'), status: chkStatus(vf, vMin, vMax) });
+
+    } else if (u.type === 'anaerobic_digester') {
+      // OLR + HRT — Metcalf & Eddy 2003
+      const olr = (Q * COD / 1000) / vol;
+      const hrtHari = vol / (Q / 24) / 24;
+      resRows.push({ param:'Organic Loading Rate (OLR)', nilai:olr, dec:3, satuan:'kg COD/m³.hari',
+        kriteria: kritStr(0.5, 5.0, 'kg COD/m³.hari'), status: chkStatus(olr, 0.5, 5.0) });
+      resRows.push({ param:'HRT', nilai:hrtHari, dec:1, satuan:'hari',
+        kriteria: kritStr(15, 30, 'hari'), status: chkStatus(hrtHari, 15, 30) });
     }
   };
   _preCompute();
   // Tag each row with the unit id so recap table can group by unit
   resRows.forEach(r => { r._unitId = u.id; });
 
-  // ── Heading ──
-  elems.push(h3(u.label, u.seq));
+  // ── Heading: removed — buildReport adds sub-bab heading above ──
 
   // ── Dimensi ──
   if (u.shape === 'kotak') {
@@ -36911,24 +37112,22 @@ function buildSludgeGasSection(rg) {
 
   elems.push(p([tx('Metode Perhitungan Timbulan Lumpur', {bold:true, size:21})]));
   elems.push(p([
-    tx('Timbulan lumpur pada unit fisik/mekanis dihitung berdasarkan efisiensi penyisihan padatan tersuspensi (TSS) di bak/unit yang bersangkutan (', {size:19}),
-    tx('sludge capture', {size:19, italic:true}),
-    tx('):', {size:19}),
+    tx('Penentuan unit proses yang menghasilkan lumpur dilakukan berdasarkan karakter setiap unit proses dalam rangkaian IPAL. Unit fisik (bak pengendap, filter, clarifier, grease trap, wetland) menghasilkan lumpur dari penyisihan TSS. Unit biologis (aerobik dan anaerobik) menghasilkan lumpur dari produksi biomassa yang proporsional dengan BOD tersisihkan. Unit tanpa produksi lumpur signifikan (ekualisasi, disinfeksi) tidak dihitung.', {size:19}),
   ], {align:AlignmentType.JUSTIFIED}));
-  elems.push(new Paragraph({
-    children: [new MathEl({ children: [mr('Timbulan lumpur dari TSS'), mr('  =  '), mr('Efisiensi'), mr(' × '), mr('Q'), mr(' × '), mr('[TSS]')] })],
-    alignment: AlignmentType.CENTER, spacing:{before:60,after:40},
-  }));
-  elems.push(p([tx('E : efisiensi penyisihan (sludge capture)', {size:17, italic:true, color:C.mutedText})], {indent:360}));
   elems.push(gap(60));
-  elems.push(p([
-    tx('Timbulan lumpur pada unit biologis diestimasi berdasarkan koefisien kinetik dan stoikiometri proses pengolahan air limbah secara biologis (anaerobik–aerobik), berhubungan dengan produksi total padatan (anabolisme–mortalitas/katabolisme):', {size:19}),
-  ], {align:AlignmentType.JUSTIFIED}));
+  elems.push(p([tx('a) Unit fisik — berbasis TSS (sludge capture):', {bold:true, size:19})]));
   elems.push(new Paragraph({
-    children: [new MathEl({ children: [mr('Timbulan lumpur dari biologis'), mr('  =  '), mr('E'), mr(' × '), mr('Q'), mr(' × '), mr('[BOD]')] })],
+    children: [new MathEl({ children: [mr('Timbulan lumpur (TSS)'), mr('  =  '), mr('η_TSS'), mr(' × '), mr('Q'), mr(' × '), mr('[TSS_in]'), mr(' × '), mr('f_capture'), mr(' / 1.000')] })],
     alignment: AlignmentType.CENTER, spacing:{before:60,after:40},
   }));
-  elems.push(p([tx('E : efisiensi penyisihan (sludge capture)', {size:17, italic:true, color:C.mutedText})], {indent:360}));
+  elems.push(p([tx('η_TSS = efisiensi removal TSS unit; f_capture = fraksi TSS yang tertangkap sebagai lumpur (sludge capture, 0–100%)', {size:17, italic:true, color:C.mutedText})], {indent:360}));
+  elems.push(gap(60));
+  elems.push(p([tx('b) Unit biologis — berbasis BOD (produksi biomassa):', {bold:true, size:19})]));
+  elems.push(new Paragraph({
+    children: [new MathEl({ children: [mr('Timbulan lumpur (BOD)'), mr('  =  '), mr('η_BOD'), mr(' × '), mr('Q'), mr(' × '), mr('[BOD_in]'), mr(' × '), mr('f_capture'), mr(' / 1.000')] })],
+    alignment: AlignmentType.CENTER, spacing:{before:60,after:40},
+  }));
+  elems.push(p([tx('η_BOD = efisiensi removal BOD unit; f_capture = faktor yield lumpur (tipikal 0,3–0,8 kg SS/kg BOD tergantung proses)', {size:17, italic:true, color:C.mutedText})], {indent:360}));
   elems.push(gap(120));
 
   // ── Tabel Timbulan Lumpur ──
@@ -36938,32 +37137,33 @@ function buildSludgeGasSection(rg) {
   if(sludgeUnits.length === 0) {
     elems.push(p([tx('Tidak ada unit pada rangkaian ini yang diperkirakan menghasilkan lumpur signifikan.', {size:19, italic:true, color:C.mutedText})]));
   } else {
-    const COLW = [500, 2900, 1400, 1400, 1300, 1860];
-    const HDR = ['No','Kompartemen IPAL','Efisiensi','Inlet\n(mg/L)','Q\n(m³/hari)','Timbulan Lumpur\n(Kg SS/hari)'];
+    const COLW = [400, 2200, 900, 1000, 1200, 1100, 1560];
+    const HDR = ['No','Kompartemen IPAL','Basis\nLumpur','Efisiensi\nRemoval','Inlet\n(mg/L)','Q\n(m³/hari)','Timbulan Lumpur\n(Kg SS/hari)'];
     const headerRow = new TableRow({
       tableHeader:true,
       children: HDR.map((h,i)=>cell(h,{width:COLW[i], bold:true, align:i===1?AlignmentType.LEFT:AlignmentType.CENTER, fill:'D9D9D9', size:16})),
     });
     const bodyRows = sludgeUnits.map(su => new TableRow({
       children: [
-        cell(String(su.seq), {width:COLW[0], align:AlignmentType.CENTER, size:16}),
-        cell(su.label, {width:COLW[1], size:16}),
-        cell(`${fmtID(su.effPct,0)}%`, {width:COLW[2], align:AlignmentType.CENTER, size:16}),
-        cell((su.inVal!==null&&!isNaN(su.inVal))?fmtID(su.inVal,2):'—', {width:COLW[3], align:AlignmentType.CENTER, size:16}),
-        cell((Qipal!==null&&!isNaN(Qipal))?fmtID(Qipal,0):'—', {width:COLW[4], align:AlignmentType.CENTER, size:16}),
-        cell((su.sludgeKgHari!==null&&!isNaN(su.sludgeKgHari))?fmtID(su.sludgeKgHari,3):'—', {width:COLW[5], align:AlignmentType.CENTER, size:16, bold:true}),
+        cell(String(su.seq),                                                                        {width:COLW[0], align:AlignmentType.CENTER, size:16}),
+        cell(su.label,                                                                              {width:COLW[1], size:16}),
+        cell(su.basis === 'TSS' ? 'TSS (Fisik)' : 'BOD (Biologis)',                                {width:COLW[2], align:AlignmentType.CENTER, size:15}),
+        cell(`${fmtID(su.effPct,0)}%`,                                                             {width:COLW[3], align:AlignmentType.CENTER, size:16}),
+        cell((su.inVal!==null&&!isNaN(su.inVal))?fmtID(su.inVal,2)+` mg/L ${su.basis}`:'—',       {width:COLW[4], align:AlignmentType.CENTER, size:15}),
+        cell((Qipal!==null&&!isNaN(Qipal))?fmtID(Qipal,0):'—',                                   {width:COLW[5], align:AlignmentType.CENTER, size:16}),
+        cell((su.sludgeKgHari!==null&&!isNaN(su.sludgeKgHari))?fmtID(su.sludgeKgHari,3):'—',     {width:COLW[6], align:AlignmentType.CENTER, size:16, bold:true}),
       ],
     }));
     const totalRow = new TableRow({
       children: [
         new TableCell({
-          width:{size:COLW[0]+COLW[1]+COLW[2]+COLW[3]+COLW[4], type:WidthType.DXA}, columnSpan:5,
+          width:{size:COLW[0]+COLW[1]+COLW[2]+COLW[3]+COLW[4]+COLW[5], type:WidthType.DXA}, columnSpan:6,
           shading:{type:ShadingType.CLEAR, fill:'F2F2F2'},
           borders:{top:{style:BorderStyle.SINGLE,size:2,color:C.borderLight},bottom:{style:BorderStyle.SINGLE,size:2,color:C.borderLight},left:{style:BorderStyle.SINGLE,size:2,color:C.borderLight},right:{style:BorderStyle.SINGLE,size:2,color:C.borderLight}},
           margins:{top:50,bottom:50,left:70,right:60},
           children:[new Paragraph({children:[new TextRun({text:'JUMLAH', bold:true, size:16})], alignment:AlignmentType.RIGHT})],
         }),
-        cell(fmtID(totalSludgeKgHari,3), {width:COLW[5], align:AlignmentType.CENTER, size:16, bold:true, fill:'F2F2F2'}),
+        cell(fmtID(totalSludgeKgHari,3), {width:COLW[6], align:AlignmentType.CENTER, size:16, bold:true, fill:'F2F2F2'}),
       ],
     });
     elems.push(new Table({
@@ -36979,7 +37179,15 @@ function buildSludgeGasSection(rg) {
   // ── Pengelolaan Gas ──
   elems.push(secLabel('B.  Pengelolaan Gas'));
   elems.push(gap(60));
-  elems.push(p([tx('Timbulan gas hanya terjadi di kompartemen/unit anaerobik. Contoh perhitungan jumlah gas yang dihasilkan dihitung berdasarkan persamaan sebagai berikut:', {size:19})], {align:AlignmentType.JUSTIFIED}));
+  // gasUnits already filtered to only anaerobic units — use directly
+  const gasUnitList = gasUnits.map(g=>g.label).join(', ') || '—';
+  elems.push(p([
+    tx('Produksi biogas (CH₄ dan CO₂) hanya terjadi pada unit proses yang memiliki kondisi ANAEROBIK aktif, yaitu ketika degradasi organik berlangsung tanpa kehadiran oksigen bebas dan metanogenesis aktif. Berdasarkan rangkaian unit proses pada IPAL ini, unit yang diidentifikasi menghasilkan biogas adalah: ', {size:19}),
+    tx(gasUnits.length > 0 ? gasUnitList : 'tidak ada unit anaerobik aktif', {size:19, bold:true}),
+    tx('. Unit aerobik (aerasi), clarifier, filter, ekualisasi, disinfeksi, dan kolam maturasi tidak menghasilkan biogas.', {size:19}),
+  ], {align:AlignmentType.JUSTIFIED}));
+  elems.push(gap(60));
+  elems.push(p([tx('Perhitungan jumlah gas dihitung berdasarkan persamaan sebagai berikut:', {size:19})], {align:AlignmentType.JUSTIFIED}));
   elems.push(gap(60));
 
   elems.push(p([tx('Pembentukan gas di bak/reaktor anaerobik (Sasse, 1998):', {bold:true, size:19})]));
@@ -37019,32 +37227,34 @@ function buildSludgeGasSection(rg) {
     });
 
     elems.push(gap(100));
-    const COLW2 = [500, 3000, 1200, 1200, 1200, 1560];
-    const HDR2 = ['No','Unit','Q\n(m³/hari)','COD_in\n(mg/L)','TSS_in\n(mg/L)','Total Biogas\n(m³/hari)'];
+    const COLW2 = [400, 2000, 900, 900, 900, 900, 900, 1260];
+    const HDR2 = ['No','Unit','Q\n(m³/hari)','COD_in\n(mg/L)','COD_out\n(mg/L)','TSS_in\n(mg/L)','TSS_out\n(mg/L)','Total Biogas\n(m³/hari)'];
     const headerRow2 = new TableRow({
       tableHeader:true,
       children: HDR2.map((h,i)=>cell(h,{width:COLW2[i], bold:true, align:i===1?AlignmentType.LEFT:AlignmentType.CENTER, fill:'D9D9D9', size:16})),
     });
     const bodyRows2 = gasUnits.map(gu => new TableRow({
       children: [
-        cell(String(gu.seq), {width:COLW2[0], align:AlignmentType.CENTER, size:16}),
-        cell(gu.label, {width:COLW2[1], size:16}),
-        cell(fmtID(gu.Q,0), {width:COLW2[2], align:AlignmentType.CENTER, size:16}),
-        cell((gu.codIn!==null&&!isNaN(gu.codIn))?fmtID(gu.codIn,2):'—', {width:COLW2[3], align:AlignmentType.CENTER, size:16}),
-        cell((gu.tssIn!==null&&!isNaN(gu.tssIn))?fmtID(gu.tssIn,2):'—', {width:COLW2[4], align:AlignmentType.CENTER, size:16}),
-        cell(fmtID(gu.gasTotal,2), {width:COLW2[5], align:AlignmentType.CENTER, size:16, bold:true}),
+        cell(String(gu.seq),                                                                      {width:COLW2[0], align:AlignmentType.CENTER, size:16}),
+        cell(gu.label,                                                                            {width:COLW2[1], size:16}),
+        cell(fmtID(gu.Q,0),                                                                      {width:COLW2[2], align:AlignmentType.CENTER, size:16}),
+        cell((gu.codIn !==null&&!isNaN(gu.codIn)) ?fmtID(gu.codIn, 2):'—',                      {width:COLW2[3], align:AlignmentType.CENTER, size:16}),
+        cell((gu.codOut!==null&&!isNaN(gu.codOut))?fmtID(gu.codOut,2):'—',                      {width:COLW2[4], align:AlignmentType.CENTER, size:16}),
+        cell((gu.tssIn !==null&&!isNaN(gu.tssIn)) ?fmtID(gu.tssIn, 2):'—',                      {width:COLW2[5], align:AlignmentType.CENTER, size:16}),
+        cell((gu.tssOut!==null&&!isNaN(gu.tssOut))?fmtID(gu.tssOut,2):'—',                      {width:COLW2[6], align:AlignmentType.CENTER, size:16}),
+        cell(fmtID(gu.gasTotal,2),                                                               {width:COLW2[7], align:AlignmentType.CENTER, size:16, bold:true}),
       ],
     }));
     const totalRow2 = new TableRow({
       children: [
         new TableCell({
-          width:{size:COLW2[0]+COLW2[1]+COLW2[2]+COLW2[3]+COLW2[4], type:WidthType.DXA}, columnSpan:5,
+          width:{size:COLW2[0]+COLW2[1]+COLW2[2]+COLW2[3]+COLW2[4]+COLW2[5]+COLW2[6], type:WidthType.DXA}, columnSpan:7,
           shading:{type:ShadingType.CLEAR, fill:'F2F2F2'},
           borders:{top:{style:BorderStyle.SINGLE,size:2,color:C.borderLight},bottom:{style:BorderStyle.SINGLE,size:2,color:C.borderLight},left:{style:BorderStyle.SINGLE,size:2,color:C.borderLight},right:{style:BorderStyle.SINGLE,size:2,color:C.borderLight}},
           margins:{top:50,bottom:50,left:70,right:60},
           children:[new Paragraph({children:[new TextRun({text:'TOTAL', bold:true, size:16})], alignment:AlignmentType.RIGHT})],
         }),
-        cell(fmtID(totalGas,2), {width:COLW2[5], align:AlignmentType.CENTER, size:16, bold:true, fill:'F2F2F2'}),
+        cell(fmtID(totalGas,2), {width:COLW2[7], align:AlignmentType.CENTER, size:16, bold:true, fill:'F2F2F2'}),
       ],
     });
     elems.push(new Table({
@@ -37059,28 +37269,158 @@ function buildSludgeGasSection(rg) {
 
 function buildReport(data) {
   const { tipe, Q, BOD, COD, MLVSS, peakFF, units, tgl } = data;
+  const ipalName  = (getActiveIpal()||{}).name || 'IPAL';
+  const peruntukan = (getActiveIpal()||{}).peruntukan || '';
   const tipeLabel = tipe === 'buang' ? 'Pembuangan ke Media Air' : 'Pemanfaatan (Penyiraman/Pencucian)';
-  const COL3 = [3500, 2430, 3430];
 
+  // ─────────────────────────────────────────────────────────────────────────
+  // HELPER: page break
+  const pageBreak = () => new Paragraph({
+    children: [new TextRun({ text: '', break: 1 })],
+    pageBreakBefore: true,
+    spacing: { before: 0, after: 0 },
+  });
+
+  // HELPER: sub-heading (Sub-Bab / 2.1, 2.2 style)
+  function h2sub(text) {
+    return new Paragraph({
+      children: [new TextRun({ text, bold: true, underline: {}, size: 22, color: '000000', font: 'Times New Roman' })],
+      heading: HeadingLevel.HEADING_3,
+      spacing: { before: 220, after: 80 },
+    });
+  }
+
+  // HELPER: normal paragraph
+  function para(text, opts = {}) {
+    return new Paragraph({
+      children: [tx(text, opts)],
+      alignment: opts.center ? AlignmentType.CENTER : AlignmentType.JUSTIFIED,
+      spacing: { before: opts.before || 0, after: opts.after || 100 },
+    });
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // SECTION A: COVER (portrait)
+  // ─────────────────────────────────────────────────────────────────────────
+  const coverChildren = [];
+
+  // Top spacer
+  for (let i = 0; i < 6; i++) coverChildren.push(gap(200));
+
+  // Title block
+  coverChildren.push(new Paragraph({
+    children: [new TextRun({ text: 'LAPORAN VERIFIKASI DESAIN', bold: true, underline: {}, size: 40, color: '000000', font: 'Times New Roman' })],
+    alignment: AlignmentType.CENTER, spacing: { before: 0, after: 60 },
+  }));
+  coverChildren.push(new Paragraph({
+    children: [new TextRun({ text: 'INSTALASI PENGOLAHAN AIR LIMBAH (IPAL) DOMESTIK', bold: true, underline: {}, size: 36, color: '000000', font: 'Times New Roman' })],
+    alignment: AlignmentType.CENTER, spacing: { before: 0, after: 200 },
+  }));
+
+  coverChildren.push(gap(240));
+
+  // Info table on cover
+  const coverInfoRows = [
+    ['Nama IPAL',       ipalName],
+    ['Tipe Pengolahan', tipeLabel],
+    ['Peruntukan',      peruntukan ? (BAKU_MUTU[peruntukan]?.label || peruntukan) : '—'],
+    ['Debit Rencana',   fmtID(Q,2) + ' m³/hari'],
+    ['BOD Influent',    fmtID(BOD,2) + ' mg/L'],
+    ['COD Influent',    fmtID(COD,2) + ' mg/L'],
+    ['Tanggal Laporan', tgl || new Date().toLocaleDateString('id-ID')],
+    ['Referensi Regulasi', 'Permen LH/BPLH No. 11 Tahun 2025'],
+    ['Dibuat oleh',     'IPAL Checker v1.2'],
+  ];
+
+  coverChildren.push(new Table({
+    width: { size: 7200, type: WidthType.DXA },
+    columnWidths: [2800, 4400],
+    rows: coverInfoRows.map(([k, v]) => new TableRow({
+      children: [
+        new TableCell({
+          width: { size: 2800, type: WidthType.DXA },
+          borders: { top:{style:BorderStyle.NONE}, bottom:{style:BorderStyle.NONE}, left:{style:BorderStyle.NONE}, right:{style:BorderStyle.NONE} },
+          margins: { top: 60, bottom: 60, left: 80, right: 40 },
+          children: [new Paragraph({ children: [tx(k, { bold: true, size: 20, font: 'Times New Roman' })] })],
+        }),
+        new TableCell({
+          width: { size: 4400, type: WidthType.DXA },
+          borders: { top:{style:BorderStyle.NONE}, bottom:{style:BorderStyle.NONE}, left:{style:BorderStyle.NONE}, right:{style:BorderStyle.NONE} },
+          margins: { top: 60, bottom: 60, left: 40, right: 80 },
+          children: [new Paragraph({ children: [tx(': ' + v, { size: 20, font: 'Times New Roman' })] })],
+        }),
+      ],
+    })),
+  }));
+
+  // Bottom spacer + footer note
+  for (let i = 0; i < 4; i++) coverChildren.push(gap(200));
+  coverChildren.push(new Paragraph({
+    children: [tx('Dokumen ini dibuat menggunakan IPAL Checker. Semua perhitungan mengacu pada Lampiran III Permen LH/BPLH No. 11 Tahun 2025.', { size: 16, color: '888888', font: 'Times New Roman' })],
+    alignment: AlignmentType.CENTER,
+    border: { top: { style: BorderStyle.SINGLE, size: 4, color: 'AAAAAA' } },
+    spacing: { before: 120, after: 0 },
+  }));
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // SECTION B: DAFTAR ISI (portrait, new page)
+  // ─────────────────────────────────────────────────────────────────────────
+  const tocChildren = [];
+  tocChildren.push(new Paragraph({
+    children: [new TextRun({ text: 'DAFTAR ISI', bold: true, underline: {}, size: 28, color: '000000', font: 'Times New Roman' })],
+    alignment: AlignmentType.CENTER,
+    spacing: { before: 0, after: 200 },
+  }));
+  tocChildren.push(gap(120));
+
+  // Manual TOC entries
+  const tocEntries = [
+    { num: '',        text: 'COVER',                                         indent: 0 },
+    { num: '',        text: 'DAFTAR ISI',                                    indent: 0 },
+    { num: 'BAB 1.',  text: 'Data Dasar Desain IPAL',                        indent: 0 },
+    { num: 'BAB 2.',  text: 'Perhitungan dan Verifikasi Per Unit Proses',    indent: 0 },
+    ...units.map((u, i) => ({
+      num: `2.${i+1}.`, text: u.label || `Unit ${i+1}`, indent: 360,
+    })),
+    { num: 'BAB 3.',  text: 'Rekapitulasi Parameter Desain IPAL',            indent: 0 },
+    { num: '3.1.',    text: 'Rekapitulasi Verifikasi Seluruh Unit Proses',   indent: 360 },
+    { num: '3.2.',    text: 'Rekapitulasi Dimensi Seluruh Unit Proses',      indent: 360 },
+    { num: 'BAB 4.',  text: 'Ringkasan Hasil Verifikasi',                    indent: 0 },
+    ...(data.removalGasData ? [
+      { num: 'BAB 5.',  text: 'Timbulan & Efisiensi Removal',                indent: 0 },
+      { num: 'BAB 6.',  text: 'Perhitungan Estimasi Outlet Tiap Parameter',  indent: 0 },
+      { num: 'BAB 7.',  text: 'Timbulan Lumpur dan Gas',                     indent: 0 },
+    ] : []),
+  ];
+
+  tocEntries.forEach(e => {
+    tocChildren.push(new Paragraph({
+      children: [
+        tx(e.num, { bold: e.indent === 0, size: 20, font: 'Times New Roman' }),
+        tx('  ' + e.text, { size: 20, font: 'Times New Roman' }),
+      ],
+      indent: e.indent ? { left: e.indent } : undefined,
+      spacing: { before: 0, after: e.indent === 0 ? 80 : 40 },
+      border: e.indent === 0 ? { bottom: { style: BorderStyle.DOTTED, size: 2, color: 'CCCCCC' } } : {},
+    }));
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // SECTION C: MAIN BODY (portrait)
+  // ─────────────────────────────────────────────────────────────────────────
   const children = [];
 
-  // ── COVER ──
-  children.push(h1('LAPORAN VERIFIKASI DESAIN IPAL DOMESTIK'));
+  // ── BAB 1: DATA DASAR ──
+  children.push(h2('BAB 1.  Data Dasar Desain IPAL'));
   children.push(gap(60));
-  children.push(p([tx('Referensi Regulasi  ', {bold:true}), tx(': Permen LH/BPLH No. 11 Tahun 2025 — Lampiran III')]));
-  children.push(p([tx('Tipe IPAL           ', {bold:true}), tx(': ' + tipeLabel)]));
-  children.push(p([tx('Tanggal             ', {bold:true}), tx(': ' + (tgl || new Date().toLocaleDateString('id-ID')))]));
-  children.push(gap(120));
 
-  // ── DATA DASAR ──
-  children.push(h2('1.  Data Dasar Desain IPAL'));
-  children.push(gap(60));
+  const COL3 = [3500, 2430, 3430];
   const dataDasarRows = [
     ['Parameter', 'Nilai', 'Satuan'],
     ['Debit (Q)', fmtID(Q,2), 'm³/hari'],
-    ['BOD Influent', fmtID(BOD,2), 'mg/l'],
-    ['COD Influent', fmtID(COD,2), 'mg/l'],
-    ['MLVSS (Unit Aerobik)', fmtID(MLVSS,0), 'mg/l'],
+    ['BOD Influent', fmtID(BOD,2), 'mg/L'],
+    ['COD Influent', fmtID(COD,2), 'mg/L'],
+    ['MLVSS (Unit Aerobik)', fmtID(MLVSS,0), 'mg/L'],
     ['Peak Flow Factor (Clarifier)', fmtID(peakFF,1), '× Q rata-rata'],
   ];
   children.push(new Table({
@@ -37090,11 +37430,11 @@ function buildReport(data) {
       tableHeader: ri === 0,
       children: row.map((cell, ci) => new TableCell({
         width: { size: COL3[ci], type: WidthType.DXA },
-        shading: { type: ShadingType.CLEAR, fill: 'FFFFFF' },
-        borders: { top:{style:BorderStyle.SINGLE,size:2,color:C.borderLight}, bottom:{style:BorderStyle.SINGLE,size:2,color:C.borderLight}, left:{style:BorderStyle.SINGLE,size:2,color:C.borderLight}, right:{style:BorderStyle.SINGLE,size:2,color:C.borderLight} },
+        shading: { type: ShadingType.CLEAR, fill: ri===0 ? 'EEEEEE' : 'FFFFFF' },
+        borders: { top:{style:BorderStyle.SINGLE,size:2,color:'999999'}, bottom:{style:BorderStyle.SINGLE,size:2,color:'999999'}, left:{style:BorderStyle.SINGLE,size:2,color:'999999'}, right:{style:BorderStyle.SINGLE,size:2,color:'999999'} },
         margins: { top:60, bottom:60, left:120, right:100 },
         children: [new Paragraph({
-          children: [new TextRun({ text:cell, bold:ri===0, size:ri===0?18:19, color:'000000', font:ci===1&&ri>0?'Courier New':'Times New Roman' })],
+          children: [new TextRun({ text: cell, bold: ri===0, size: ri===0?18:19, color:'000000', font: ci===1&&ri>0?'Courier New':'Times New Roman' })],
           alignment: ci>0 ? AlignmentType.CENTER : AlignmentType.LEFT,
         })],
       })),
@@ -37102,63 +37442,44 @@ function buildReport(data) {
   }));
   children.push(gap(160));
 
-  // ── UNIT SECTIONS ──
-  children.push(h2('2.  Perhitungan dan Verifikasi Per Unit Proses'));
+  // ── BAB 2: PERHITUNGAN PER UNIT ──
+  children.push(h2('BAB 2.  Perhitungan dan Verifikasi Per Unit Proses'));
   children.push(gap(80));
 
   let allResRows = [];
-  units.forEach(u => {
-    const { elems, resRows } = buildUnitSection(u, tipe, Q, BOD, MLVSS, peakFF);
+  units.forEach((u, ui) => {
+    // Sub-bab numbering
+    children.push(new Paragraph({
+      children: [new TextRun({ text: `2.${ui+1}.  ${u.label}`, bold: true, underline: {}, size: 22, color: '000000', font: 'Times New Roman' })],
+      heading: HeadingLevel.HEADING_3,
+      spacing: { before: ui===0?80:320, after: 100 },
+    }));
+    children.push(gap(60));
+    const { elems, resRows } = buildUnitSection(u, tipe, Q, BOD, MLVSS, peakFF, COD);
     elems.forEach(e => children.push(e));
     allResRows = allResRows.concat(resRows);
   });
 
-  // ── SECTION 3: TIMBULAN & EFISIENSI REMOVAL (rendered in LANDSCAPE — separate docx section) ──
-  const rg = data.removalGasData;
-  const portraitChildren2 = []; // section 4 content (portrait) — perhitungan estimasi outlet
-  const landscapeChildren  = []; // section 3 content (landscape) — tabel removal
-  const sludgeGasChildren  = []; // section 5 content (portrait) — timbulan lumpur & gas
-
-  if (rg) {
-    // -- Section 3 content: removal recap table (landscape) --
-    landscapeChildren.push(h2('3.  Timbulan & Efisiensi Removal'));
-    landscapeChildren.push(gap(60));
-    landscapeChildren.push(p([tx('Peruntukan: ', {bold:true, size:18}), tx(rg.bm ? rg.bm.label : '—', {size:18})]));
-    landscapeChildren.push(gap(60));
-    landscapeChildren.push(buildRemovalRecapTable(rg));
-    landscapeChildren.push(gap(100));
-    landscapeChildren.push(p([tx('Catatan: ', {bold:true, size:16, color:C.mutedText}), tx('Nilai % Removal merupakan rentang tipikal dari literatur (Metcalf & Eddy; Tchobanoglous et al.; Chernicharo; von Sperling; Said & Yudo; Kadlec & Wallace; Judd & Judd; Sasse; Ødegaard; Mara; Qasim). Nilai aktual bergantung pada kondisi operasional, suhu, dan kualitas air baku.', {size:16, color:C.mutedText})]));
-
-    // -- Section 4 content: step-by-step outlet calculation narrative (portrait) --
-    portraitChildren2.push(h2('4.  Perhitungan Estimasi Outlet Tiap Parameter'));
-    portraitChildren2.push(gap(60));
-    portraitChildren2.push(...buildOutletCalcNarrative(rg));
-
-    // -- Section 5 content: sludge & gas (portrait) --
-    sludgeGasChildren.push(h2('5.  Timbulan Lumpur dan Gas'));
-    sludgeGasChildren.push(gap(60));
-    sludgeGasChildren.push(...buildSludgeGasSection(rg));
-  }
-
-  // ── GLOBAL RECAP TABLE ──
-  children.push(h2('6.  Rekapitulasi Keseluruhan Parameter Desain IPAL'));
+  // ── BAB 3: REKAPITULASI ──
+  children.push(h2('BAB 3.  Rekapitulasi Parameter Desain IPAL'));
   children.push(gap(80));
 
-  // Build single unified recap table — unit name as group header row
-  {
-    const COLS_RK = [2200, 1400, 1560, 2400, 1000];
-    const HDR_RK  = ['Unit / Parameter', 'Satuan', 'Nilai Desain', 'Kriteria Desain (LH)', 'Status'];
+  // ── 3.1 Verifikasi seluruh unit ──
+  children.push(h2sub('3.1  Rekapitulasi Verifikasi Seluruh Unit Proses terhadap Kriteria Permen LH No. 11 Tahun 2025'));
+  children.push(gap(60));
 
-    // Build all rows: for each unit insert a group-header row + data rows
+  {
+    const COLS_RK = [2200, 1200, 1600, 2760, 1000];
+    const HDR_RK  = ['Unit / Parameter', 'Satuan', 'Nilai Desain', 'Kriteria Desain (Permen LH 11/2025)', 'Status'];
+
     const allTableRows = [
-      // Header row
       new TableRow({
         tableHeader: true,
         children: HDR_RK.map((h, ci) => new TableCell({
           width: { size: COLS_RK[ci], type: WidthType.DXA },
-          shading: { type: ShadingType.CLEAR, fill: 'D9D9D9' },
+          shading: { type: ShadingType.CLEAR, fill: 'D0D0D0' },
           borders: { top:{style:BorderStyle.SINGLE,size:6,color:'333333'}, bottom:{style:BorderStyle.SINGLE,size:6,color:'333333'}, left:{style:BorderStyle.SINGLE,size:2,color:'555555'}, right:{style:BorderStyle.SINGLE,size:2,color:'555555'} },
-          margins: { top:70, bottom:70, left:120, right:80 },
+          margins: { top:70, bottom:70, left:100, right:80 },
           children: [new Paragraph({
             children: [new TextRun({ text: h, bold: true, size: 18, color: '000000', font: 'Times New Roman' })],
             alignment: AlignmentType.CENTER,
@@ -37169,34 +37490,60 @@ function buildReport(data) {
 
     units.forEach(u => {
       const uResRows = allResRows.filter(r => r._unitId === u.id);
-      if (uResRows.length === 0) return;
 
-      // Unit name group-header row (spans full width via shading, no merge needed)
+      // Unit group header row — merged across ALL columns
       allTableRows.push(new TableRow({
-        children: COLS_RK.map((w, ci) => new TableCell({
-          width: { size: w, type: WidthType.DXA },
-          shading: { type: ShadingType.CLEAR, fill: 'F2F2F2' },
-          borders: { top:{style:BorderStyle.SINGLE,size:4,color:'888888'}, bottom:{style:BorderStyle.SINGLE,size:4,color:'888888'}, left:{style:BorderStyle.SINGLE,size:2,color:'888888'}, right:{style:BorderStyle.SINGLE,size:2,color:'888888'} },
-          margins: { top:60, bottom:60, left:120, right:80 },
-          children: [new Paragraph({
-            children: [new TextRun({ text: ci === 0 ? u.label : '', bold: true, size: 18, color: '000000', font: 'Times New Roman' })],
-            alignment: AlignmentType.LEFT,
-          })],
-        })),
+        children: [
+          new TableCell({
+            width: { size: COLS_RK.reduce((a,b)=>a+b,0), type: WidthType.DXA },
+            columnSpan: COLS_RK.length,
+            shading: { type: ShadingType.CLEAR, fill: 'E0E0E0' },
+            borders: {
+              top:   { style: BorderStyle.SINGLE, size: 6, color: '333333' },
+              bottom:{ style: BorderStyle.SINGLE, size: 6, color: '333333' },
+              left:  { style: BorderStyle.SINGLE, size: 2, color: '555555' },
+              right: { style: BorderStyle.SINGLE, size: 2, color: '555555' },
+            },
+            margins: { top: 70, bottom: 70, left: 140, right: 100 },
+            children: [new Paragraph({
+              children: [new TextRun({ text: u.label, bold: true, size: 20, color: '000000', font: 'Times New Roman' })],
+              alignment: AlignmentType.LEFT,
+            })],
+          }),
+        ],
       }));
 
-      // Data rows for this unit
+      // Data rows — if no params, show info row
+      if (uResRows.length === 0) {
+        allTableRows.push(new TableRow({
+          children: COLS_RK.map((w, ci) => new TableCell({
+            width: { size: w, type: WidthType.DXA },
+            shading: { type: ShadingType.CLEAR, fill: 'FAFAFA' },
+            borders: { top:{style:BorderStyle.SINGLE,size:2,color:'CCCCCC'}, bottom:{style:BorderStyle.SINGLE,size:2,color:'CCCCCC'}, left:{style:BorderStyle.SINGLE,size:2,color:'CCCCCC'}, right:{style:BorderStyle.SINGLE,size:2,color:'CCCCCC'} },
+            margins: { top:50, bottom:50, left:80, right:80 },
+            children: [new Paragraph({
+              children: [new TextRun({ text: ci===0 ? '    (Tidak ada parameter kriteria yang diperiksa)' : '', size: 17, color: '888888', italics: true, font: 'Times New Roman' })],
+              alignment: AlignmentType.LEFT,
+            })],
+          })),
+        }));
+      }
       uResRows.forEach(r => {
-        const statusIcon  = r.status === 'pass' ? '✓ Sesuai' : r.status === 'fail' ? '✗ Tidak Sesuai' : '⚠ Cek Manual';
-        const statusColor = r.status === 'pass' ? '1A6B1A' : r.status === 'fail' ? 'B30000' : '7A5C00';
-        const nilaiStr    = (r.nilai !== null && r.nilai !== undefined && !isNaN(r.nilai)) ? fmtS(r.nilai, r.dec||3) : '—';
+        const statusIcon  = r.status === 'pass' ? '✓ Sesuai'
+                          : r.status === 'fail' ? '✗ Tidak Sesuai'
+                          : '⚠ Cek Manual';
+        const statusColor = r.status === 'pass' ? '1A6B1A'
+                          : r.status === 'fail' ? 'B30000'
+                          : '7A5C00';
+        const nilaiStr = (r.nilai !== null && r.nilai !== undefined && !isNaN(r.nilai))
+          ? fmtS(r.nilai, r.dec||3) : '—';
         allTableRows.push(new TableRow({
           children: [
-            { text: '    ' + r.param, font: 'Times New Roman', align: AlignmentType.LEFT,   color: '000000', bold: false },
-            { text: r.satuan,          font: 'Times New Roman', align: AlignmentType.CENTER, color: '000000', bold: false },
-            { text: nilaiStr,          font: 'Courier New',     align: AlignmentType.CENTER, color: '000000', bold: true  },
-            { text: r.kriteria,        font: 'Times New Roman', align: AlignmentType.CENTER, color: '000000', bold: false },
-            { text: statusIcon,        font: 'Times New Roman', align: AlignmentType.CENTER, color: statusColor, bold: true },
+            { text: '    ' + r.param, font:'Times New Roman', align:AlignmentType.LEFT,   color:'000000', bold:false },
+            { text: r.satuan,         font:'Times New Roman', align:AlignmentType.CENTER, color:'000000', bold:false },
+            { text: nilaiStr,         font:'Courier New',     align:AlignmentType.CENTER, color:'000000', bold:true  },
+            { text: r.kriteria,       font:'Times New Roman', align:AlignmentType.CENTER, color:'000000', bold:false },
+            { text: statusIcon,       font:'Times New Roman', align:AlignmentType.CENTER, color:statusColor, bold:true },
           ].map((cell, ci) => new TableCell({
             width: { size: COLS_RK[ci], type: WidthType.DXA },
             shading: { type: ShadingType.CLEAR, fill: 'FFFFFF' },
@@ -37212,15 +37559,123 @@ function buildReport(data) {
     });
 
     children.push(new Table({
-      width: { size: 9560, type: WidthType.DXA },
+      width: { size: 9760, type: WidthType.DXA },
       columnWidths: COLS_RK,
       rows: allTableRows,
     }));
     children.push(gap(120));
   }
 
-  // ── SUMMARY ──
-  children.push(h2('7.  Ringkasan Hasil Verifikasi'));
+  // ── 3.2 Rekapitulasi Dimensi ──
+  children.push(h2sub('3.2  Rekapitulasi Dimensi Seluruh Unit Proses'));
+  children.push(gap(60));
+
+  {
+    const COLS_DIM = [2200, 1500, 2400, 1830, 1830];
+    const HDR_DIM  = ['Unit Proses', 'Bentuk', 'Dimensi', 'Volume (m³)', 'Luas (m²)'];
+
+    const headerRow = new TableRow({
+      tableHeader: true,
+      children: HDR_DIM.map((h, ci) => new TableCell({
+        width: { size: COLS_DIM[ci], type: WidthType.DXA },
+        shading: { type: ShadingType.CLEAR, fill: 'D0D0D0' },
+        borders: { top:{style:BorderStyle.SINGLE,size:6,color:'333333'}, bottom:{style:BorderStyle.SINGLE,size:6,color:'333333'}, left:{style:BorderStyle.SINGLE,size:2,color:'555555'}, right:{style:BorderStyle.SINGLE,size:2,color:'555555'} },
+        margins: { top:70, bottom:70, left:100, right:80 },
+        children: [new Paragraph({
+          children: [new TextRun({ text: h, bold: true, size: 18, color: '000000', font: 'Times New Roman' })],
+          alignment: AlignmentType.CENTER,
+        })],
+      })),
+    });
+
+    const dimRows = units.map(u => {
+      const vol  = u.vol;
+      const area = u.area;
+
+
+      // Dimension string — use actual dims from data
+      const bentukStr = u.shape === 'kotak' ? 'Persegi Panjang' : 'Tabung/Dome';
+      let dimStr = '—';
+      if (u.shape === 'kotak') {
+        const P = u.dims?.P, L = u.dims?.L, T = u.dims?.T;
+        if (!isNaN(P) && !isNaN(L) && !isNaN(T))
+          dimStr = `P=${fmtS(P,2)} m\nL=${fmtS(L,2)} m\nT=${fmtS(T,2)} m`;
+      } else {
+        const D = u.dims?.D, T = u.dims?.T;
+        if (!isNaN(D) && !isNaN(T))
+          dimStr = `D=${fmtS(D,2)} m\nT=${fmtS(T,2)} m`;
+      }
+      const volStr  = (!isNaN(vol) && vol != null) ? fmtS(vol,3) : '—';
+      const areaStr = (!isNaN(area) && area != null) ? fmtS(area,3) : '—';
+
+      // Build multi-line dimension cell
+      const dimLines = dimStr.split('\n');
+      const dimParagraphs = dimLines.map(line => new Paragraph({
+        children: [new TextRun({ text: line, font: 'Courier New', size: 17, color: '000000' })],
+        alignment: AlignmentType.LEFT,
+        spacing: { before: 0, after: 0 },
+      }));
+
+      const cells = [
+        { text: u.label,  font:'Times New Roman', align:AlignmentType.LEFT,  bold:true, paragraphs: null },
+        { text: bentukStr,font:'Times New Roman', align:AlignmentType.CENTER,bold:false, paragraphs: null },
+        { text: '',       font:'Courier New',     align:AlignmentType.LEFT,  bold:false, paragraphs: dimParagraphs },
+        { text: volStr,   font:'Courier New',     align:AlignmentType.CENTER,bold:true,  paragraphs: null },
+        { text: areaStr,  font:'Courier New',     align:AlignmentType.CENTER,bold:false, paragraphs: null },
+      ];
+
+      return new TableRow({
+        children: cells.map((cell, ci) => new TableCell({
+          width: { size: COLS_DIM[ci], type: WidthType.DXA },
+          shading: { type: ShadingType.CLEAR, fill: 'FFFFFF' },
+          borders: { top:{style:BorderStyle.SINGLE,size:2,color:'CCCCCC'}, bottom:{style:BorderStyle.SINGLE,size:2,color:'CCCCCC'}, left:{style:BorderStyle.SINGLE,size:2,color:'CCCCCC'}, right:{style:BorderStyle.SINGLE,size:2,color:'CCCCCC'} },
+          margins: { top:50, bottom:50, left:80, right:80 },
+          children: cell.paragraphs || [new Paragraph({
+            children: [new TextRun({ text: cell.text, bold: cell.bold, size: 18, color: '000000', font: cell.font })],
+            alignment: cell.align,
+          })],
+        })),
+      });
+    });
+
+    // Total volume row
+    const totalVol = units.reduce((acc, u) => {
+      const v = u.vol;
+      return (v != null && !isNaN(v)) ? acc + v : acc;
+    }, 0);
+    const totalArea = units.reduce((acc, u) => {
+      const a = u.area;
+      return (a != null && !isNaN(a)) ? acc + a : acc;
+    }, 0);
+    const totalRow = new TableRow({
+      children: [
+        { text: 'TOTAL', bold: true },
+        { text: '', bold: false },
+        { text: '', bold: false },
+        { text: fmtS(totalVol, 3), bold: true },
+        { text: fmtS(totalArea, 3), bold: false },
+      ].map((cell, ci) => new TableCell({
+        width: { size: COLS_DIM[ci], type: WidthType.DXA },
+        shading: { type: ShadingType.CLEAR, fill: 'EEEEEE' },
+        borders: { top:{style:BorderStyle.SINGLE,size:4,color:'444444'}, bottom:{style:BorderStyle.SINGLE,size:4,color:'444444'}, left:{style:BorderStyle.SINGLE,size:2,color:'666666'}, right:{style:BorderStyle.SINGLE,size:2,color:'666666'} },
+        margins: { top:60, bottom:60, left:80, right:80 },
+        children: [new Paragraph({
+          children: [new TextRun({ text: cell.text, bold: cell.bold, size: 18, color: '000000', font: cell.bold && ci>=3 ? 'Courier New' : 'Times New Roman' })],
+          alignment: ci === 0 ? AlignmentType.LEFT : AlignmentType.CENTER,
+        })],
+      })),
+    });
+
+    children.push(new Table({
+      width: { size: 9760, type: WidthType.DXA },
+      columnWidths: COLS_DIM,
+      rows: [headerRow, ...dimRows, totalRow],
+    }));
+    children.push(gap(120));
+  }
+
+  // ── BAB 4: RINGKASAN ──
+  children.push(h2('BAB 4.  Ringkasan Hasil Verifikasi'));
   children.push(gap(80));
 
   const passN  = allResRows.filter(r=>r.status==='pass').length;
@@ -37228,42 +37683,106 @@ function buildReport(data) {
   const naN    = allResRows.filter(r=>r.status==='na').length;
   const totalN = passN + failN;
 
-  const sumRows = [
-    ['Keterangan', 'Jumlah', 'Parameter'],
-    [`✓  Parameter Sesuai Kriteria`, String(passN), C.passText, C.passBg],
-    [`✗  Parameter Tidak Sesuai Kriteria`, String(failN), C.failText, C.failBg],
-    [`⚠  Parameter Perlu Cek Manual`, String(naN), C.warnText, C.warnBg],
-    [`Total Unit Proses Diverifikasi`, String(units.length), C.navy, C.light],
-  ];
+  // Narrative
+  let narasiRingkasan = '';
+  if (failN === 0 && passN > 0) {
+    narasiRingkasan = `Berdasarkan hasil verifikasi terhadap ${totalN} parameter desain dari ${units.length} unit proses yang diperiksa, seluruh parameter telah memenuhi kriteria teknis yang ditetapkan dalam Lampiran III Peraturan Menteri Lingkungan Hidup dan Kehutanan Nomor 11 Tahun 2025. Dengan demikian, desain IPAL ini dinilai layak secara teknis sesuai regulasi yang berlaku.`;
+  } else if (failN > 0) {
+    narasiRingkasan = `Berdasarkan hasil verifikasi, sebanyak ${passN} dari ${totalN} parameter desain telah memenuhi kriteria teknis Lampiran III Permen LH/BPLH No. 11 Tahun 2025, sedangkan ${failN} parameter belum memenuhi persyaratan yang ditetapkan. Parameter yang tidak memenuhi kriteria perlu ditinjau ulang sebelum dokumen ini digunakan sebagai acuan teknis.`;
+  }
+  if (narasiRingkasan) {
+    children.push(new Paragraph({
+      children: [new TextRun({ text: narasiRingkasan, font: 'Times New Roman', size: 20, color: '000000' })],
+      alignment: AlignmentType.JUSTIFIED,
+      spacing: { before: 0, after: 120 },
+    }));
+  }
 
+  const sumRows = [
+    ['Keterangan', 'Jumlah'],
+    ['✓  Parameter Sesuai Kriteria', String(passN)],
+    ['✗  Parameter Tidak Sesuai Kriteria', String(failN)],
+    ['⚠  Parameter Perlu Cek Manual', String(naN)],
+    ['Σ  Total Parameter Diperiksa', String(totalN)],
+    ['Unit Proses Diverifikasi', String(units.length) + ' unit'],
+  ];
   children.push(new Table({
-    width: { size: 9360, type: WidthType.DXA },
-    columnWidths: [5760, 1800, 1800],
+    width: { size: 7200, type: WidthType.DXA },
+    columnWidths: [5400, 1800],
     rows: sumRows.map((r, ri) => new TableRow({
       tableHeader: ri===0,
-      children: (ri===0 ? r : [r[0], r[1], 'parameter']).map((cell, ci) => new TableCell({
-        width: { size: ci===0?5760:1800, type: WidthType.DXA },
-        shading: { type: ShadingType.CLEAR, fill: 'FFFFFF' },
-        borders: { top:{style:BorderStyle.SINGLE,size:2,color:C.borderLight}, bottom:{style:BorderStyle.SINGLE,size:2,color:C.borderLight}, left:{style:BorderStyle.SINGLE,size:2,color:C.borderLight}, right:{style:BorderStyle.SINGLE,size:2,color:C.borderLight} },
+      children: r.map((cell, ci) => new TableCell({
+        width: { size: ci===0?5400:1800, type: WidthType.DXA },
+        shading: { type: ShadingType.CLEAR, fill: ri===0?'D0D0D0':'FFFFFF' },
+        borders: { top:{style:BorderStyle.SINGLE,size:2,color:'999999'}, bottom:{style:BorderStyle.SINGLE,size:2,color:'999999'}, left:{style:BorderStyle.SINGLE,size:2,color:'999999'}, right:{style:BorderStyle.SINGLE,size:2,color:'999999'} },
         margins: { top:60, bottom:60, left:120, right:100 },
         children: [new Paragraph({
-          children: [new TextRun({ text:String(cell), bold:ri===0||ci<2, size:ri===0?18:ci===1?22:18, color:'000000', font:ci===1&&ri>0?'Courier New':'Times New Roman' })],
+          children: [new TextRun({ text: cell, bold: ri===0||ci===1, size: ri===0?18:ci===1?22:19, color:'000000', font: ci===1&&ri>0?'Courier New':'Times New Roman' })],
           alignment: ci>0 ? AlignmentType.CENTER : AlignmentType.LEFT,
         })],
       })),
     })),
   }));
+  children.push(gap(160));
+  children.push(new Paragraph({
+    children: [
+      new TextRun({ text: 'Catatan: ', bold: true, size: 17, color: '555555', font: 'Times New Roman' }),
+      new TextRun({ text: 'Dokumen ini digenerate otomatis oleh IPAL Checker. Semua perhitungan mengacu pada Lampiran III Permen LH/BPLH No. 11 Tahun 2025. Gunakan sebagai pendamping, bukan pengganti kajian teknis resmi.', size: 17, color: '555555', font: 'Times New Roman' }),
+    ],
+    spacing: { before: 0, after: 80 },
+  }));
 
-  children.push(gap(120));
-  children.push(p([tx('Catatan: ', {bold:true, size:17, color:C.mutedText}), tx('Dokumen ini digenerate otomatis oleh IPAL Checker. Semua perhitungan mengacu pada Lampiran III Permen LH/BPLH No. 11 Tahun 2025. Gunakan sebagai pendamping, bukan pengganti kajian teknis resmi.', {size:17, color:C.mutedText})]));
+  // ─────────────────────────────────────────────────────────────────────────
+  // SECTION D: LANDSCAPE — Removal Recap (BAB 5)
+  // ─────────────────────────────────────────────────────────────────────────
+  const rg = data.removalGasData;
+  const landscapeChildren  = [];
+  const portraitChildren2  = [];
+  const sludgeGasChildren  = [];
 
+  if (rg) {
+    landscapeChildren.push(h2('BAB 5.  Timbulan & Efisiensi Removal'));
+    landscapeChildren.push(gap(60));
+    landscapeChildren.push(p([tx('Peruntukan: ', {bold:true, size:18}), tx(rg.bm ? rg.bm.label : '—', {size:18})]));
+    landscapeChildren.push(gap(60));
+    landscapeChildren.push(buildRemovalRecapTable(rg));
+    landscapeChildren.push(gap(100));
+    landscapeChildren.push(p([
+      tx('Catatan: ', {bold:true, size:16, color:C.mutedText}),
+      tx('Nilai % Removal merupakan rentang tipikal dari literatur (Metcalf & Eddy; Tchobanoglous et al.; Chernicharo; von Sperling; Said & Yudo; Kadlec & Wallace; Judd & Judd; Sasse; Ødegaard; Mara; Qasim). Nilai aktual bergantung pada kondisi operasional, suhu, dan kualitas air baku.', {size:16, color:C.mutedText}),
+    ]));
+
+    portraitChildren2.push(h2('BAB 6.  Perhitungan Estimasi Outlet Tiap Parameter'));
+    portraitChildren2.push(gap(60));
+    portraitChildren2.push(...buildOutletCalcNarrative(rg));
+
+    sludgeGasChildren.push(h2('BAB 7.  Timbulan Lumpur dan Gas'));
+    sludgeGasChildren.push(gap(60));
+    sludgeGasChildren.push(...buildSludgeGasSection(rg));
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // ASSEMBLE DOCUMENT
+  // ─────────────────────────────────────────────────────────────────────────
   return new Document({
     styles: { default: { document: { run: { font:'Times New Roman', size:20 } } } },
     sections: [
+      // Section 1: Cover (portrait)
+      {
+        properties: { page: { margin: { top:1800, bottom:1800, left:1800, right:1440 } } },
+        children: coverChildren,
+      },
+      // Section 2: Daftar Isi (portrait)
+      {
+        properties: { page: { margin: { top:1440, bottom:1440, left:1440, right:1080 } } },
+        children: tocChildren,
+      },
+      // Section 3: Body (portrait) — BAB 1–4
       {
         properties: { page: { margin: { top:1440, bottom:1440, left:1440, right:1080 } } },
         children,
       },
+      // Section 4: Landscape — BAB 5 removal table
       ...(landscapeChildren.length ? [{
         properties: {
           page: {
@@ -37273,6 +37792,7 @@ function buildReport(data) {
         },
         children: landscapeChildren,
       }] : []),
+      // Section 5: Portrait — BAB 6–7
       ...((portraitChildren2.length || sludgeGasChildren.length) ? [{
         properties: { page: { margin: { top:1440, bottom:1440, left:1440, right:1080 } } },
         children: [...portraitChildren2, ...sludgeGasChildren],
@@ -37311,7 +37831,7 @@ function gatherReportData() {
       const el = document.getElementById(`u${u.id}_${p}`);
       if (el) params[p] = el.tagName === 'SELECT' ? el.value : parseID(el.value);
     });
-    return { seq: idx+1, type: u.type, label: UL[u.type], shape: u.shape, dims, vol, area, params };
+    return { id: u.id, seq: idx+1, type: u.type, label: UL[u.type] || u.type, shape: u.shape, dims, vol, area, params };
   });
 
   const tgl = new Date().toLocaleDateString('id-ID', {day:'2-digit', month:'long', year:'numeric'});
@@ -37364,7 +37884,7 @@ async function exportWord() {
 // removalOverrides[uid][param] = pct (0–100, integer)
 let removalOverrides = {};
 // influent manual overrides for params not in main form
-let removalInfluent = { TSS:'', FC:'10000', Klorin:'0' };
+let removalInfluent = { TSS:'', NH3:'', Deterjen:'', MinyakLemak:'', FC:'10000', Klorin:'0' };
 // klorinDoseOverrides[uid] = dose (mg/L), for units with klorin_add_presets (e.g. disinfeksi)
 let klorinDoseOverrides = {};
 
