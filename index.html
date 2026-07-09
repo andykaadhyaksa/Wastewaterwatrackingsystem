@@ -685,6 +685,10 @@ footer{text-align:center;padding:26px 20px;font-size:.72rem;color:var(--faint);b
     <div class="topbar">
       <div class="topbar-tabs" id="ipalTabs"></div>
       <div class="topbar-actions">
+        <span id="autosaveIndicator" style="display:none;align-items:center;gap:5px;font-size:0.72rem;color:var(--muted);margin-right:4px;white-space:nowrap;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <span id="autosaveIndicatorText">Tersimpan otomatis</span>
+        </span>
         <button class="btn-tool" onclick="saveFile()" title="Simpan semua IPAL ke file .ipal">
           <svg viewBox="0 0 24 24"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
           Simpan File
@@ -838,7 +842,7 @@ footer{text-align:center;padding:26px 20px;font-size:.72rem;color:var(--faint);b
                 <div class="es"><div class="ei">🏗️</div><p>Belum ada unit proses.<br>Tambahkan dari pilihan di bawah.</p></div>
               </div>
               <div class="add-area">
-                <select class="add-sel" id="newUT">
+                <select class="add-sel" id="newUT" onchange="toggleCustomUTName()">
                   <option value="">— Pilih unit proses yang akan ditambahkan —</option>
                   <optgroup label="── Pre-Treatment ──">
                     <option value="grease_trap">Grease Trap</option>
@@ -882,7 +886,11 @@ footer{text-align:center;padding:26px 20px;font-size:.72rem;color:var(--faint);b
                   <optgroup label="── Desinfeksi ──">
                     <option value="disinfeksi">Unit Desinfeksi</option>
                   </optgroup>
+                  <optgroup label="── Lainnya ──">
+                    <option value="custom">✏️ Input Manual / Unit Lainnya</option>
+                  </optgroup>
                 </select>
+                <input type="text" class="add-sel" id="newUTCustomName" placeholder="Nama unit proses (mis. Bar Screen, Sumur Pengumpul, dll.)" style="display:none;margin-top:8px;">
                 <button class="btn-add" onclick="addUnit();updateSummary()">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>Tambah Unit
                 </button>
@@ -2327,7 +2335,7 @@ function gatherRemovalGasData() {
   let totalGas = 0;
   units.forEach((u, i) => {
     const meta = SLUDGE_GAS_META[u.type] || { basis:null, gas:false };
-    const label = UL[u.type] || u.type;
+    const label = getUnitLabel(u);
     if(meta.basis) {
       const basisEntry = trace[i][meta.basis];
       const effPct = basisEntry.pct;
@@ -2369,6 +2377,11 @@ function gatherRemovalGasData() {
 function renderRemovalRecap() {
   const el = document.getElementById('removalRecapWrap');
   if(!el) return;
+  // Preserve horizontal/vertical scroll position of the recap table so that
+  // typing/selecting a value doesn't jump the view back to the left/top.
+  const wrapEl = el.querySelector('.removal-recap-wrap');
+  const prevScrollLeft = wrapEl ? wrapEl.scrollLeft : (el.scrollLeft || 0);
+  const prevScrollTop  = wrapEl ? wrapEl.scrollTop  : (el.scrollTop  || 0);
   const ipal = getActiveIpal();
   if(!ipal || !ipal.units.length) {
     el.innerHTML = '<div class="es"><div class="ei">📊</div><p>Tambahkan unit proses IPAL pada Dashboard terlebih dahulu.</p></div>';
@@ -2535,7 +2548,7 @@ function renderRemovalRecap() {
       <th rowspan="2" data-col="2">Unit</th>
       <th rowspan="2" class="rem-inf-hd" data-col="3">INFLUENT</th>`;
   units.forEach((u, ui) => {
-    thead += `<th colspan="2" class="unit-hd" data-col="${4+ui*2}" style="min-width:180px;">${UL[u.type]||u.type}</th>`;
+    thead += `<th colspan="2" class="unit-hd" data-col="${4+ui*2}" style="min-width:180px;">${getUnitLabel(u)}</th>`;
   });
   thead += `<th rowspan="2" class="outlet-hd" data-col="${4+nUnits*2}">OUTLET<br>IPAL</th>`;
   if(bm || CUSTOM_PARAMS.length) thead += `<th rowspan="2" class="bm-hd" data-col="${5+nUnits*2}">BMAL</th>`;
@@ -2733,6 +2746,17 @@ function renderRemovalRecap() {
       ${refText}<br>
       ⚠ Nilai % Removal merupakan rentang tipikal dari literatur. Nilai aktual bergantung pada kondisi operasional, suhu, dan kualitas air.
     </div>`;
+
+  // Restore scroll position after rebuilding the table so the view doesn't
+  // jump back to the left/top when the user is typing an input value.
+  const newWrapEl = el.querySelector('.removal-recap-wrap');
+  if(newWrapEl) {
+    newWrapEl.scrollLeft = prevScrollLeft;
+    newWrapEl.scrollTop  = prevScrollTop;
+  } else {
+    el.scrollLeft = prevScrollLeft;
+    el.scrollTop  = prevScrollTop;
+  }
 }
 
 function refreshAllRemoval() {
@@ -2878,7 +2902,7 @@ function renderSludgeGasPage() {
   let anySludge = false;
   units.forEach((u, i) => {
     const meta = SLUDGE_GAS_META[u.type] || { basis:null, gas:false };
-    const label = UL[u.type] || u.type;
+    const label = getUnitLabel(u);
     if(!meta.basis) {
       sludgeRows += `<tr>
         <td>${i+1}</td><td>${label}</td>
@@ -2917,7 +2941,7 @@ function renderSludgeGasPage() {
   let anyGas = false;
   units.forEach((u, i) => {
     const meta = SLUDGE_GAS_META[u.type] || { basis:null, gas:false };
-    const label = UL[u.type] || u.type;
+    const label = getUnitLabel(u);
     if(!meta.gas) return;
     anyGas = true;
     const codEntry = trace[i].COD;
@@ -3118,7 +3142,14 @@ const UL={
   filtrasi_lambat:'Filtrasi Lambat (Slow Sand Filter)',
   filtrasi_cepat:'Filtrasi Cepat (Rapid Sand Filter)',
   filtrasi_tekanan:'Filtrasi Bertekanan (Pressure Filter)',
+  custom:'Unit Proses Lainnya (Input Manual)',
 };
+// Returns display label for a unit, using its custom name if type==='custom'
+function getUnitLabel(u){
+  if(!u) return '';
+  if(u.type==='custom') return u.customName || 'Unit Proses Lainnya (Input Manual)';
+  return UL[u.type] || u.type;
+}
 
 // ── KRITERIA ───────────────────────────────────────
 const KR={
@@ -3591,14 +3622,31 @@ function captureAllIpalStates(){
   // the last time switchIpal() was called, so no further DOM read needed.
 }
 
+function toggleCustomUTName(){
+  const sel = document.getElementById('newUT');
+  const nameEl = document.getElementById('newUTCustomName');
+  if(!sel||!nameEl) return;
+  nameEl.style.display = sel.value==='custom' ? 'block' : 'none';
+  if(sel.value!=='custom') nameEl.value='';
+}
 function addUnit(){
   const ipal = getActiveIpal(); if(!ipal) return;
   const sel = document.getElementById('newUT');
   const t = sel.value; if(!t){alert('Pilih unit proses.');return;}
+  let customName='';
+  if(t==='custom'){
+    const nameEl = document.getElementById('newUTCustomName');
+    customName = (nameEl?.value||'').trim();
+    if(!customName){alert('Isi nama unit proses terlebih dahulu.');return;}
+  }
   captureUnitInputs();
   ipal.uc = (ipal.uc||0)+1;
-  ipal.units.push({id: ipal.uc, type:t, shape:'kotak'});
+  const unit = {id: ipal.uc, type:t, shape:'kotak'};
+  if(t==='custom') unit.customName = customName;
+  ipal.units.push(unit);
   sel.value='';
+  const nameEl = document.getElementById('newUTCustomName');
+  if(nameEl){nameEl.value='';nameEl.style.display='none';}
   renderUnits();
 }
 function removeUnit(id){
@@ -3642,8 +3690,8 @@ function buildCard(u,seq){
   return `<div class="unit-card" id="card_${u.id}">
   <div class="uc-hd">
     <div class="u-seq">${seq}</div>
-    <div class="u-name">${UL[u.type]}</div>
-    <div class="u-tag">${u.type.replace(/_/g,' ')}</div>
+    <div class="u-name">${getUnitLabel(u)}</div>
+    <div class="u-tag">${u.type==='custom'?'input manual':u.type.replace(/_/g,' ')}</div>
     <button class="u-del" onclick="removeUnit(${u.id})">✕</button>
   </div>
   <div class="uc-body">
@@ -3859,7 +3907,7 @@ function runCheck(){
     const us=uf>0?'fail':up>0?'pass':'na';
     const ub=uf>0?`${uf} Tdk Sesuai`:up>0?`${up} Sesuai`:'Perlu Input';
     html+=`<div class="res-unit">
-  <div class="r-hd"><div class="r-seq">${idx+1}</div>${UL[u.type]}<span class="r-badge ${us}">${ub}</span></div>
+  <div class="r-hd"><div class="r-seq">${idx+1}</div>${getUnitLabel(u)}<span class="r-badge ${us}">${ub}</span></div>
   <div class="dim-bar">${dimInfo} &nbsp;|&nbsp; Vol = <strong>${vol!==null?fmtS(vol,3)+' m³':'—'}</strong></div>
   <table class="rt"><thead><tr><th>Parameter</th><th>Nilai Desain (Auto)</th><th>Kriteria Permen LH 11/2025</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table>
 </div>`;
@@ -3881,7 +3929,7 @@ function saveFile(){
   // Flush ALL current DOM inputs into ipals[] before serialising
   captureAllIpalStates();
   const payload = {
-    version: '1.1',
+    version: '1.2',
     saved: new Date().toISOString(),
     ipals: JSON.parse(JSON.stringify(ipals)),
     activeIpalId,
@@ -3890,6 +3938,9 @@ function saveFile(){
     klorinDoseOverrides: JSON.parse(JSON.stringify(klorinDoseOverrides)),
     removalCustomParams: JSON.parse(JSON.stringify(removalCustomParams)),
     paRows: JSON.parse(JSON.stringify(paRows)),
+    sludgeCaptureOverrides: JSON.parse(JSON.stringify(sludgeCaptureOverrides)),
+    fluktHiddenLines: JSON.parse(JSON.stringify(fluktHiddenLines)),
+    fluktActiveIpalId,
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
   const url  = URL.createObjectURL(blob);
@@ -3939,6 +3990,15 @@ function openFile(){
         if(data.paRows && Array.isArray(data.paRows)){
           paRows = data.paRows;
           paRowCounter = Math.max(0, ...paRows.map(r=>r.id));
+        }
+        if(data.sludgeCaptureOverrides) {
+          sludgeCaptureOverrides = data.sludgeCaptureOverrides;
+        }
+        if(data.fluktHiddenLines) {
+          fluktHiddenLines = data.fluktHiddenLines;
+        }
+        if(data.fluktActiveIpalId !== undefined) {
+          fluktActiveIpalId = data.fluktActiveIpalId;
         }
         renderIpalTabs();
         loadActiveIpalState();
@@ -4567,10 +4627,20 @@ function scheduleAutosave(){
 function doAutosave(){
   try{
     saveActiveIpalState();
-    const payload = { version:'1.1', saved:new Date().toISOString(), ipals, activeIpalId,
-      removalInfluent, removalOverrides, klorinDoseOverrides, paRows };
+    const payload = { version:'1.2', saved:new Date().toISOString(), ipals, activeIpalId,
+      removalInfluent, removalOverrides, klorinDoseOverrides, removalCustomParams, paRows,
+      sludgeCaptureOverrides, fluktHiddenLines, fluktActiveIpalId };
     localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(payload));
+    showAutosaveIndicator();
   }catch(e){ /* storage may be unavailable; fail silently */ }
+}
+let _autosaveIndicatorTimer = null;
+function showAutosaveIndicator(){
+  const el = document.getElementById('autosaveIndicator');
+  if(!el) return;
+  el.style.display = 'inline-flex';
+  if(_autosaveIndicatorTimer) clearTimeout(_autosaveIndicatorTimer);
+  _autosaveIndicatorTimer = setTimeout(()=>{ el.style.display = 'none'; }, 1800);
 }
 function tryRestoreAutosave(){
   let raw;
@@ -4592,21 +4662,50 @@ function tryRestoreAutosave(){
     if(data.removalInfluent)     Object.assign(removalInfluent,     data.removalInfluent);
     if(data.removalOverrides)    Object.assign(removalOverrides,     data.removalOverrides);
     if(data.klorinDoseOverrides) Object.assign(klorinDoseOverrides,  data.klorinDoseOverrides);
+    if(data.removalCustomParams && Array.isArray(data.removalCustomParams)) {
+      removalCustomParams = data.removalCustomParams;
+      removalCustomCounter = removalCustomParams.reduce((mx,c) => {
+        const m = /^custom_(\d+)$/.exec(c.key||'');
+        return m ? Math.max(mx, parseInt(m[1],10)) : mx;
+      }, 0);
+    }
     if(data.paRows && Array.isArray(data.paRows)){
       paRows = data.paRows;
       paRowCounter = Math.max(0, ...paRows.map(r=>r.id));
     }
+    if(data.sludgeCaptureOverrides) sludgeCaptureOverrides = data.sludgeCaptureOverrides;
+    if(data.fluktHiddenLines) fluktHiddenLines = data.fluktHiddenLines;
+    if(data.fluktActiveIpalId !== undefined) fluktActiveIpalId = data.fluktActiveIpalId;
     renderIpalTabs();
     loadActiveIpalState();
     restoreUnitDims();
     updateSummary();
+    setTimeout(()=>{
+      const el = document.getElementById('autosaveIndicatorText');
+      const wrap = document.getElementById('autosaveIndicator');
+      if(el && wrap){
+        el.textContent = 'Data sebelumnya dipulihkan';
+        wrap.style.display = 'inline-flex';
+        setTimeout(()=>{ wrap.style.display = 'none'; el.textContent = 'Tersimpan otomatis'; }, 3200);
+      }
+    }, 300);
     return true;
   }catch(e){ return false; /* corrupted autosave; ignore */ }
 }
 // Debounced autosave on any input/change anywhere in the app
 document.addEventListener('input', scheduleAutosave, true);
 document.addEventListener('change', scheduleAutosave, true);
-window.addEventListener('beforeunload', doAutosave);
+window.addEventListener('beforeunload', (e)=>{
+  doAutosave();
+  // Show the browser's native "leave site?" confirmation as an extra safety
+  // net. Data itself is already safe via autosave, but this gives the user
+  // a chance to cancel an accidental refresh/close.
+  if(ipals && ipals.length){
+    e.preventDefault();
+    e.returnValue = '';
+    return '';
+  }
+});
 
 // ── INIT ───────────────────────────────────────────
 function init(){
@@ -38553,7 +38652,7 @@ function buildRemovalRecapTable(rg) {
       shading: { type: ShadingType.CLEAR, fill:'D9D9D9' },
       borders: { top:{style:BorderStyle.SINGLE,size:2,color:C.borderLight}, bottom:{style:BorderStyle.SINGLE,size:2,color:C.borderLight}, left:{style:BorderStyle.SINGLE,size:2,color:C.borderLight}, right:{style:BorderStyle.SINGLE,size:2,color:C.borderLight} },
       margins: { top:50, bottom:50, left:70, right:60 },
-      children: [new Paragraph({ children:[new TextRun({ text: UL[u.type]||u.type, bold:true, size:15, color:'000000' })], alignment: AlignmentType.CENTER })],
+      children: [new Paragraph({ children:[new TextRun({ text: getUnitLabel(u), bold:true, size:15, color:'000000' })], alignment: AlignmentType.CENTER })],
     }));
   });
   hdrRow1Cells.push(cell('Outlet IPAL', { width:outletColW, bold:true, align:AlignmentType.CENTER, vAlign:VerticalAlign.CENTER, fill:'D9D9D9', size:15, rowSpan:2 }));
@@ -38680,7 +38779,7 @@ function buildOutletCalcNarrative(rg) {
     }
     if(param.key === 'pH') {
       elems.push(new Paragraph({
-        children: [tx('• ', {bold:true, size:19}), tx(`${units[0]?UL[units[0].type]:'Unit pertama'} — ${units[units.length-1]?UL[units[units.length-1].type]:'Unit terakhir'} (Outlet)`, {italic:true, size:19})],
+        children: [tx('• ', {bold:true, size:19}), tx(`${units[0]?getUnitLabel(units[0]):'Unit pertama'} — ${units[units.length-1]?getUnitLabel(units[units.length-1]):'Unit terakhir'} (Outlet)`, {italic:true, size:19})],
         spacing: { before:40, after:20 }, indent: { left:360 },
       }));
       elems.push(p([tx('Effluen = 6 – 9 (tidak berubah signifikan melalui unit proses non-kimiawi)', {size:19})], {indent:720}));
@@ -38698,7 +38797,7 @@ function buildOutletCalcNarrative(rg) {
       const pct = tEntry.pct;
       const inVal = tEntry.inVal;
       const outVal = tEntry.outVal;
-      const label = UL[u.type] || u.type;
+      const label = getUnitLabel(u);
 
       elems.push(new Paragraph({
         children: [tx('• ', {bold:true, size:19}), tx(label, {italic:true, bold:true, size:19})],
@@ -39460,7 +39559,7 @@ function gatherReportData() {
       const el = document.getElementById(`u${u.id}_${p}`);
       if (el) params[p] = el.tagName === 'SELECT' ? el.value : parseID(el.value);
     });
-    return { id: u.id, seq: idx+1, type: u.type, label: UL[u.type] || u.type, shape: u.shape, dims, vol, area, params };
+    return { id: u.id, seq: idx+1, type: u.type, label: getUnitLabel(u), shape: u.shape, dims, vol, area, params };
   });
 
   const tgl = new Date().toLocaleDateString('id-ID', {day:'2-digit', month:'long', year:'numeric'});
