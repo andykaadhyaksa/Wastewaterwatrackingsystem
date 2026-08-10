@@ -161,6 +161,9 @@ select.rem-sel:focus{outline:none;border-color:#888;}
 
 .dim-row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;}
 .dim-row .fg{flex:1;min-width:78px;}
+.dim-row.dim-extra{margin-top:8px;padding-top:8px;border-top:1px dashed var(--border,#ddd);}
+.sum-vol-table{margin-bottom:10px;}
+.sum-vol-table thead th{font-size:.78rem;}
 .vol-pill{background:var(--active);color:white;border-radius:var(--r-sm);padding:10px 16px;font-size:.8rem;font-weight:600;white-space:nowrap;align-self:flex-end;line-height:1.5;}
 .kl-calc{margin-top:14px;border:1px solid var(--line);border-radius:var(--r);background:var(--bg);padding:16px 18px;}
 .kl-calc-hd{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
@@ -600,6 +603,10 @@ footer{text-align:center;padding:26px 20px;font-size:.72rem;color:var(--faint);b
 .fl-tbl td{border-right:1px solid var(--line-soft);}
 .fl-tbl td:last-child{border-right:none;}
 .fl-tbl .fl-peak{background:#fff8e1;font-weight:700;color:#b45309;}
+.fl-chart-legend{display:flex;flex-wrap:wrap;gap:6px 18px;padding-bottom:10px;font-size:.78rem;color:var(--ink-soft);}
+.fl-chart-legend .fl-cl-item{display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none;}
+.fl-chart-legend .fl-cl-item.fl-cl-off{opacity:.4;text-decoration:line-through;}
+.fl-chart-legend .fl-cl-swatch{display:inline-block;width:18px;height:0;}
 .fl-chart-wrap{background:var(--card);border:1px solid var(--line);border-radius:var(--r-sm);padding:16px;margin-bottom:22px;overflow-x:auto;}
 .fl-chart-wrap canvas{display:block;max-width:100%;}
 .fl-info-box{background:#f0f6ff;border:1px solid #c8d8f0;border-radius:var(--r-sm);padding:12px 16px;font-size:0.78rem;color:var(--ink-soft);margin-bottom:14px;line-height:1.6;}
@@ -700,6 +707,10 @@ footer{text-align:center;padding:26px 20px;font-size:.72rem;color:var(--faint);b
         <button class="btn-tool" onclick="openFile()" title="Buka file .ipal yang tersimpan">
           <svg viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>
           Buka File
+        </button>
+        <button class="btn-tool" onclick="resetApp()" title="Hapus semua data dan mulai dari awal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+          Reset
         </button>
         <div class="export-dd" id="exportDD">
           <button class="btn-export" onclick="toggleExportMenu(event)" id="btnExport">
@@ -3453,10 +3464,12 @@ const KR={
     buang:[
       {p:'bod_loading_vol',l:'BOD Loading Rate (Volumetrik)',u:'kg BOD/m³-media/hari',min:0.5,max:4.0,r:'Said & Yudo 2006'},
       {p:'surface_area',l:'Luas Permukaan Spesifik Media',u:'m²/m³',min:150,max:null,r:'Lampiran III'},
+      {p:'hrt_jam',l:'HRT (Volume Efektif Cairan)',u:'jam',min:4,max:null,r:'Said & Yudo 2006'},
     ],
     manfaat:[
       {p:'bod_loading_vol',l:'BOD Loading Rate (Volumetrik)',u:'kg BOD/m³-media/hari',min:1.5,max:6.0,r:'WEF 2011'},
       {p:'surface_area',l:'Luas Permukaan Spesifik Media',u:'m²/m³',min:150,max:null,r:'Lampiran III'},
+      {p:'hrt_jam',l:'HRT (Volume Efektif Cairan)',u:'jam',min:6,max:null,r:'WEF 2011'},
     ]
   },
   // ── STABILIZATION POND ──────────────────────────────────────
@@ -3572,7 +3585,7 @@ const FIELDS={
   sbr:[{id:'fm',l:'F/M Ratio',u:'kg BOD/kg MLVSS.hari',type:'auto'},{id:'hrt_jam',l:'HRT per siklus',u:'jam',type:'auto'}],
   mbr:[{id:'flux',l:'Flux Membran',u:'liter/m².jam',type:'input',ph:'25'},{id:'hrt_jam',l:'HRT',u:'jam',type:'auto'}],
   mbbr:[{id:'media_vol',l:'Volume Media',u:'m³',type:'input',ph:'1,00',hint:'Volume total media di reaktor'},{id:'bod_loading',l:'BOD Loading Rate',u:'g BOD/m².hari',type:'input',ph:'15'},{id:'nh3_loading',l:'Nitrogen Loading Rate',u:'g NH₃-N/m².hari',type:'input',ph:'0,5'},{id:'media_pct',l:'% Volume Media / Volume Reaktor',u:'%',type:'input',ph:'50',hint:'Maks 70%'}],
-  biofilter:[{id:'bod_loading_vol',l:'BOD Loading Rate',u:'kg BOD/m³-media/hari',type:'auto'},{id:'surface_area',l:'Luas Permukaan Spesifik Media',u:'m²/m³',type:'input',ph:'200',hint:'Min 150 m²/m³'}],
+  biofilter:[{id:'bod_loading_vol',l:'BOD Loading Rate',u:'kg BOD/m³-media/hari',type:'auto'},{id:'surface_area',l:'Luas Permukaan Spesifik Media',u:'m²/m³',type:'input',ph:'200',hint:'Min 150 m²/m³'},{id:'hrt_jam',l:'HRT (Volume Efektif Cairan)',u:'jam',type:'auto'}],
   pond_anaerobic:[{id:'olr',l:'VLR',u:'kg BOD/m³.hari',type:'auto'},{id:'hrt_hari',l:'HRT',u:'hari',type:'auto'},{id:'rasio_pl',l:'Rasio Panjang/Lebar',u:'',type:'input',ph:'2'}],
   pond_facultative:[{id:'slr_surf',l:'Organic Surface Loading Rate',u:'kg BOD/hektar.hari',type:'input',ph:'280'},{id:'hrt_hari',l:'HRT',u:'hari',type:'auto'},{id:'rasio_pl',l:'Rasio Panjang/Lebar',u:'',type:'input',ph:'3'}],
   pond_maturation:[{id:'hrt_hari',l:'HRT',u:'hari',type:'auto'}],
@@ -3606,7 +3619,12 @@ let unitCounter = 0;
 
 function newIpal(name='IPAL 1'){
   ipalCounter++;
-  return {id: ipalCounter, name, tipe:'buang', peruntukan:'', Q:'', qMode:'manual', BOD:'', COD:'', MLVSS:'', peakFF:'1,5', units:[], uc:0};
+  return {id: ipalCounter, name, tipe:'buang', peruntukan:'', Q:'', qMode:'manual', BOD:'', COD:'', MLVSS:'', peakFF:'1,5', units:[], uc:0,
+    // Parameter Influent (Bagian 2) & state Removal Recap — per-IPAL agar TIDAK
+    // hilang/tertukar saat pindah tab IPAL atau saat render ulang panel.
+    removalInfluent: { TSS:'', NH3:'', Deterjen:'', MinyakLemak:'', FC:'10000', Klorin:'0' },
+    removalOverrides: {}, klorinDoseOverrides: {}, disinfeksiSource: {},
+    removalCustomParams: [], removalCustomCounter: 0 };
 }
 
 // ── IPAL MANAGEMENT ────────────────────────────────
@@ -3654,6 +3672,37 @@ function switchIpal(id){
   refreshPenggunaanAirIfVisible();
 }
 
+// Snapshot the current global removal/influent state (which the rest of the
+// app reads/writes via the shared removalInfluent/removalOverrides/etc.
+// variables) back onto the IPAL object that is about to lose focus, so it is
+// never lost or bled into another IPAL's tab.
+function saveActiveIpalRemovalState(){
+  const ipal = getActiveIpal();
+  if(!ipal) return;
+  ipal.removalInfluent       = JSON.parse(JSON.stringify(removalInfluent||{}));
+  ipal.removalOverrides      = JSON.parse(JSON.stringify(removalOverrides||{}));
+  ipal.klorinDoseOverrides   = JSON.parse(JSON.stringify(klorinDoseOverrides||{}));
+  ipal.disinfeksiSource      = JSON.parse(JSON.stringify(disinfeksiSource||{}));
+  ipal.removalCustomParams   = JSON.parse(JSON.stringify(removalCustomParams||[]));
+  ipal.removalCustomCounter  = removalCustomCounter||0;
+}
+
+// Restore the removal/influent state for the IPAL that is becoming active
+// into the shared globals, so every existing function that reads
+// removalInfluent/removalOverrides/etc. keeps working unchanged.
+function loadActiveIpalRemovalState(){
+  const ipal = getActiveIpal();
+  if(!ipal) return;
+  removalInfluent = ipal.removalInfluent
+    ? JSON.parse(JSON.stringify(ipal.removalInfluent))
+    : { TSS:'', NH3:'', Deterjen:'', MinyakLemak:'', FC:'10000', Klorin:'0' };
+  removalOverrides     = ipal.removalOverrides    ? JSON.parse(JSON.stringify(ipal.removalOverrides))    : {};
+  klorinDoseOverrides  = ipal.klorinDoseOverrides ? JSON.parse(JSON.stringify(ipal.klorinDoseOverrides)) : {};
+  disinfeksiSource     = ipal.disinfeksiSource    ? JSON.parse(JSON.stringify(ipal.disinfeksiSource))    : {};
+  removalCustomParams  = ipal.removalCustomParams ? JSON.parse(JSON.stringify(ipal.removalCustomParams)) : [];
+  removalCustomCounter = ipal.removalCustomCounter || 0;
+}
+
 function getActiveIpal(){
   return ipals.find(x=>x.id===activeIpalId);
 }
@@ -3673,7 +3722,13 @@ function saveActiveIpalState(){
   const perEl = document.getElementById('ipalPeruntukan');
   if(tipeEl) ipal.tipe       = tipeEl.value || 'buang';
   if(perEl)  ipal.peruntukan = perEl.value  || '';
-  if(qEl && (ipal.qMode||'manual')==='manual') ipal.Q = qEl.value || '';
+  if((ipal.qMode||'manual')==='auto'){
+    // Mode Otomatis: selalu pakai total live dari Penggunaan Air, bukan nilai
+    // ipal.Q lama, supaya export & perhitungan lain memakai angka terkini.
+    ipal.Q = paFmt(paGetTotalLimbahForIpal(ipal.id));
+  } else if(qEl){
+    ipal.Q = qEl.value || '';
+  }
   if(bodEl)  ipal.BOD   = bodEl.value || '';
   if(codEl)  ipal.COD   = codEl.value || '';
   if(mlvssEl)ipal.MLVSS = mlvssEl.value || '';
@@ -3685,6 +3740,8 @@ function saveActiveIpalState(){
       if(el !== null) u['_'+p] = el.value;
     });
   });
+  // Persist Parameter Influent (Bagian 2) & state Removal Recap
+  saveActiveIpalRemovalState();
 }
 
 function loadActiveIpalState(){
@@ -3701,6 +3758,9 @@ function loadActiveIpalState(){
   set('mlvssG', ipal.MLVSS);
   set('peakFF', ipal.peakFF || '1,5');
   renderQTotalField();
+  // Restore Parameter Influent (Bagian 2) & state Removal Recap for this IPAL
+  // BEFORE rendering the influent panel, so it reads the correct values.
+  loadActiveIpalRemovalState();
   // Rebuild Bagian 2: Parameter Influent grid (BOD/COD live here now), then restore values
   renderInfluentPanel();
   set('bodIn',  ipal.BOD);
@@ -3754,7 +3814,24 @@ const ALL_UNIT_PARAMS = ['P','L','T','D',
   'fm','sor','sor_pk','la','ll','ft','vf','wk','flux','bod_loading','bod_loading_vol',
   'nh3_loading','media_pct','media_vol','surface_area','slr_surf','rasio_pl',
   'bed_slope','cs_loading','bpNH3','bpRatio',
-  'klPctFC','klB','klN','klOut','klDecay','klKadar','klRho'];
+  'klPctFC','klB','klN','klOut','klDecay','klKadar','klRho',
+  // ── Freeboard / ruang lumpur / volume mati / rasio media (dasar volume efektif cair) ──
+  'freeboard_pct','freeboard_m','kedalaman_efektif',
+  'vol_mati','rasio_media','vol_media','vol_eff_cair',
+  // ── Kalkulator Aerasi (Metcalf & Eddy 2003) ──
+  'ar_BODrem','ar_bod5bodl','ar_difftype','ar_effdiff',
+  'ar_effblower','ar_airperdiff','ar_luasperdiff','ar_rho'];
+
+// Unit-unit yang menggunakan media isian (biofilter-family) sehingga perlu
+// input rasio isian media untuk memisahkan volume media dari volume efektif
+// cairan sebagai dasar HRT.
+const MEDIA_UNIT_TYPES = new Set(['biofilter','mbbr','anoxic_mbbr','ifas']);
+
+function getUnitTypeById(uid){
+  const ipal = getActiveIpal(); if(!ipal) return null;
+  const u = ipal.units.find(x=>x.id===uid);
+  return u ? u.type : null;
+}
 
 // Snapshot whatever is currently typed into unit cards back onto the unit
 // objects (u['_'+param]) so a re-render doesn't wipe it out.
@@ -3784,7 +3861,14 @@ function captureAllIpalStates(){
     const perEl3 = document.getElementById('ipalPeruntukan');
     if(tipeEl)  ipal.tipe       = tipeEl.value  || 'buang';
     if(perEl3)  ipal.peruntukan = perEl3.value  || '';
-    if(qEl && (ipal.qMode||'manual')==='manual') ipal.Q = qEl.value || '';
+    if((ipal.qMode||'manual')==='auto'){
+      // Mode Otomatis: Q yang berlaku adalah total live dari Penggunaan Air,
+      // BUKAN nilai lama ipal.Q — supaya export selalu memakai angka terkini
+      // sesuai apa yang ditampilkan (read-only) di field Debit.
+      ipal.Q = paFmt(paGetTotalLimbahForIpal(ipal.id));
+    } else if(qEl){
+      ipal.Q = qEl.value || '';
+    }
     if(bodEl)   ipal.BOD    = bodEl.value   || '';
     if(codEl)   ipal.COD    = codEl.value   || '';
     if(mlvssEl) ipal.MLVSS  = mlvssEl.value || '';
@@ -3796,6 +3880,8 @@ function captureAllIpalStates(){
         if(el !== null) u['_'+p] = el.value;
       });
     });
+    // 3. Capture Parameter Influent (Bagian 2) & state Removal Recap
+    saveActiveIpalRemovalState();
   }
   // Non-active IPALs: their data was already committed to the ipals[] array
   // the last time switchIpal() was called, so no further DOM read needed.
@@ -3857,6 +3943,13 @@ function renderUnits(){
   units.forEach(u=>calcVol(u.id));
 }
 
+// Unit-unit yang memerlukan suplai oksigen aktif (blower / aerator permukaan)
+const AEROBIC_UNIT_TYPES = new Set([
+  'aerobic','activated_sludge','sbr','mbr','mbbr','ifas',
+  'oxidation_ditch','anoxic_mbbr','biofilter',
+  'pond_facultative','pond_maturation'
+]);
+
 function buildCard(u,seq){
   const flds=FIELDS[u.type]||[];
   const dimHtml=u.shape==='kotak'?dimKotak(u.id):dimTabung(u.id);
@@ -3867,6 +3960,7 @@ function buildCard(u,seq){
   }).join('');
   const hasF=fieldsHtml.length>0;
   const klorinCalcHtml = u.type==='disinfeksi' ? buildKlorinCalc(u.id) : '';
+  const aerasiCalcHtml = AEROBIC_UNIT_TYPES.has(u.type) ? buildAerasiCalc(u.id) : '';
   return `<div class="unit-card" id="card_${u.id}">
   <div class="uc-hd">
     <div class="u-seq">${seq}</div>
@@ -3885,6 +3979,7 @@ function buildCard(u,seq){
     <div><div class="sub-lbl">Dimensi</div><div id="dim_${u.id}">${dimHtml}</div></div>
     ${hasF?`<div><div class="sub-lbl">Parameter Desain</div><div class="form-grid">${fieldsHtml}</div></div>`:''}
     ${klorinCalcHtml}
+    ${aerasiCalcHtml}
   </div>
 </div>`;
 }
@@ -4096,17 +4191,302 @@ function calcKlorinDesinfeksi(uid){
   renderRemovalRecap();
 }
 
+// ── KALKULATOR KEBUTUHAN OKSIGEN & BLOWER / AERATOR ──────────────────────────
+// Ref: Metcalf & Eddy AECOM (2014) "Wastewater Engineering" 5th ed.
+//      WEF MOP 8 (2009), Tchobanoglous et al.
+//
+// Tahapan:
+//  1) AOR (Actual O₂ Requirement) = O₂ BOD-removal + O₂ nitrifikasi
+//     - O₂ BOD  = ΔS × Q × f_BOD   [f_BOD = 1,0 kg O₂/kg BOD untuk aerobik]
+//     - O₂ NH₃  = ΔNH₃ × Q × 4,57  [stoikiometri nitrifikasi]
+//  2) SOR (Standard O₂ Req) = AOR / [α × β × (C_s,T/9,08) - C_DO] × (1/θ)^(T-20)
+//     dengan C_s,T = C_s,20 × β × f_altitude  dan C_s,20 default 9,08 mg/L @ 20°C
+//  3) Q_udara = SOR / (0,232 × ρ_udara × E_transfer)  [m³ udara/jam]
+//     E_transfer default Fine Bubble Diffuser 25%
+//  4) Faktor keamanan (SF) → SOR_desain = SOR × SF
+//     Kapasitas per unit = SOR_desain / n_unit
+//  5) Beban puncak: SOR_peak = SOR × PFF
+
+function buildAerasiCalc(uid){
+  return `<div class="kl-calc" id="arcalc_${uid}">
+    <div class="kl-calc-hd">
+      <div class="kl-calc-title">💨 Kebutuhan Udara & Diffuser — Unit Aerobik</div>
+      <div class="kl-calc-ref">Metcalf &amp; Eddy, 2003 — F/M Ratio extended aeration 0,05–0,2</div>
+    </div>
+    <div style="font-size:0.68rem;color:var(--muted);margin-bottom:10px;">
+      Gunakan nilai BOD <em>masuk ke unit ini</em> (BOD influen × % removal unit ini).
+      Ratio BOD₅/BODL default 0,7. Efisiensi diffuser: Coarse bubble 4–8%, Medium 6–15%, Fine bubble 10–30%.
+    </div>
+    <div class="kl-grid" style="grid-template-columns:repeat(auto-fill,minmax(155px,1fr));">
+      <div class="fg"><label>BOD yang Disisihkan (S₀−S)</label>
+        <input type="text" id="u${uid}_ar_BODrem" class="mf" placeholder="150,00"
+          oninput="maskID(this)" onblur="formatID(this);calcAerasi(${uid})">
+        <span class="unit-hint">mg/L — BOD masuk × % removal unit ini</span>
+      </div>
+      <div class="fg"><label>Ratio BOD₅/BODL</label>
+        <input type="text" id="u${uid}_ar_bod5bodl" class="mf" placeholder="0,70"
+          oninput="maskID(this)" onblur="formatID(this);calcAerasi(${uid})">
+        <span class="unit-hint">— default 0,7 (Metcalf &amp; Eddy 2003)</span>
+      </div>
+      <div class="fg"><label>Tipe Diffuser</label>
+        <select id="u${uid}_ar_difftype" onchange="calcAerasi(${uid})" style="width:100%;padding:5px 7px;font-size:0.8rem;border:1px solid var(--line);border-radius:var(--r-sm);">
+          <option value="fine">Fine Bubble (10%)</option>
+          <option value="medium">Medium Bubble (10%)</option>
+          <option value="coarse">Coarse Bubble (6%)</option>
+          <option value="custom">Custom (%)</option>
+        </select>
+      </div>
+      <div class="fg"><label>Efisiensi Diffuser (%)</label>
+        <input type="text" id="u${uid}_ar_effdiff" class="mf" placeholder="10,00"
+          oninput="maskID(this)" onblur="formatID(this);calcAerasi(${uid})">
+        <span class="unit-hint">% — Fine Bubble 10–30%, Coarse 4–8%</span>
+      </div>
+      <div class="fg"><label>Efisiensi Blower (%)</label>
+        <input type="text" id="u${uid}_ar_effblower" class="mf" placeholder="75,00"
+          oninput="maskID(this)" onblur="formatID(this);calcAerasi(${uid})">
+        <span class="unit-hint">% — tipikal 70–80%</span>
+      </div>
+      <div class="fg"><label>Air Flow per Diffuser</label>
+        <input type="text" id="u${uid}_ar_airperdiff" class="mf" placeholder="5,00"
+          oninput="maskID(this)" onblur="formatID(this);calcAerasi(${uid})">
+        <span class="unit-hint">m³/jam per pcs — Fine Bubble tipikal 5</span>
+      </div>
+      <div class="fg"><label>Luas Coverage per Diffuser</label>
+        <input type="text" id="u${uid}_ar_luasperdiff" class="mf" placeholder="2,80"
+          oninput="maskID(this)" onblur="formatID(this);calcAerasi(${uid})">
+        <span class="unit-hint">m²/pcs — tipikal Fine Bubble 2,8 m²</span>
+      </div>
+      <div class="fg"><label>Density Udara</label>
+        <input type="text" id="u${uid}_ar_rho" class="mf" placeholder="1,30"
+          oninput="maskID(this)" onblur="formatID(this);calcAerasi(${uid})">
+        <span class="unit-hint">kg/m³ — default 1,3 kg/m³</span>
+      </div>
+    </div>
+    <div id="arResult_${uid}"></div>
+  </div>`;
+}
+
+// ── KALKULATOR KEBUTUHAN UDARA & DIFFUSER (Metcalf & Eddy 2003) ──────────────
+// Alur perhitungan sesuai contoh manual (foto):
+//  1) O₂ Required (kg O₂/hari) = [Q × (So−S) / (BOD₅/BODL)] / 1000
+//  2) O₂ Required (kg O₂/jam)  = (1) / 24
+//  3) Air Required (kg Udara/jam) = (2) / (fraksi O₂ × 1) = (2) / 0,232
+//     — catatan foto: Air Required = O2(kg/hr) / 0,232 langsung (massa udara)
+//  4) Volumetric Udara (m³/jam)  = Air Required / Density Udara
+//     Volumetric Udara (m³/menit) = (4) / 60
+//  5) Udara dibutuhkan dgn diffuser (m³/menit) = Volumetric(menit) / (Eff.Diffuser/100)
+//  6) Maka, kebutuhan udara final (m³/menit)   = (5) / (Eff.Blower/100)
+//  7) Jumlah Diffuser (pcs) = kebutuhan udara final(m³/jam) / Air Flow per diffuser
+//  8) Luas Area Aeration (m²) = Jumlah Diffuser × Luas per diffuser
+function calcAerasi(uid){
+  const box = document.getElementById(`arResult_${uid}`);
+  if(!box) return;
+
+  const gn = id => parseID(document.getElementById(`u${uid}_${id}`)?.value);
+  const gs = id => document.getElementById(`u${uid}_${id}`)?.value || '';
+
+  // Auto-isi efisiensi diffuser berdasar tipe yang dipilih
+  const diffType = gs('ar_difftype');
+  const diffTypeDefaults = { fine:10, medium:10, coarse:6 };
+  const effDiffInput = gn('ar_effdiff');
+  let effDiff;
+  if(diffType === 'custom'){
+    effDiff = (!isNaN(effDiffInput) && effDiffInput > 0) ? effDiffInput : 10;
+  } else {
+    effDiff = diffTypeDefaults[diffType] || 10;
+    // Sync input field
+    const el = document.getElementById(`u${uid}_ar_effdiff`);
+    if(el && !el._userEditing) el.value = String(effDiff).replace('.',',');
+  }
+
+  const BODrem    = gn('ar_BODrem');
+  const bod5bodl  = gn('ar_bod5bodl');
+  const effBlower = gn('ar_effblower');
+  const airPerDiff= gn('ar_airperdiff');
+  const luasPerDiff = gn('ar_luasperdiff');
+  const rhoUdara  = gn('ar_rho');
+
+  const Q = parseID(document.getElementById('qTotal')?.value); // m³/hari
+
+  const fv = (v,d=2) => isFinite(v) ? fmtID(v,d) : '—';
+
+  if(isNaN(Q) || Q <= 0){
+    box.innerHTML = `<div class="kl-empty">📊 Isi Debit (Q) IPAL pada Bagian Data IPAL terlebih dahulu.</div>`;
+    return;
+  }
+  if(isNaN(BODrem) || BODrem <= 0){
+    box.innerHTML = `<div class="kl-empty">🧪 Isi BOD yang disisihkan (mg/L) untuk menghitung kebutuhan udara.</div>`;
+    return;
+  }
+
+  // Defaults
+  const bod5bodl_u   = (!isNaN(bod5bodl)  && bod5bodl  > 0) ? bod5bodl  : 0.7;
+  const effBlower_u  = (!isNaN(effBlower) && effBlower > 0) ? effBlower : 75;
+  const airPerDiff_u = (!isNaN(airPerDiff)&& airPerDiff> 0) ? airPerDiff: 5;
+  const luasPerDiff_u= (!isNaN(luasPerDiff)&&luasPerDiff>0) ? luasPerDiff:2.8;
+  const rho_u        = (!isNaN(rhoUdara)  && rhoUdara  > 0) ? rhoUdara  : 1.3;
+  const fraksiO2     = 0.232; // 23,2% fraksi massa O₂ di udara
+
+  // 1) O₂ Required (kg O₂/hari)
+  const O2_day = (Q * BODrem / bod5bodl_u) / 1000;
+
+  // 2) O₂ Required (kg O₂/jam)
+  const O2_hour = O2_day / 24;
+
+  // 3) Air Required (kg Udara/jam)
+  const airReq_kghr = O2_hour / fraksiO2;
+
+  // 4) Volumetric Udara
+  const volUdara_jam   = airReq_kghr / rho_u;       // m³/jam
+  const volUdara_menit = volUdara_jam / 60;          // m³/menit
+
+  // 5) Udara dibutuhkan dengan diffuser (m³/menit)
+  const udaraDiffuser_menit = volUdara_menit / (effDiff / 100);
+
+  // 6) Kebutuhan udara final (m³/menit)
+  const udaraFinal_menit = udaraDiffuser_menit / (effBlower_u / 100);
+  const udaraFinal_jam   = udaraFinal_menit * 60;
+
+  // 7) Jumlah diffuser
+  const airPerDiff_menit = airPerDiff_u / 60;
+  const jumlahDiffuser   = Math.ceil(udaraFinal_menit / airPerDiff_menit);
+
+  // 8) Luas area aerasi
+  const luasAerasi = jumlahDiffuser * luasPerDiff_u;
+
+  // Label tipe diffuser
+  const diffLbl = {fine:'Fine Bubble', medium:'Medium Bubble', coarse:'Coarse Bubble', custom:'Custom'}[diffType] || 'Fine Bubble';
+
+  const statGrid = `
+    <div class="kl-stat-grid">
+      <div class="kl-stat"><div class="kl-stat-lbl">O₂ Required</div><div class="kl-stat-val">${fv(O2_day,2)} <small>kg O₂/hari</small></div></div>
+      <div class="kl-stat"><div class="kl-stat-lbl">O₂ Required</div><div class="kl-stat-val">${fv(O2_hour,2)} <small>kg O₂/jam</small></div></div>
+      <div class="kl-stat"><div class="kl-stat-lbl">Air Required</div><div class="kl-stat-val">${fv(airReq_kghr,2)} <small>kg Udara/jam</small></div></div>
+      <div class="kl-stat"><div class="kl-stat-lbl">Density Udara</div><div class="kl-stat-val">${fv(rho_u,2)} <small>kg Udara/m³</small></div></div>
+      <div class="kl-stat"><div class="kl-stat-lbl">Volumetric Udara</div><div class="kl-stat-val">${fv(volUdara_jam,2)} <small>m³ Udara/jam</small></div></div>
+      <div class="kl-stat"><div class="kl-stat-lbl">Volumetric Udara</div><div class="kl-stat-val">${fv(volUdara_menit,2)} <small>m³ Udara/menit</small></div></div>
+      <div class="kl-stat"><div class="kl-stat-lbl">Efisiensi Diffuser (${diffLbl})</div><div class="kl-stat-val">${fv(effDiff,0)} <small>%</small></div></div>
+      <div class="kl-stat"><div class="kl-stat-lbl">Udara dgn Diffuser</div><div class="kl-stat-val">${fv(udaraDiffuser_menit,3)} <small>m³ Udara/menit</small></div></div>
+      <div class="kl-stat highlight"><div class="kl-stat-lbl">Maka, Kebutuhan Udara Dibutuhkan</div><div class="kl-stat-val">${fv(udaraFinal_menit,2)} <small>m³ Udara/menit</small></div></div>
+    </div>
+    <div class="kl-stat-grid">
+      <div class="kl-stat"><div class="kl-stat-lbl">Tipe Diffuser</div><div class="kl-stat-val" style="font-size:0.9rem;">${diffLbl}</div></div>
+      <div class="kl-stat"><div class="kl-stat-lbl">Air Flow (per Diffuser)</div><div class="kl-stat-val">${fv(airPerDiff_u,1)} <small>m³/jam → ${fv(airPerDiff_menit,3)} m³/menit</small></div></div>
+      <div class="kl-stat highlight"><div class="kl-stat-lbl">Jumlah Diffuser Dibutuhkan</div><div class="kl-stat-val">${jumlahDiffuser} <small>pcs</small></div></div>
+      <div class="kl-stat highlight"><div class="kl-stat-lbl">Luas Area Aeration</div><div class="kl-stat-val">${fv(luasAerasi,1)} <small>m²</small></div></div>
+    </div>`;
+
+  const steps = `
+  <details class="kl-steps">
+    <summary>Lihat cara perhitungan (rumus, substitusi, hasil) — Metcalf &amp; Eddy, 2003</summary>
+    <div class="kl-steps-body">
+      <div class="kl-step">
+        <div class="kl-step-lbl">1) O₂ Required (kg O₂/hari)</div>
+        <div class="kl-step-formula">O₂ Required = [Q × (So−S) / (BOD₅/BODL)] / 1000</div>
+        <div class="kl-step-sub">= [${fv(Q,1)} m³/hari × ${fv(BODrem,2)} mg/L / ${fv(bod5bodl_u,2)}] / 1000</div>
+        <div class="kl-step-result">= ${fv(O2_day,3)} kg O₂/hari</div>
+      </div>
+      <div class="kl-step">
+        <div class="kl-step-lbl">2) O₂ Required (kg O₂/jam)</div>
+        <div class="kl-step-formula">= O₂ Required (hari) / 24</div>
+        <div class="kl-step-sub">= ${fv(O2_day,3)} / 24</div>
+        <div class="kl-step-result">= ${fv(O2_hour,3)} kg O₂/jam</div>
+      </div>
+      <div class="kl-step">
+        <div class="kl-step-lbl">3) Air Required (kg Udara/jam)</div>
+        <div class="kl-step-formula">= O₂ Required (jam) / fraksi O₂ udara (23,2%)</div>
+        <div class="kl-step-sub">= ${fv(O2_hour,3)} / 0,232</div>
+        <div class="kl-step-result">= ${fv(airReq_kghr,3)} kg Udara/jam</div>
+      </div>
+      <div class="kl-step">
+        <div class="kl-step-lbl">4) Volumetric Udara</div>
+        <div class="kl-step-formula">Volumetric = Air Required / Density Udara (${fv(rho_u,2)} kg/m³)</div>
+        <div class="kl-step-sub">= ${fv(airReq_kghr,3)} / ${fv(rho_u,2)} = ${fv(volUdara_jam,3)} m³ Udara/jam</div>
+        <div class="kl-step-result">= ${fv(volUdara_jam,3)} m³/jam ÷ 60 = ${fv(volUdara_menit,4)} m³/menit</div>
+      </div>
+      <div class="kl-step">
+        <div class="kl-step-lbl">5) Udara dibutuhkan dengan Diffuser (Efisiensi ${fv(effDiff,0)}%, ${diffLbl})</div>
+        <div class="kl-step-formula">= Volumetric Udara (m³/menit) / Efisiensi Diffuser</div>
+        <div class="kl-step-sub">= ${fv(volUdara_menit,4)} / ${fv(effDiff/100,2)}</div>
+        <div class="kl-step-result">= ${fv(udaraDiffuser_menit,4)} m³ Udara/menit</div>
+      </div>
+      <div class="kl-step">
+        <div class="kl-step-lbl">6) Maka, Kebutuhan Udara Dibutuhkan (Efisiensi Blower ${fv(effBlower_u,0)}%)</div>
+        <div class="kl-step-formula">= (5) / Efisiensi Blower</div>
+        <div class="kl-step-sub">= ${fv(udaraDiffuser_menit,4)} / ${fv(effBlower_u/100,2)}</div>
+        <div class="kl-step-result">= ${fv(udaraFinal_menit,3)} m³ Udara/menit</div>
+      </div>
+      <div class="kl-step">
+        <div class="kl-step-lbl">7) Jumlah Diffuser (${diffLbl})</div>
+        <div class="kl-step-formula">Jumlah = Kebutuhan Udara Final (m³/menit) / Air Flow per Diffuser</div>
+        <div class="kl-step-sub">= ${fv(udaraFinal_menit,3)} m³/menit / ${fv(airPerDiff_menit,4)} m³/menit/pcs (${fv(airPerDiff_u,1)} m³/jam)</div>
+        <div class="kl-step-result">= ${fv(udaraFinal_menit/airPerDiff_menit,2)} → ${jumlahDiffuser} pcs (dibulatkan ke atas)</div>
+      </div>
+      <div class="kl-step">
+        <div class="kl-step-lbl">8) Luas Area Aeration</div>
+        <div class="kl-step-formula">Luas = Jumlah Diffuser × Luas per Diffuser (${fv(luasPerDiff_u,2)} m²/pcs)</div>
+        <div class="kl-step-sub">= ${jumlahDiffuser} × ${fv(luasPerDiff_u,2)}</div>
+        <div class="kl-step-result">= ${fv(luasAerasi,1)} m²</div>
+      </div>
+    </div>
+  </details>`;
+
+  const finalBanner = `<div class="kl-final">
+    💨 Kebutuhan Udara: <strong>${fv(udaraFinal_menit,2)} m³ Udara/menit</strong>
+    &nbsp;|&nbsp; Diffuser (${diffLbl}): <strong>${jumlahDiffuser} pcs</strong>
+    &nbsp;|&nbsp; Luas Area Aerasi: <strong>${fv(luasAerasi,1)} m²</strong>
+    <span class="kl-final-note"> — Air Flow ${fv(airPerDiff_u,1)} m³/jam/pcs, Eff. Diffuser ${fv(effDiff,0)}%, Eff. Blower ${fv(effBlower_u,0)}%</span>
+  </div>`;
+
+  box.innerHTML = `<div class="kl-results">${statGrid}${steps}${finalBanner}</div>`;
+}
+
+// Blok tambahan yang sama dipakai baik bentuk kotak maupun tabung, agar
+// perhitungan volume efektif operasi & volume efektif cair konsisten di
+// seluruh bagian aplikasi (Verifikasi Kepatuhan, Neraca Massa, Laporan).
+function dimExtra(uid){
+  const isMediaType = MEDIA_UNIT_TYPES.has(getUnitTypeById(uid));
+  return `
+  <div class="dim-row dim-extra">
+    <div class="fg"><label>Freeboard <span class="ab">% dari T</span></label>
+      <input type="text" id="u${uid}_freeboard_pct" placeholder="20,00" oninput="maskID(this);calcVol(${uid})" onblur="formatID(this);calcVol(${uid})">
+      <span class="unit-hint">% — default 20% dari kedalaman total (T/D)</span>
+    </div>
+    <div class="fg"><label>Kedalaman Freeboard <span class="ab">AUTO</span></label>
+      <input type="text" id="u${uid}_freeboard_m" class="af" readonly placeholder="—"><span class="unit-hint">meter</span>
+    </div>
+    <div class="fg"><label>Kedalaman Operasi Efektif <span class="ab">AUTO</span></label>
+      <input type="text" id="u${uid}_kedalaman_efektif" class="af" readonly placeholder="—"><span class="unit-hint">meter (T − freeboard)</span>
+    </div>
+  </div>
+  <div class="dim-row dim-extra">
+    <div class="fg"><label>Volume Mati (Dead Zone) <span class="ab">AUTO</span></label>
+      <input type="text" id="u${uid}_vol_mati" class="af" readonly placeholder="—">
+      <span class="unit-hint">m³ — 5% × V efektif operasi (zona sudut/short-circuit)</span>
+    </div>
+    ${isMediaType?`<div class="fg"><label>Rasio Isian Media</label>
+      <input type="text" id="u${uid}_rasio_media" placeholder="0,00" oninput="maskID(this);calcVol(${uid})" onblur="formatID(this);calcVol(${uid})">
+      <span class="unit-hint">% dari volume efektif operasi</span>
+    </div>
+    <div class="fg"><label>Volume Media <span class="ab">AUTO</span></label>
+      <input type="text" id="u${uid}_vol_media" class="af" readonly placeholder="—"><span class="unit-hint">m³</span>
+    </div>`:''}
+    <div class="fg"><label>Volume Efektif Cair <span class="ab">AUTO</span></label>
+      <input type="text" id="u${uid}_vol_eff_cair" class="af" readonly placeholder="—"><span class="unit-hint">m³ — dasar perhitungan HRT</span>
+    </div>
+  </div>`;
+}
 function dimKotak(uid){return `<div class="dim-row">
   <div class="fg"><label>Panjang (P)</label><input type="text" id="u${uid}_P" placeholder="0,00" oninput="maskID(this);calcVol(${uid})" onblur="formatID(this);calcVol(${uid})"><span class="unit-hint">meter</span></div>
   <div class="fg"><label>Lebar (L)</label><input type="text" id="u${uid}_L" placeholder="0,00" oninput="maskID(this);calcVol(${uid})" onblur="formatID(this);calcVol(${uid})"><span class="unit-hint">meter</span></div>
-  <div class="fg"><label>Tinggi (T)</label><input type="text" id="u${uid}_T" placeholder="0,00" oninput="maskID(this);calcVol(${uid})" onblur="formatID(this);calcVol(${uid})"><span class="unit-hint">meter</span></div>
-  <div class="vol-pill" id="vol_${uid}">V = <span>—</span> m³</div>
-</div>`;}
+  <div class="fg"><label>Tinggi Total (T)</label><input type="text" id="u${uid}_T" placeholder="0,00" oninput="maskID(this);calcVol(${uid})" onblur="formatID(this);calcVol(${uid})"><span class="unit-hint">meter</span></div>
+  <div class="vol-pill" id="vol_${uid}">V total kotor = <span>—</span> m³</div>
+</div>${dimExtra(uid)}`;}
 function dimTabung(uid){return `<div class="dim-row">
   <div class="fg"><label>Diameter (D)</label><input type="text" id="u${uid}_D" placeholder="0,00" oninput="maskID(this);calcVol(${uid})" onblur="formatID(this);calcVol(${uid})"><span class="unit-hint">meter</span></div>
-  <div class="fg"><label>Tinggi (T)</label><input type="text" id="u${uid}_T" placeholder="0,00" oninput="maskID(this);calcVol(${uid})" onblur="formatID(this);calcVol(${uid})"><span class="unit-hint">meter</span></div>
-  <div class="vol-pill" id="vol_${uid}">V = <span>—</span> m³</div>
-</div>`;}
+  <div class="fg"><label>Tinggi Total (T)</label><input type="text" id="u${uid}_T" placeholder="0,00" oninput="maskID(this);calcVol(${uid})" onblur="formatID(this);calcVol(${uid})"><span class="unit-hint">meter</span></div>
+  <div class="vol-pill" id="vol_${uid}">V total kotor = <span>—</span> m³</div>
+</div>${dimExtra(uid)}`;}
 
 function setShape(uid,shape){
   const ipal = getActiveIpal(); if(!ipal) return;
@@ -4117,39 +4497,132 @@ function setShape(uid,shape){
   document.getElementById(`dim_${uid}`).innerHTML=shape==='kotak'?dimKotak(uid):dimTabung(uid);
 }
 
-// ── CALC ───────────────────────────────────────────
-function getVol(uid){
+// ── CALC — KASKADE VOLUME (geometris → efektif operasi → efektif cair) ─────
+// Tahapan (semua dalam m³, kecuali disebutkan):
+//  1) Volume Total Kotor  = P×L×T (kotak)  atau  π×(D/2)²×T (tabung)
+//  2) Freeboard           = % dari kedalaman total (default 20%) → kedalaman
+//     operasi efektif = T − kedalaman freeboard
+//  3) Volume Efektif Operasi = Volume Total Kotor − Volume Freeboard
+//  4) (khusus unit berisi media) Volume Media = Volume Efektif Operasi × rasio isian
+//     Volume Efektif Cairan (setelah media) = Volume Efektif Operasi − Volume Media
+//  5) Volume Mati (Dead Zone) = 5% × Volume Efektif Operasi[/Cairan] — OTOMATIS
+//     (memperhitungkan zona sudut bak persegi & short-circuit hidrolik)
+//  6) Volume Efektif Cair (basis HRT) = Volume Efektif Operasi[/Cairan] − Volume Mati
+// getVol() SELALU mengembalikan Volume Efektif Cair, karena seluruh bagian
+// aplikasi (autoCalc/HRT, Verifikasi Kepatuhan, Neraca Massa, Laporan Word)
+// memanggil getVol() sebagai basis tunggal HRT — sehingga tidak ada
+// inkonsistensi HRT antar bagian aplikasi.
+
+function getBaseDims(uid){
   const ipal = getActiveIpal(); if(!ipal) return null;
   const u = ipal.units.find(x=>x.id===uid); if(!u) return null;
   if(u.shape==='kotak'){
     const P=parseID(document.getElementById(`u${uid}_P`)?.value);
     const L=parseID(document.getElementById(`u${uid}_L`)?.value);
     const T=parseID(document.getElementById(`u${uid}_T`)?.value);
-    if([P,L,T].some(isNaN)||P<=0||L<=0||T<=0)return null; return P*L*T;
+    if([P,L,T].some(isNaN)||P<=0||L<=0||T<=0)return null;
+    return {shape:'kotak', P, L, T, area: P*L, volKotor: P*L*T};
   }else{
     const D=parseID(document.getElementById(`u${uid}_D`)?.value);
     const T=parseID(document.getElementById(`u${uid}_T`)?.value);
-    if([D,T].some(isNaN)||D<=0||T<=0)return null; return Math.PI*(D/2)**2*T;
-  }
-}
-function getArea(uid){
-  const ipal = getActiveIpal(); if(!ipal) return null;
-  const u = ipal.units.find(x=>x.id===uid); if(!u) return null;
-  if(u.shape==='kotak'){
-    const P=parseID(document.getElementById(`u${uid}_P`)?.value);
-    const L=parseID(document.getElementById(`u${uid}_L`)?.value);
-    if(isNaN(P)||isNaN(L)||P<=0||L<=0)return null; return P*L;
-  }else{
-    const D=parseID(document.getElementById(`u${uid}_D`)?.value);
-    if(isNaN(D)||D<=0)return null; return Math.PI*(D/2)**2;
+    if([D,T].some(isNaN)||D<=0||T<=0)return null;
+    const area = Math.PI*(D/2)**2;
+    return {shape:'tabung', D, T, area, volKotor: area*T};
   }
 }
 
+// Luas dasar bak (m²) — dipakai untuk kedua bentuk (kotak/tabung).
+function getArea(uid){
+  const d = getBaseDims(uid);
+  return d ? d.area : null;
+}
+
+// Luas penampang aliran horizontal (m²) — Lebar × Tinggi (bentuk kotak),
+// dipakai khusus untuk Kecepatan Aliran pada Grease Trap (bukan luas alas
+// P×L). Untuk bentuk tabung/dome, tidak ada dimensi "Lebar", sehingga
+// dikembalikan null (kecepatan aliran tidak dihitung untuk bentuk ini).
+function getFlowAreaLT(uid){
+  const d = getBaseDims(uid);
+  if(!d || d.shape!=='kotak') return null;
+  return d.L * d.T;
+}
+
+// Volume total kotor = P×L×T atau π×(D/2)²×T — dimensi geometris konstruksi.
+function getVolGross(uid){
+  const d = getBaseDims(uid);
+  return d ? d.volKotor : null;
+}
+
+// Rincian lengkap kaskade volume untuk satu unit. Mengembalikan null jika
+// dimensi dasar belum lengkap.
+function getVolBreakdown(uid){
+  const d = getBaseDims(uid); if(!d) return null;
+  const T = d.T; // kedalaman total konstruksi
+  const area = d.area;
+  const volKotor = d.volKotor;
+
+  // 2) Freeboard
+  const fbPctRaw = parseID(document.getElementById(`u${uid}_freeboard_pct`)?.value);
+  const fbPct = (!isNaN(fbPctRaw) && fbPctRaw>=0) ? fbPctRaw : 20; // default 20%
+  const freeboardM = T * (fbPct/100);
+  const kedalamanEfektif = Math.max(T - freeboardM, 0);
+  const volFreeboard = area * freeboardM;
+
+  // 3) Volume efektif operasi (tanpa ruang lumpur — dihilangkan dari perhitungan unit proses)
+  const volEfektifOperasi = Math.max(volKotor - volFreeboard, 0);
+
+  // 5) Volume media (khusus unit berisi media)
+  const isMedia = MEDIA_UNIT_TYPES.has(getUnitTypeById(uid));
+  let rasioMedia = null, volMedia = 0, volSetelahMedia = volEfektifOperasi;
+  if(isMedia){
+    const rm = parseID(document.getElementById(`u${uid}_rasio_media`)?.value);
+    rasioMedia = (!isNaN(rm) && rm>=0) ? rm : 0;
+    volMedia = volEfektifOperasi * (rasioMedia/100);
+    volSetelahMedia = Math.max(volEfektifOperasi - volMedia, 0);
+  }
+
+  // 6) Volume mati (dead zone) = 5% dari volume efektif operasi (otomatis)
+  //    Memperhitungkan zona sudut bak persegi dan short-circuit hidrolik
+  const volMati = volSetelahMedia * 0.05;
+  const volEffCair = Math.max(volSetelahMedia - volMati, 0);
+
+  return {
+    shape:d.shape, T, area, volKotor,
+    fbPct, freeboardM, kedalamanEfektif, volFreeboard,
+    volEfektifOperasi,
+    isMedia, rasioMedia, volMedia, volSetelahMedia,
+    volMati, volEffCair
+  };
+}
+
+// getVol() adalah SATU-SATUNYA basis volume yang dipakai untuk perhitungan
+// HRT di seluruh aplikasi (autoCalc, Verifikasi Kepatuhan, Neraca Massa,
+// Laporan Word) — selalu mengembalikan Volume Efektif Cair.
+function getVol(uid){
+  const b = getVolBreakdown(uid);
+  return b ? b.volEffCair : null;
+}
+
 function calcVol(uid){
-  const vol=getVol(uid);
+  const b = getVolBreakdown(uid);
   const pill=document.getElementById(`vol_${uid}`);
-  if(pill)pill.innerHTML=vol!==null?`V = <span>${fmtS(vol,3)}</span> m³`:`V = <span>—</span> m³`;
+  if(pill)pill.innerHTML=b?`V total kotor = <span>${fmtS(b.volKotor,3)}</span> m³`:`V total kotor = <span>—</span> m³`;
+
+  const setF = (id, val, dec) => { const el=document.getElementById(`u${uid}_${id}`); if(el) el.value = val!==null && val!==undefined && !isNaN(val) ? fmtS(val,dec) : '—'; };
+  if(b){
+    setF('freeboard_m', b.freeboardM, 3);
+    setF('kedalaman_efektif', b.kedalamanEfektif, 3);
+    setF('vol_mati', b.volMati, 3);
+    if(b.isMedia) setF('vol_media', b.volMedia, 3);
+    setF('vol_eff_cair', b.volEffCair, 3);
+  }else{
+    ['freeboard_m','kedalaman_efektif','vol_mati','vol_media','vol_eff_cair'].forEach(id=>setF(id,null,0));
+  }
   autoCalc(uid);
+  // Refresh kalkulator aerasi jika unit ini adalah unit aerobik
+  if(typeof calcAerasi === 'function' && AEROBIC_UNIT_TYPES.has(getUnitTypeById(uid))){
+    calcAerasi(uid);
+  }
 }
 
 function recalcAll(){
@@ -4169,12 +4642,12 @@ function autoCalc(uid){
   const slr=(area&&Qh)?Qh/area:null;
   const sa=(id,n,d=3)=>setAuto(`u${uid}_${id}`,n,d);
   switch(u.type){
-    case 'grease_trap': sa('v_aliran',(area&&Qh)?Qh/60/area:NaN,4); sa('hrt_menit',hrt_min,1); break;
+    case 'grease_trap': { const areaLT=getFlowAreaLT(uid); sa('v_aliran',(areaLT&&Qh)?Qh/60/areaLT:NaN,4); sa('hrt_menit',hrt_min,1); break; }
     case 'equalization': sa('hrt_jam',hrt_jam,2); break;
     case 'presed_konv': sa('slr',slr,3); sa('hrt_jam',hrt_jam,2); break;
     case 'presed_lamella':{ const pa=parseID(document.getElementById(`u${uid}_proj_area`)?.value); sa('hazen',(!isNaN(pa)&&pa>0&&Qh)?Qh/pa:NaN,3); sa('hrt_menit',hrt_min,1); break;}
     case 'anaerobic': sa('olr',(vol&&!isNaN(Q)&&!isNaN(BOD))?(Q*BOD/1000)/vol:NaN,3); sa('hrt_jam',hrt_jam,2); break;
-    case 'biofilter': sa('bod_loading_vol',(vol&&!isNaN(Q)&&!isNaN(BOD))?(Q*BOD/1000)/vol:NaN,3); break;
+    case 'biofilter': sa('bod_loading_vol',(vol&&!isNaN(Q)&&!isNaN(BOD))?(Q*BOD/1000)/vol:NaN,3); sa('hrt_jam',hrt_jam,2); break;
     case 'aerobic': sa('fm',(vol&&!isNaN(Q)&&!isNaN(BOD)&&!isNaN(MLVSS)&&MLVSS>0)?(Q*BOD)/(MLVSS*vol):NaN,4); sa('hrt_jam',hrt_jam,2); break;
     case 'secondary_clarifier': sa('sor',slr,3); sa('sor_pk',(slr&&!isNaN(pff))?slr*pff:NaN,3); sa('hrt_jam',hrt_jam,2); break;
     case 'secondary_clarifier_lamella':{ const pa=parseID(document.getElementById(`u${uid}_proj_area`)?.value); sa('sor',(!isNaN(pa)&&pa>0&&Qh)?Qh/pa:NaN,3); break;}
@@ -4282,7 +4755,8 @@ function runCheck(){
 
   units.forEach((u,idx)=>{
     const krs=KR[u.type]?.[tipe]||[];
-    const vol=getVol(u.id);
+    const vb=getVolBreakdown(u.id);
+    const vol=vb?vb.volEffCair:null; // Volume Efektif Cair — basis HRT di seluruh aplikasi
     let dimInfo='';
     if(u.shape==='kotak'){
       const P=parseID(document.getElementById(`u${u.id}_P`)?.value),L=parseID(document.getElementById(`u${u.id}_L`)?.value),T=parseID(document.getElementById(`u${u.id}_T`)?.value);
@@ -4291,7 +4765,32 @@ function runCheck(){
       const D=parseID(document.getElementById(`u${u.id}_D`)?.value),T=parseID(document.getElementById(`u${u.id}_T`)?.value);
       dimInfo=`D = <strong>${fmtS(D,2)} m</strong> &nbsp;|&nbsp; T = <strong>${fmtS(T,2)} m</strong>`;
     }
-    let rows=`<tr><td class="td-p">Volume Efektif</td><td class="td-v">${vol!==null?fmtS(vol,3)+' m³':'—'}</td><td class="td-c">—<span class="td-ref">Informasi geometri</span></td><td><span class="dot na">Info</span></td></tr>`;
+
+    // ── Tabel Ringkasan Dimensi & Volume per unit ──
+    // Urutan baris sesuai permintaan: dimensi geometris, volume total kotor,
+    // volume ruang lumpur, volume freeboard, volume efektif operasi,
+    // volume media (jika ada), volume mati (jika ada), volume efektif cair, HRT.
+    const mv=(v,d=3)=>v!==null&&v!==undefined&&!isNaN(v)?fmtS(v,d)+' m³':'—';
+    let sumRows='';
+    if(vb){
+      const dimTxt = u.shape==='kotak'
+        ? `P×L×T total = ${dimInfo}`
+        : `D×T total = ${dimInfo}`;
+      sumRows += `<tr><td class="td-p">Dimensi Geometris</td><td class="td-v" colspan="3">${dimTxt}</td></tr>`;
+      sumRows += `<tr><td class="td-p">Volume Total Kotor</td><td class="td-v" colspan="3">${mv(vb.volKotor)}</td></tr>`;
+      sumRows += `<tr><td class="td-p">Volume Freeboard</td><td class="td-v" colspan="3">${mv(vb.volFreeboard)} <span class="td-ref">${fmtS(vb.fbPct,1)}% dari T = ${fmtS(vb.freeboardM,3)} m</span></td></tr>`;
+      sumRows += `<tr><td class="td-p">Volume Efektif Operasi</td><td class="td-v" colspan="3">${mv(vb.volEfektifOperasi)}</td></tr>`;
+      if(vb.isMedia){
+        sumRows += `<tr><td class="td-p">Volume Media</td><td class="td-v" colspan="3">${mv(vb.volMedia)} <span class="td-ref">rasio isian ${fmtS(vb.rasioMedia,1)}%</span></td></tr>`;
+      }
+      sumRows += `<tr><td class="td-p">Volume Mati (Dead Zone)</td><td class="td-v" colspan="3">${mv(vb.volMati)} <span class="td-ref">5% × V efektif operasi — zona sudut &amp; short-circuit</span></td></tr>`;
+      sumRows += `<tr><td class="td-p"><strong>Volume Efektif Cair</strong></td><td class="td-v" colspan="3"><strong>${mv(vb.volEffCair)}</strong></td></tr>`;
+    }else{
+      sumRows = `<tr><td class="td-p" colspan="4">Lengkapi dimensi (P/L/T atau D/T) untuk menghitung volume.</td></tr>`;
+    }
+    const sumTableHtml = `<table class="rt sum-vol-table"><thead><tr><th colspan="4">Ringkasan Dimensi &amp; Volume</th></tr></thead><tbody>${sumRows}</tbody></table>`;
+
+    let rows=`<tr><td class="td-p">Volume Efektif Cair (basis HRT)</td><td class="td-v">${vol!==null?fmtS(vol,3)+' m³':'—'}</td><td class="td-c">—<span class="td-ref">Volume operasi dikurangi freeboard, media &amp; volume mati (5% auto)</span></td><td><span class="dot na">Info</span></td></tr>`;
     if(EXTERNAL_REF_TYPES.has(u.type)){
       rows+=`<tr><td class="td-p" colspan="4" style="color:#8a6100;background:#fff9e6;font-style:italic;">⚠️ Unit ini tidak tercantum dalam Lampiran III Permen LH/BPLH No. 11 Tahun 2025, sehingga tidak memiliki kriteria kepatuhan baku dari regulasi tersebut. Parameter desain pada kartu unit mengacu pada referensi literatur/praktik lapangan eksternal — lihat keterangan pada masing-masing field.</td></tr>`;
     }
@@ -4305,13 +4804,22 @@ function runCheck(){
       const vs=!isNaN(val)?`${fmtS(val,4)} ${cr.u}`:'—';
       const rc=st==='pass'?'rp':st==='fail'?'rf':'';
       const dl=st==='pass'?'Sesuai':st==='fail'?'Tidak Sesuai':'Perlu Cek';
-      rows+=`<tr class="${rc}"><td class="td-p">${cr.l}</td><td class="td-v">${vs}</td><td class="td-c">${fmtCr(cr)}<span class="td-ref">${cr.r}</span></td><td><span class="dot ${st}">${dl}</span></td></tr>`;
+      // Selisih terhadap batas kriteria minimum/maksimum untuk keterangan validasi otomatis
+      // (berlaku juga untuk HRT, karena HRT dihitung dari volume efektif cair yang sama
+      // dengan yang dipakai di ringkasan desain, evaluasi unit, neraca massa & laporan).
+      let selisihTxt='';
+      if(st==='fail' && !isNaN(val)){
+        if(cr.min!==null && val<cr.min) selisihTxt=` <span class="td-ref" style="color:#b3261e;">kurang ${fmtS(cr.min-val,4)} ${cr.u} dari batas minimum</span>`;
+        else if(cr.max!==null && val>cr.max) selisihTxt=` <span class="td-ref" style="color:#b3261e;">lebih ${fmtS(val-cr.max,4)} ${cr.u} dari batas maksimum</span>`;
+      }
+      rows+=`<tr class="${rc}"><td class="td-p">${cr.l}</td><td class="td-v">${vs}</td><td class="td-c">${fmtCr(cr)}<span class="td-ref">${cr.r}</span>${selisihTxt}</td><td><span class="dot ${st}">${dl}</span></td></tr>`;
     });
     const us=uf>0?'fail':up>0?'pass':'na';
     const ub=uf>0?`${uf} Tdk Sesuai`:up>0?`${up} Sesuai`:'Perlu Input';
     html+=`<div class="res-unit">
   <div class="r-hd"><div class="r-seq">${idx+1}</div>${getUnitLabel(u)}<span class="r-badge ${us}">${ub}</span></div>
-  <div class="dim-bar">${dimInfo} &nbsp;|&nbsp; Vol = <strong>${vol!==null?fmtS(vol,3)+' m³':'—'}</strong></div>
+  <div class="dim-bar">${dimInfo} &nbsp;|&nbsp; V total kotor = <strong>${vb?fmtS(vb.volKotor,3)+' m³':'—'}</strong> &nbsp;|&nbsp; V efektif cair = <strong>${vol!==null?fmtS(vol,3)+' m³':'—'}</strong></div>
+  ${sumTableHtml}
   <table class="rt"><thead><tr><th>Parameter</th><th>Nilai Desain (Auto)</th><th>Kriteria Permen LH 11/2025</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table>
 </div>`;
   });
@@ -5061,17 +5569,32 @@ function tryRestoreAutosave(){
       ip.uc = Math.max(0, ...(ip.units||[]).map(u=>u.id));
     });
     activeIpalId = data.activeIpalId || ipals[0]?.id;
-    // Restore removal influent & overrides (v1.1+)
-    if(data.removalInfluent)     Object.assign(removalInfluent,     data.removalInfluent);
-    if(data.removalOverrides)    Object.assign(removalOverrides,     data.removalOverrides);
-    if(data.klorinDoseOverrides) Object.assign(klorinDoseOverrides,  data.klorinDoseOverrides);
-    if(data.removalCustomParams && Array.isArray(data.removalCustomParams)) {
-      removalCustomParams = data.removalCustomParams;
-      removalCustomCounter = removalCustomParams.reduce((mx,c) => {
-        const m = /^custom_(\d+)$/.exec(c.key||'');
-        return m ? Math.max(mx, parseInt(m[1],10)) : mx;
-      }, 0);
-    }
+    // Backward-compat: versi lama menyimpan removalInfluent/dkk sebagai satu
+    // state global (bukan per-IPAL). Jika IPAL hasil restore belum punya
+    // field-nya sendiri (data lama), isi dari payload lama supaya tidak hilang.
+    const legacyRemoval = {
+      removalInfluent: data.removalInfluent,
+      removalOverrides: data.removalOverrides,
+      klorinDoseOverrides: data.klorinDoseOverrides,
+      removalCustomParams: data.removalCustomParams,
+    };
+    ipals.forEach(ip => {
+      if(!ip.removalInfluent && legacyRemoval.removalInfluent) ip.removalInfluent = legacyRemoval.removalInfluent;
+      if(!ip.removalOverrides && legacyRemoval.removalOverrides) ip.removalOverrides = legacyRemoval.removalOverrides;
+      if(!ip.klorinDoseOverrides && legacyRemoval.klorinDoseOverrides) ip.klorinDoseOverrides = legacyRemoval.klorinDoseOverrides;
+      if(!ip.removalCustomParams && legacyRemoval.removalCustomParams) ip.removalCustomParams = legacyRemoval.removalCustomParams;
+      if(!ip.removalInfluent) ip.removalInfluent = { TSS:'', NH3:'', Deterjen:'', MinyakLemak:'', FC:'10000', Klorin:'0' };
+      if(!ip.removalOverrides) ip.removalOverrides = {};
+      if(!ip.klorinDoseOverrides) ip.klorinDoseOverrides = {};
+      if(!ip.disinfeksiSource) ip.disinfeksiSource = {};
+      if(!ip.removalCustomParams) ip.removalCustomParams = [];
+      if(ip.removalCustomCounter === undefined) {
+        ip.removalCustomCounter = (ip.removalCustomParams||[]).reduce((mx,c) => {
+          const m = /^custom_(\d+)$/.exec(c.key||'');
+          return m ? Math.max(mx, parseInt(m[1],10)) : mx;
+        }, 0);
+      }
+    });
     if(data.paRows && Array.isArray(data.paRows)){
       paRows = data.paRows;
       paRowCounter = Math.max(0, ...paRows.map(r=>r.id));
@@ -5126,6 +5649,46 @@ function init(){
   const summaryColEl = document.getElementById('summaryCol');
   if(summaryColEl) summaryColEl.style.display = 'none';
   renderPenggunaanAirPage();
+}
+
+// ── RESET APP ── Hapus semua data yang tertampilkan & tersimpan (autosave),
+// lalu kembalikan aplikasi ke kondisi awal (satu IPAL kosong).
+function resetApp(){
+  const ok = confirm('Hapus semua data yang tertampilkan? Tindakan ini tidak bisa dibatalkan.\n\nSemua IPAL, hasil perhitungan, dan data tersimpan otomatis akan dihapus.');
+  if(!ok) return;
+
+  // Batalkan autosave yang sedang dijadwalkan
+  if(_autosaveTimer) clearTimeout(_autosaveTimer);
+  _autosaveTimer = null;
+
+  // Kosongkan penyimpanan lokal (crash-safety autosave)
+  try{ localStorage.removeItem(AUTOSAVE_KEY); }catch(e){ /* storage may be unavailable */ }
+
+  // Reset seluruh state global ke kondisi awal
+  ipals = [];
+  activeIpalId = null;
+  ipalCounter = 0;
+  paRows = [];
+  sludgeCaptureOverrides = {};
+  removalOverrides = {};
+  removalInfluent = { TSS:'', NH3:'', Deterjen:'', MinyakLemak:'', FC:'10000', Klorin:'0' };
+  klorinDoseOverrides = {};
+  removalCustomParams = [];
+  removalCustomCounter = 0;
+  fluktActiveIpalId = 'all';
+  fluktHiddenLines = { all: {}, byIpal: {} };
+
+  // Buat satu IPAL kosong baru, seperti saat aplikasi pertama kali dibuka
+  const first = newIpal('IPAL 1');
+  ipals.push(first);
+  activeIpalId = first.id;
+  renderIpalTabs();
+  loadActiveIpalState();
+  updateSummary();
+
+  // Kembali ke halaman "Penggunaan Air"
+  renderPenggunaanAirPage();
+  showPage('penggunaan_air');
 }
 
 </script>
@@ -38538,7 +39101,8 @@ function buildUnitSection(u, tipe, Q, BOD, MLVSS, peakFF, COD) {
   const resRows = [];
   const _preCompute = () => {
     if (u.type === 'grease_trap') {
-      const vAl = (Qh/60) / area;
+      const areaLT = (u.shape === 'kotak' && !isNaN(u.dims.L) && !isNaN(u.dims.T)) ? (u.dims.L * u.dims.T) : NaN;
+      const vAl = (Qh/60) / areaLT;
       resRows.push({ param:'Kecepatan Aliran', nilai:vAl, dec:4, satuan:'m/menit', kriteria:kritStr(0.021,0.035,'m/menit'), status:chkStatus(vAl,0.021,0.035) });
       resRows.push({ param:'HRT', nilai:hrt_min, dec:1, satuan:'menit', kriteria:kritStr(30,null,'menit'), status:chkStatus(hrt_min,30,null) });
     } else if (u.type === 'equalization') {
@@ -38781,21 +39345,55 @@ function buildUnitSection(u, tipe, Q, BOD, MLVSS, peakFF, COD) {
 
   // ── VOLUME ──
   const volBlocks = [];
+  const vb = u.volBreakdown || null;
 
   if (u.shape === 'kotak') {
     const P = u.dims.P, L = u.dims.L, T = u.dims.T;
-    volBlocks.push(eqBlock('Volume Efektif (V)', [
-      { note: 'Rumus umum — tangki persegi panjang:', eq: [mr('V'), mr('  =  '), mr('P'), mr(' × '), mr('L'), mr(' × '), mr('T')] },
-      { note: 'Substitusi nilai:', eq: [mr('V'), mr('  =  '), mr(`${fmtS(P,2)}`), mr(' × '), mr(`${fmtS(L,2)}`), mr(' × '), mr(`${fmtS(T,2)}`)] },
-      { isResult: true, eq: [mr('V'), mr('  =  '), mr(`${fmtS(vol,3)} m³`)] },
+    volBlocks.push(eqBlock('Volume Total Kotor (V total)', [
+      { note: 'Rumus umum — tangki persegi panjang (dimensi geometris konstruksi):', eq: [mr('V total'), mr('  =  '), mr('P'), mr(' × '), mr('L'), mr(' × '), mr('T')] },
+      { note: 'Substitusi nilai:', eq: [mr('V total'), mr('  =  '), mr(`${fmtS(P,2)}`), mr(' × '), mr(`${fmtS(L,2)}`), mr(' × '), mr(`${fmtS(T,2)}`)] },
+      { isResult: true, eq: [mr('V total'), mr('  =  '), mr(`${fmtS(vb?vb.volKotor:null,3)} m³`)] },
     ]));
   } else {
     const D = u.dims.D, T = u.dims.T;
-    volBlocks.push(eqBlock('Volume Efektif (V)', [
-      { note: 'Rumus umum — tabung/dome:', eq: [mr('V'), mr('  =  '), mr('π'), mr(' × '), new MathSuperScript({ children: [frac([mr('D')], [mr('2')])], superScript: [mr('2')] }), mr(' × '), mr('T')] },
-      { note: 'Substitusi nilai:', eq: [mr('V'), mr('  =  '), mr('3,14159'), mr(' × '), new MathSuperScript({ children: [frac([mr(`${fmtS(D,2)}`)], [mr('2')])], superScript: [mr('2')] }), mr(' × '), mr(`${fmtS(T,2)}`)] },
-      { isResult: true, eq: [mr('V'), mr('  =  '), mr(`${fmtS(vol,3)} m³`)] },
+    volBlocks.push(eqBlock('Volume Total Kotor (V total)', [
+      { note: 'Rumus umum — tabung/dome (dimensi geometris konstruksi):', eq: [mr('V total'), mr('  =  '), mr('π'), mr(' × '), new MathSuperScript({ children: [frac([mr('D')], [mr('2')])], superScript: [mr('2')] }), mr(' × '), mr('T')] },
+      { note: 'Substitusi nilai:', eq: [mr('V total'), mr('  =  '), mr('3,14159'), mr(' × '), new MathSuperScript({ children: [frac([mr(`${fmtS(D,2)}`)], [mr('2')])], superScript: [mr('2')] }), mr(' × '), mr(`${fmtS(T,2)}`)] },
+      { isResult: true, eq: [mr('V total'), mr('  =  '), mr(`${fmtS(vb?vb.volKotor:null,3)} m³`)] },
     ]));
+  }
+
+  // ── RINGKASAN KASKADE VOLUME (freeboard → efektif operasi
+  //     → media (jika ada) → volume mati (AUTO) → Volume Efektif Cair — basis HRT) ──
+  // Dihitung di sini, tapi dicetak di AKHIR bagian A (setelah Luas & HRT) — lihat push ke volBlocks di bawah.
+  let kaskadeVolumeBlock = null;
+  if (vb) {
+    const rows = [
+      ['Kedalaman Freeboard', `${fmtS(vb.fbPct,1)}% × T = ${fmtS(vb.freeboardM,3)} m`],
+      ['Kedalaman Operasi Efektif', `T − freeboard = ${fmtS(vb.kedalamanEfektif,3)} m`],
+      ['Volume Freeboard', `${fmtS(vb.volFreeboard,3)} m³`],
+      ['Volume Efektif Operasi', `V total − V freeboard = ${fmtS(vb.volEfektifOperasi,3)} m³`],
+    ];
+    if (vb.isMedia) {
+      rows.push(['Volume Media', `${fmtS(vb.rasioMedia,1)}% × V efektif operasi = ${fmtS(vb.volMedia,3)} m³`]);
+      rows.push(['Volume Efektif Cairan (setelah media)', `${fmtS(vb.volSetelahMedia,3)} m³`]);
+    }
+    rows.push(['Volume Mati (Dead Zone)', `5% × V efektif operasi = ${fmtS(vb.volMati,3)} m³`]);
+    rows.push(['Volume Efektif Cair (basis HRT)', `${fmtS(vb.volEffCair,3)} m³`]);
+
+    const kaskadeElems = [];
+    kaskadeElems.push(secLabel('Ringkasan Kaskade Volume'));
+    kaskadeElems.push(gap(40));
+    rows.forEach(([k,v]) => {
+      kaskadeElems.push(new Paragraph({
+        children: [
+          new TextRun({ text: k, size: 20, color: '555555', font: 'Times New Roman' }),
+          new TextRun({ text: '  =  ' + v, size: 20, color: '000000', font: 'Times New Roman' }),
+        ],
+        indent: { left: 360 }, spacing: { before: 0, after: 40 },
+      }));
+    });
+    kaskadeVolumeBlock = kaskadeElems;
   }
 
   // ── AREA ──
@@ -38828,7 +39426,7 @@ function buildUnitSection(u, tipe, Q, BOD, MLVSS, peakFF, COD) {
     const Qresult   = inMin ? fmtS(Q/1440, 6) : fmtS(Qh, 4);
 
     volBlocks.push(eqBlock('Hydraulic Retention Time (HRT)', [
-      { note: 'Rumus umum:', eq: [mr('HRT'), mr('  =  '), frac([mr('V')], [mr('Q')])] },
+      { note: 'Rumus umum (V = Volume Efektif Cair):', eq: [mr('HRT'), mr('  =  '), frac([mr('V')], [mr('Q')])] },
       { note: `Konversi Q: ${fmtS(Q,2)} m³/hari ÷ ${QdivLabel} = ${Qresult} m³/${hrtUnit}:`,
         eq: [mr('HRT'), mr('  =  '), frac([mr(`${fmtS(vol,3)} m³`)], [mr(`${Qresult} m³/${hrtUnit}`)])] },
       { isResult: true, eq: [mr('HRT'), mr('  =  '), mr(`${fmtS(hrtVal, inMin?1:2)} ${hrtUnit}`)] },
@@ -38843,11 +39441,18 @@ function buildUnitSection(u, tipe, Q, BOD, MLVSS, peakFF, COD) {
   const unitBlocks = [];
 
   if (u.type === 'grease_trap') {
-    const vAl = (Qh/60) / area;
+    const L = u.dims.L, T = u.dims.T;
+    const areaLT = (u.shape === 'kotak' && !isNaN(L) && !isNaN(T)) ? (L * T) : NaN;
+    const vAl = (Qh/60) / areaLT;
+    unitBlocks.push(eqBlock('Luas Penampang Aliran (A)', [
+      { note: 'Luas penampang melintang aliran horizontal — Lebar × Tinggi:', eq: [mr('A'), mr('  =  '), mr('L'), mr(' × '), mr('T')] },
+      { note: 'Substitusi nilai:', eq: [mr('A'), mr('  =  '), mr(`${fmtS(L,2)}`), mr(' × '), mr(`${fmtS(T,2)}`)] },
+      { isResult: true, eq: [mr('A'), mr('  =  '), mr(`${fmtS(areaLT,3)} m²`)] },
+    ]));
     unitBlocks.push(eqBlock('Kecepatan Aliran (v)', [
-      { note: 'Kecepatan aliran horizontal melalui penampang tangki:', eq: [mr('v'), mr('  =  '), frac([mr('Q')], [mr('A'), mr(' × '), mr('60')])] },
+      { note: 'Kecepatan aliran horizontal melalui penampang tangki (A = Luas Penampang Aliran = Lebar × Tinggi):', eq: [mr('v'), mr('  =  '), frac([mr('Q')], [mr('A'), mr(' × '), mr('60')])] },
       { note: `Q per menit = ${fmtS(Qh,4)} m³/jam ÷ 60 = ${fmtS(Qh/60,6)} m³/menit:`,
-        eq: [mr('v'), mr('  =  '), frac([mr(`${fmtS(Qh/60,6)} m³/menit`)], [mr(`${fmtS(area,3)} m²`)])] },
+        eq: [mr('v'), mr('  =  '), frac([mr(`${fmtS(Qh/60,6)} m³/menit`)], [mr(`${fmtS(areaLT,3)} m²`)])] },
       { isResult: true, eq: [mr('v'), mr('  =  '), mr(`${fmtS(vAl,4)} m/menit`)] },
     ]));
   } else if (u.type === 'presed_konv') {
@@ -39000,15 +39605,400 @@ function buildUnitSection(u, tipe, Q, BOD, MLVSS, peakFF, COD) {
         tx('Nilai Residual Klorin dan % Removal Fecal Coliform pada unit ini menggunakan sumber referensi literatur (bukan hasil perhitungan Kalkulator Dosis Klorin), sebagaimana dipilih pada tabel Hasil Evaluasi.', {size:19, italic:true, color:C.mutedText}),
       ]));
     }
+
+  // ── Tipe tambahan — Lampiran III Permen LH 11/2025 (rincian rumus) ──────
+  } else if (u.type === 'septic_tank') {
+    const hrtHari = hrt_jam / 24;
+    const [hMin] = tipe === 'buang' ? [1] : [2];
+    unitBlocks.push(eqBlock('Hydraulic Retention Time (HRT)', [
+      { note: 'Waktu tinggal air limbah dalam septic tank (V = Volume Efektif Cair):', eq: [mr('HRT'), mr('  =  '), frac([mr('V')], [mr('Q')])] },
+      { note: 'Substitusi nilai, dikonversi ke satuan hari:', eq: [mr('HRT'), mr('  =  '), frac([mr(`${fmtS(vol,3)} m³`)], [mr(`${fmtS(Q,2)} m³/hari`)])] },
+      { isResult: true, eq: [mr('HRT'), mr('  =  '), mr(`${fmtS(hrtHari,2)} hari`)] },
+    ]));
+    unitBlocks.push(p([
+      tx('Referensi: ', {bold:true, size:17, color:C.mutedText}),
+      tx(`Kriteria minimum HRT septic tank = ${hMin} hari (${tipe==='buang'?'jalur pembuangan':'jalur pemanfaatan'}), mengacu Lampiran III Permen LH/BPLH No. 11 Tahun 2025 dan SNI 03-2398.`, {size:17, color:C.mutedText}),
+    ]));
+
+  } else if (u.type === 'baffled_reactor') {
+    const olr = (Q * BOD / 1000) / vol;
+    unitBlocks.push(eqBlock('Organic Loading Rate (OLR)', [
+      { note: 'Beban organik per satuan volume reaktor bersekat (baffled/ABR):', eq: [mr('OLR'), mr('  =  '), frac([mr('Q'), mr(' × '), mr('S₀')], [mr('V')])] },
+      { note: `S₀ = BOD influent (mg/L ÷ 1.000 = kg/m³):`, eq: [mr('OLR'), mr('  =  '), frac([mr(`${fmtS(Q,2)}`), mr(' × '), mr(`${fmtS(BOD,2)}/1.000`)], [mr(`${fmtS(vol,3)}`)])] },
+      { isResult: true, eq: [mr('OLR'), mr('  =  '), mr(`${fmtS(olr,3)} kg BOD/m³.hari`)] },
+    ]));
+    unitBlocks.push(eqBlock('Hydraulic Retention Time (HRT)', [
+      { note: 'Waktu tinggal air limbah dalam kompartemen ABR (V = Volume Efektif Cair):', eq: [mr('HRT'), mr('  =  '), frac([mr('V')], [mr('Q')])] },
+      { note: `Konversi Q: ${fmtS(Q,2)} m³/hari ÷ 24 jam/hari = ${fmtS(Qh,4)} m³/jam:`, eq: [mr('HRT'), mr('  =  '), frac([mr(`${fmtS(vol,3)} m³`)], [mr(`${fmtS(Qh,4)} m³/jam`)])] },
+      { isResult: true, eq: [mr('HRT'), mr('  =  '), mr(`${fmtS(hrt_jam,2)} jam`)] },
+    ]));
+    unitBlocks.push(p([tx('Referensi: ', {bold:true, size:17, color:C.mutedText}), tx('Tchobanoglous & Metcalf-Eddy, Wastewater Engineering; Lampiran III Permen LH/BPLH No. 11 Tahun 2025.', {size:17, color:C.mutedText})]));
+
+  } else if (u.type === 'anaerobic_filter') {
+    const olr = (Q * BOD / 1000) / vol;
+    unitBlocks.push(eqBlock('Organic Loading Rate (OLR)', [
+      { note: 'Beban organik per satuan volume reaktor (termasuk volume media):', eq: [mr('OLR'), mr('  =  '), frac([mr('Q'), mr(' × '), mr('S₀')], [mr('V')])] },
+      { note: `S₀ = BOD influent (mg/L ÷ 1.000 = kg/m³):`, eq: [mr('OLR'), mr('  =  '), frac([mr(`${fmtS(Q,2)}`), mr(' × '), mr(`${fmtS(BOD,2)}/1.000`)], [mr(`${fmtS(vol,3)}`)])] },
+      { isResult: true, eq: [mr('OLR'), mr('  =  '), mr(`${fmtS(olr,3)} kg BOD/m³.hari`)] },
+    ]));
+    unitBlocks.push(eqBlock('Hydraulic Retention Time (HRT)', [
+      { note: 'Waktu tinggal air limbah dalam reaktor filter anaerobik (V = Volume Efektif Cair, setelah dikurangi volume media):', eq: [mr('HRT'), mr('  =  '), frac([mr('V')], [mr('Q')])] },
+      { note: `Konversi Q ke m³/jam:`, eq: [mr('HRT'), mr('  =  '), frac([mr(`${fmtS(vol,3)} m³`)], [mr(`${fmtS(Qh,4)} m³/jam`)])] },
+      { isResult: true, eq: [mr('HRT'), mr('  =  '), mr(`${fmtS(hrt_jam,2)} jam`)] },
+    ]));
+    unitBlocks.push(p([tx('Referensi: ', {bold:true, size:17, color:C.mutedText}), tx('Metcalf & Eddy, Wastewater Engineering, 2003; Lampiran III Permen LH/BPLH No. 11 Tahun 2025.', {size:17, color:C.mutedText})]));
+
+  } else if (u.type === 'activated_sludge') {
+    const fm = (Q * BOD) / (MLVSS * vol);
+    unitBlocks.push(eqBlock('F/M Ratio (Extended Aeration)', [
+      { note: 'Perbandingan laju beban organik terhadap massa biomassa aktif (MLVSS):', eq: [mr('F/M'), mr('  =  '), frac([mr('Q'), mr(' × '), mr('S₀')], [mr('MLVSS'), mr(' × '), mr('V')])] },
+      { note: `S₀ = BOD influent = ${fmtS(BOD,2)} mg/l ; MLVSS = ${fmtS(MLVSS,0)} mg/l:`,
+        eq: [mr('F/M'), mr('  =  '), frac([mr(`${fmtS(Q,2)}`), mr(' × '), mr(`${fmtS(BOD,2)}`)], [mr(`${fmtS(MLVSS,0)}`), mr(' × '), mr(`${fmtS(vol,3)}`)])] },
+      { isResult: true, eq: [mr('F/M'), mr('  =  '), mr(`${fmtS(fm,4)} kg BOD/kg MLVSS.hari`)] },
+    ]));
+    unitBlocks.push(eqBlock('Hydraulic Retention Time (HRT)', [
+      { note: 'Waktu tinggal air limbah dalam tangki aerasi (V = Volume Efektif Cair):', eq: [mr('HRT'), mr('  =  '), frac([mr('V')], [mr('Q')])] },
+      { note: `Konversi Q ke m³/jam:`, eq: [mr('HRT'), mr('  =  '), frac([mr(`${fmtS(vol,3)} m³`)], [mr(`${fmtS(Qh,4)} m³/jam`)])] },
+      { isResult: true, eq: [mr('HRT'), mr('  =  '), mr(`${fmtS(hrt_jam,2)} jam`)] },
+    ]));
+    unitBlocks.push(p([tx('Referensi: ', {bold:true, size:17, color:C.mutedText}), tx('Metcalf & Eddy, Wastewater Engineering, 2003 (Extended Aeration); Lampiran III Permen LH/BPLH No. 11 Tahun 2025.', {size:17, color:C.mutedText})]));
+
+  } else if (u.type === 'sbr') {
+    const fm = (Q * BOD) / (MLVSS * vol);
+    unitBlocks.push(eqBlock('F/M Ratio', [
+      { note: 'Perbandingan laju beban organik terhadap massa biomassa aktif (MLVSS) dalam reaktor SBR:', eq: [mr('F/M'), mr('  =  '), frac([mr('Q'), mr(' × '), mr('S₀')], [mr('MLVSS'), mr(' × '), mr('V')])] },
+      { note: `S₀ = BOD influent = ${fmtS(BOD,2)} mg/l ; MLVSS = ${fmtS(MLVSS,0)} mg/l:`,
+        eq: [mr('F/M'), mr('  =  '), frac([mr(`${fmtS(Q,2)}`), mr(' × '), mr(`${fmtS(BOD,2)}`)], [mr(`${fmtS(MLVSS,0)}`), mr(' × '), mr(`${fmtS(vol,3)}`)])] },
+      { isResult: true, eq: [mr('F/M'), mr('  =  '), mr(`${fmtS(fm,4)} kg BOD/kg MLVSS.hari`)] },
+    ]));
+    unitBlocks.push(eqBlock('HRT per Siklus', [
+      { note: 'Waktu tinggal efektif air limbah per siklus operasi SBR (V = Volume Efektif Cair):', eq: [mr('HRT'), mr('  =  '), frac([mr('V')], [mr('Q')])] },
+      { note: `Konversi Q ke m³/jam:`, eq: [mr('HRT'), mr('  =  '), frac([mr(`${fmtS(vol,3)} m³`)], [mr(`${fmtS(Qh,4)} m³/jam`)])] },
+      { isResult: true, eq: [mr('HRT'), mr('  =  '), mr(`${fmtS(hrt_jam,2)} jam`)] },
+    ]));
+    unitBlocks.push(p([tx('Referensi: ', {bold:true, size:17, color:C.mutedText}), tx('Tchobanoglous et al., Wastewater Engineering, 2014 (Sequencing Batch Reactor); Lampiran III Permen LH/BPLH No. 11 Tahun 2025.', {size:17, color:C.mutedText})]));
+
+  } else if (u.type === 'mbr') {
+    const flux = u.params.flux || NaN;
+    unitBlocks.push(eqBlock('Hydraulic Retention Time (HRT)', [
+      { note: 'Waktu tinggal air limbah dalam tangki bioreaktor MBR (V = Volume Efektif Cair):', eq: [mr('HRT'), mr('  =  '), frac([mr('V')], [mr('Q')])] },
+      { note: `Konversi Q ke m³/jam:`, eq: [mr('HRT'), mr('  =  '), frac([mr(`${fmtS(vol,3)} m³`)], [mr(`${fmtS(Qh,4)} m³/jam`)])] },
+      { isResult: true, eq: [mr('HRT'), mr('  =  '), mr(`${fmtS(hrt_jam,2)} jam`)] },
+    ]));
+    if (!isNaN(flux)) {
+      unitBlocks.push(p([
+        tx('Flux Membran (input desain): ', {bold:true, size:20, color:'000000'}),
+        tx(`${fmtS(flux,1)} L/m².jam — parameter ini merupakan input langsung dari spesifikasi membran yang digunakan, bukan hasil turunan dari dimensi tangki.`, {size:20, color:'000000'}),
+      ]));
+    }
+    unitBlocks.push(p([tx('Referensi: ', {bold:true, size:17, color:C.mutedText}), tx('Judd & Judd, The MBR Book, 2006; Lampiran III Permen LH/BPLH No. 11 Tahun 2025.', {size:17, color:C.mutedText})]));
+
+  } else if (u.type === 'mbbr') {
+    const bodLoad = u.params.bod_loading || NaN;
+    const mediaPct = u.params.media_pct || NaN;
+    unitBlocks.push(eqBlock('Hydraulic Retention Time (HRT)', [
+      { note: 'Waktu tinggal air limbah dalam reaktor MBBR (V = Volume Efektif Cair):', eq: [mr('HRT'), mr('  =  '), frac([mr('V')], [mr('Q')])] },
+      { note: `Konversi Q ke m³/jam:`, eq: [mr('HRT'), mr('  =  '), frac([mr(`${fmtS(vol,3)} m³`)], [mr(`${fmtS(Qh,4)} m³/jam`)])] },
+      { isResult: true, eq: [mr('HRT'), mr('  =  '), mr(`${fmtS(hrt_jam,2)} jam`)] },
+    ]));
+    if (!isNaN(bodLoad) || !isNaN(mediaPct)) {
+      unitBlocks.push(p([
+        tx('BOD Loading Rate & % Media (input desain): ', {bold:true, size:20, color:'000000'}),
+        tx(`BOD Loading = ${!isNaN(bodLoad)?fmtS(bodLoad,2):'—'} g BOD/m².hari; % Volume Media = ${!isNaN(mediaPct)?fmtS(mediaPct,1):'—'}% — parameter ini merupakan input langsung dari spesifikasi media biofilm, bukan hasil turunan dari dimensi tangki.`, {size:20, color:'000000'}),
+      ]));
+    }
+    unitBlocks.push(p([tx('Referensi: ', {bold:true, size:17, color:C.mutedText}), tx('Ødegaard, Innovations in Wastewater Treatment, 2006; Lampiran III Permen LH/BPLH No. 11 Tahun 2025.', {size:17, color:C.mutedText})]));
+
+  } else if (u.type === 'biofilter') {
+    const bodLoadVol = u.params.bod_loading_vol || NaN;
+    const surfArea   = u.params.surface_area    || NaN;
+    unitBlocks.push(eqBlock('Hydraulic Retention Time (HRT)', [
+      { note: 'Waktu tinggal air limbah dalam reaktor biofilter (V = Volume Efektif Cair, setelah dikurangi volume media):', eq: [mr('HRT'), mr('  =  '), frac([mr('V')], [mr('Q')])] },
+      { note: `Konversi Q ke m³/jam:`, eq: [mr('HRT'), mr('  =  '), frac([mr(`${fmtS(vol,3)} m³`)], [mr(`${fmtS(Qh,4)} m³/jam`)])] },
+      { isResult: true, eq: [mr('HRT'), mr('  =  '), mr(`${fmtS(hrt_jam,2)} jam`)] },
+    ]));
+    if (!isNaN(bodLoadVol)) {
+      unitBlocks.push(eqBlock('BOD Loading Rate (Volume)', [
+        { note: 'Beban organik per satuan volume media biofilter:', eq: [mr('BLR'), mr('  =  '), frac([mr('Q'), mr(' × '), mr('S₀')], [mr('V_media')])] },
+        { isResult: true, eq: [mr('BLR'), mr('  =  '), mr(`${fmtS(bodLoadVol,3)} kg BOD/m³-media/hari`)] },
+      ]));
+    }
+    if (!isNaN(surfArea)) {
+      unitBlocks.push(p([
+        tx('Luas Permukaan Spesifik Media (input desain): ', {bold:true, size:20, color:'000000'}),
+        tx(`${fmtS(surfArea,0)} m²/m³ — parameter ini merupakan spesifikasi teknis media (mis. bioball/sarang tawon), bukan hasil turunan dari dimensi tangki.`, {size:20, color:'000000'}),
+      ]));
+    }
+    unitBlocks.push(p([tx('Referensi: ', {bold:true, size:17, color:C.mutedText}), tx('Said & Yudo, Penerapan Teknologi Biofilter, 2006; Lampiran III Permen LH/BPLH No. 11 Tahun 2025.', {size:17, color:C.mutedText})]));
+
+  } else if (u.type === 'anaerobic_lagoon' || u.type === 'pond_anaerobic') {
+    const olr = (Q * BOD / 1000) / vol;
+    const hrtHari = vol / (Q / 24) / 24;
+    unitBlocks.push(eqBlock('Organic Loading Rate (VLR)', [
+      { note: 'Beban organik volumetrik per satuan volume kolam anaerobik:', eq: [mr('VLR'), mr('  =  '), frac([mr('Q'), mr(' × '), mr('S₀')], [mr('V')])] },
+      { note: `S₀ = BOD influent (mg/L ÷ 1.000 = kg/m³):`, eq: [mr('VLR'), mr('  =  '), frac([mr(`${fmtS(Q,2)}`), mr(' × '), mr(`${fmtS(BOD,2)}/1.000`)], [mr(`${fmtS(vol,3)}`)])] },
+      { isResult: true, eq: [mr('VLR'), mr('  =  '), mr(`${fmtS(olr,3)} kg BOD/m³.hari`)] },
+    ]));
+    unitBlocks.push(eqBlock('Hydraulic Retention Time (HRT)', [
+      { note: 'Waktu tinggal air limbah dalam kolam (V = Volume Efektif Cair):', eq: [mr('HRT'), mr('  =  '), frac([mr('V')], [mr('Q')])] },
+      { note: `Substitusi nilai, dikonversi ke satuan hari:`, eq: [mr('HRT'), mr('  =  '), frac([mr(`${fmtS(vol,3)} m³`)], [mr(`${fmtS(Q,2)} m³/hari`)])] },
+      { isResult: true, eq: [mr('HRT'), mr('  =  '), mr(`${fmtS(hrtHari,1)} hari`)] },
+    ]));
+    const rasio = u.params.rasio_pl || NaN;
+    if (!isNaN(rasio)) {
+      unitBlocks.push(p([tx('Rasio Panjang/Lebar (input desain): ', {bold:true, size:20, color:'000000'}), tx(`${fmtS(rasio,1)} — dihitung dari dimensi P dan L kolam sebagaimana diisikan pada data unit.`, {size:20, color:'000000'})]));
+    }
+    unitBlocks.push(p([tx('Referensi: ', {bold:true, size:17, color:C.mutedText}), tx('von Sperling, Wastewater Stabilisation Ponds, 2007; Lampiran III Permen LH/BPLH No. 11 Tahun 2025.', {size:17, color:C.mutedText})]));
+
+  } else if (u.type === 'pond_facultative' || u.type === 'pond_fakultatif') {
+    const hrtHari = vol / (Q / 24) / 24;
+    const slrSurf = u.params.slr_surf || NaN;
+    unitBlocks.push(eqBlock('Hydraulic Retention Time (HRT)', [
+      { note: 'Waktu tinggal air limbah dalam kolam fakultatif (V = Volume Efektif Cair):', eq: [mr('HRT'), mr('  =  '), frac([mr('V')], [mr('Q')])] },
+      { note: `Substitusi nilai, dikonversi ke satuan hari:`, eq: [mr('HRT'), mr('  =  '), frac([mr(`${fmtS(vol,3)} m³`)], [mr(`${fmtS(Q,2)} m³/hari`)])] },
+      { isResult: true, eq: [mr('HRT'), mr('  =  '), mr(`${fmtS(hrtHari,1)} hari`)] },
+    ]));
+    if (!isNaN(slrSurf)) {
+      unitBlocks.push(p([
+        tx('Organic Surface Loading Rate (input desain): ', {bold:true, size:20, color:'000000'}),
+        tx(`${fmtS(slrSurf,0)} kg BOD/hektar.hari — dihitung dari beban BOD total dibagi luas permukaan kolam.`, {size:20, color:'000000'}),
+      ]));
+    }
+    const rasio = u.params.rasio_pl || NaN;
+    if (!isNaN(rasio)) {
+      unitBlocks.push(p([tx('Rasio Panjang/Lebar (input desain): ', {bold:true, size:20, color:'000000'}), tx(`${fmtS(rasio,1)} — dihitung dari dimensi P dan L kolam sebagaimana diisikan pada data unit.`, {size:20, color:'000000'})]));
+    }
+    unitBlocks.push(p([tx('Referensi: ', {bold:true, size:17, color:C.mutedText}), tx('Mara, Domestic Wastewater Treatment in Developing Countries, 2004; Lampiran III Permen LH/BPLH No. 11 Tahun 2025.', {size:17, color:C.mutedText})]));
+
+  } else if (u.type === 'pond_maturation' || u.type === 'pond_maturasi') {
+    const hrtHari = vol / (Q / 24) / 24;
+    unitBlocks.push(eqBlock('Hydraulic Retention Time (HRT)', [
+      { note: 'Waktu tinggal air limbah dalam kolam maturasi (V = Volume Efektif Cair):', eq: [mr('HRT'), mr('  =  '), frac([mr('V')], [mr('Q')])] },
+      { note: `Substitusi nilai, dikonversi ke satuan hari:`, eq: [mr('HRT'), mr('  =  '), frac([mr(`${fmtS(vol,3)} m³`)], [mr(`${fmtS(Q,2)} m³/hari`)])] },
+      { isResult: true, eq: [mr('HRT'), mr('  =  '), mr(`${fmtS(hrtHari,1)} hari`)] },
+    ]));
+    unitBlocks.push(p([tx('Referensi: ', {bold:true, size:17, color:C.mutedText}), tx('von Sperling, Wastewater Stabilisation Ponds, 2007; Lampiran III Permen LH/BPLH No. 11 Tahun 2025.', {size:17, color:C.mutedText})]));
+
+  } else if (u.type === 'wetland' || u.type === 'cw_fws' || u.type === 'cw_ssf_h' || u.type === 'cw_ssf_v') {
+    const bodLoad = u.params.bod_loading || NaN;
+    const hrtHari = vol && Q ? vol / (Q / 24) / 24 : NaN;
+    unitBlocks.push(eqBlock('Hydraulic Retention Time (HRT)', [
+      { note: 'Waktu tinggal air limbah dalam wetland/constructed wetland (V = Volume Efektif Cair, memperhitungkan porositas media bila ada):', eq: [mr('HRT'), mr('  =  '), frac([mr('V')], [mr('Q')])] },
+      { note: `Substitusi nilai, dikonversi ke satuan hari:`, eq: [mr('HRT'), mr('  =  '), frac([mr(`${fmtS(vol,3)} m³`)], [mr(`${fmtS(Q,2)} m³/hari`)])] },
+      { isResult: true, eq: [mr('HRT'), mr('  =  '), mr(`${fmtS(hrtHari,1)} hari`)] },
+    ]));
+    if (!isNaN(bodLoad)) {
+      unitBlocks.push(p([
+        tx('BOD Loading Rate (input desain): ', {bold:true, size:20, color:'000000'}),
+        tx(`${fmtS(bodLoad,1)} g BOD/m².hari — dihitung dari beban BOD total dibagi luas permukaan wetland.`, {size:20, color:'000000'}),
+      ]));
+    }
+    unitBlocks.push(p([tx('Referensi: ', {bold:true, size:17, color:C.mutedText}), tx('Kadlec & Wallace, Treatment Wetlands, 2009; Lampiran III Permen LH/BPLH No. 11 Tahun 2025.', {size:17, color:C.mutedText})]));
+
+  } else if (u.type === 'sand_filter' || u.type === 'filtrasi_lambat' || u.type === 'filtrasi_cepat' || u.type === 'filtrasi_tekanan') {
+    const vf = Qh / area;
+    const [vMin,vMax] = u.type === 'filtrasi_cepat' ? [7,15]
+                       : u.type === 'filtrasi_tekanan' ? [15,30]
+                       : [0.1, 0.3];
+    unitBlocks.push(eqBlock(`Kecepatan Aliran Filtrasi — Jenis: ${u.type === 'filtrasi_cepat' ? 'Cepat' : u.type === 'filtrasi_tekanan' ? 'Tekanan' : 'Lambat'}`, [
+      { note: 'Kecepatan aliran vertikal melalui media filter:', eq: [mr('v_f'), mr('  =  '), frac([mr('Q')], [mr('A'), mr(' × '), mr('24')])] },
+      { note: 'Substitusi nilai:', eq: [mr('v_f'), mr('  =  '), frac([mr(`${fmtS(Q,2)} m³/hari`)], [mr(`${fmtS(area,3)} m²`), mr(' × '), mr('24 jam')])] },
+      { isResult: true, eq: [mr('v_f'), mr('  =  '), mr(`${fmtS(vf,3)} m/jam`)] },
+    ]));
+    unitBlocks.push(p([tx('Referensi: ', {bold:true, size:17, color:C.mutedText}), tx(`Tchobanoglous et al., Wastewater Engineering, 2014. Kriteria kecepatan aliran: ${vMin}–${vMax} m/jam; Lampiran III Permen LH/BPLH No. 11 Tahun 2025.`, {size:17, color:C.mutedText})]));
+
+  } else if (u.type === 'anaerobic_digester') {
+    const olr = (Q * COD / 1000) / vol;
+    const hrtHari = vol / (Q / 24) / 24;
+    unitBlocks.push(eqBlock('Organic Loading Rate (OLR)', [
+      { note: 'Beban organik per satuan volume digester, berbasis COD:', eq: [mr('OLR'), mr('  =  '), frac([mr('Q'), mr(' × '), mr('S₀')], [mr('V')])] },
+      { note: `S₀ = COD influent (mg/L ÷ 1.000 = kg/m³):`, eq: [mr('OLR'), mr('  =  '), frac([mr(`${fmtS(Q,2)}`), mr(' × '), mr(`${fmtS(COD,2)}/1.000`)], [mr(`${fmtS(vol,3)}`)])] },
+      { isResult: true, eq: [mr('OLR'), mr('  =  '), mr(`${fmtS(olr,3)} kg COD/m³.hari`)] },
+    ]));
+    unitBlocks.push(eqBlock('Hydraulic Retention Time (HRT)', [
+      { note: 'Waktu tinggal lumpur/air limbah dalam digester anaerobik (V = Volume Efektif Cair):', eq: [mr('HRT'), mr('  =  '), frac([mr('V')], [mr('Q')])] },
+      { note: `Substitusi nilai, dikonversi ke satuan hari:`, eq: [mr('HRT'), mr('  =  '), frac([mr(`${fmtS(vol,3)} m³`)], [mr(`${fmtS(Q,2)} m³/hari`)])] },
+      { isResult: true, eq: [mr('HRT'), mr('  =  '), mr(`${fmtS(hrtHari,1)} hari`)] },
+    ]));
+    unitBlocks.push(p([tx('Referensi: ', {bold:true, size:17, color:C.mutedText}), tx('Metcalf & Eddy, Wastewater Engineering, 2003 (Anaerobic Digestion); Lampiran III Permen LH/BPLH No. 11 Tahun 2025.', {size:17, color:C.mutedText})]));
   }
 
   if (unitBlocks.length > 0) {
     unitBlocks.forEach(b => { if(Array.isArray(b)){b.forEach(e=>elems.push(e));}else{elems.push(b);} elems.push(gap(40)); });
   }
 
+  // Ringkasan Kaskade Volume — penutup akhir Bagian A, dicetak SETELAH semua
+  // rumus (umum & spesifik unit), SEBELUM Bagian B (Kebutuhan Udara / Hasil Verifikasi).
+  if (kaskadeVolumeBlock) {
+    kaskadeVolumeBlock.forEach(e => elems.push(e));
+    elems.push(gap(60));
+  }
+
+  // ── AERASI: Perhitungan Kebutuhan Udara & Diffuser (Metcalf & Eddy 2003) ──
+  if (AEROBIC_UNIT_TYPES.has(u.type)) {
+    const ar = u.params;
+    const BODrem_ar   = ar.ar_BODrem;
+    const bod5bodl_ar = (!isNaN(ar.ar_bod5bodl) && ar.ar_bod5bodl > 0) ? ar.ar_bod5bodl : 0.7;
+    const difftype_ar = ar.ar_difftype || 'fine';
+    const diffLblMap  = { fine:'Fine Bubble', medium:'Medium Bubble', coarse:'Coarse Bubble', custom:'Custom' };
+    const diffLbl_ar  = diffLblMap[difftype_ar] || 'Fine Bubble';
+    const effDiffRaw  = ar.ar_effdiff;
+    const effDiff_ar  = (!isNaN(effDiffRaw) && effDiffRaw > 0) ? effDiffRaw
+                        : (difftype_ar === 'coarse' ? 6 : 10);
+    const effBlower_ar  = (!isNaN(ar.ar_effblower)  && ar.ar_effblower  > 0) ? ar.ar_effblower  : 75;
+    const airPerDiff_ar = (!isNaN(ar.ar_airperdiff) && ar.ar_airperdiff > 0) ? ar.ar_airperdiff : 5;
+    const luasPerDiff_ar= (!isNaN(ar.ar_luasperdiff)&& ar.ar_luasperdiff> 0) ? ar.ar_luasperdiff: 2.8;
+    const rho_ar        = (!isNaN(ar.ar_rho)        && ar.ar_rho        > 0) ? ar.ar_rho        : 1.3;
+    const fraksiO2_ar   = 0.232;
+
+    const arBlockHeader = secLabel('B.  Perhitungan Kebutuhan Udara & Diffuser (Unit Aerobik)');
+    const arRef = p([
+      tx('Referensi: Metcalf & Eddy, Wastewater Engineering, 2003. F/M Ratio extended aeration 0,05–0,2. ' +
+         'Efisiensi diffuser: Coarse bubble 4–8%, Medium bubble 6–15%, Fine bubble 10–30%.',
+         { size: 17, color: C.mutedText, italic: true })
+    ]);
+
+    if (!isNaN(BODrem_ar) && BODrem_ar > 0 && Q > 0) {
+      // ── Calculations ──
+      const O2_day       = (Q * BODrem_ar / bod5bodl_ar) / 1000;
+      const O2_hour      = O2_day / 24;
+      const airReq_kghr  = O2_hour / fraksiO2_ar;
+      const volUd_jam    = airReq_kghr / rho_ar;
+      const volUd_menit  = volUd_jam / 60;
+      const udDiff_menit = volUd_menit / (effDiff_ar / 100);
+      const udFinal_min  = udDiff_menit / (effBlower_ar / 100);
+      const udFinal_jam  = udFinal_min * 60;
+      const airPDm       = airPerDiff_ar / 60;
+      const jmlDiff      = Math.ceil(udFinal_min / airPDm);
+      const luasAerasi   = jmlDiff * luasPerDiff_ar;
+
+      const aerasiBlocks = [];
+      // Step 1
+      aerasiBlocks.push(eqBlock('1) O₂ Required (kg O₂/hari)', [
+        { note: 'Oksigen yang dibutuhkan untuk mengoksidasi BOD yang disisihkan:', eq: [mr('O₂'), mr('  =  '), frac([mr('Q × (S₀−S)'), mr('')], [mr('BOD₅/BODL × 1.000')])] },
+        { note: `Q = ${fmtS(Q,2)} m³/hari, (S₀−S) = ${fmtS(BODrem_ar,2)} mg/L, BOD₅/BODL = ${fmtS(bod5bodl_ar,2)}:`,
+          eq: [mr('O₂'), mr('  =  '), frac([mr(`${fmtS(Q,2)} × ${fmtS(BODrem_ar,2)}`)], [mr(`${fmtS(bod5bodl_ar,2)} × 1.000`)])] },
+        { isResult: true, eq: [mr('O₂ Required'), mr('  =  '), mr(`${fmtS(O2_day,3)} kg O₂/hari`)] },
+      ]));
+      // Step 2
+      aerasiBlocks.push(eqBlock('2) O₂ Required (kg O₂/jam)', [
+        { note: 'Konversi ke per jam:', eq: [mr('O₂/jam'), mr('  =  '), frac([mr('O₂/hari')], [mr('24')])] },
+        { note: 'Substitusi nilai:', eq: [mr('O₂/jam'), mr('  =  '), frac([mr(`${fmtS(O2_day,3)}`)], [mr('24')])] },
+        { isResult: true, eq: [mr('O₂/jam'), mr('  =  '), mr(`${fmtS(O2_hour,4)} kg O₂/jam`)] },
+      ]));
+      // Step 3
+      aerasiBlocks.push(eqBlock('3) Air Required (kg Udara/jam)', [
+        { note: 'Udara mengandung ±23,2% oksigen secara massa (fraksi O₂ = 0,232):', eq: [mr('Air Req'), mr('  =  '), frac([mr('O₂/jam')], [mr('0,232')])] },
+        { note: 'Substitusi nilai:', eq: [mr('Air Req'), mr('  =  '), frac([mr(`${fmtS(O2_hour,4)}`)], [mr('0,232')])] },
+        { isResult: true, eq: [mr('Air Req'), mr('  =  '), mr(`${fmtS(airReq_kghr,3)} kg Udara/jam`)] },
+      ]));
+      // Step 4
+      aerasiBlocks.push(eqBlock('4) Volumetric Udara (m³ Udara/jam dan /menit)', [
+        { note: `Konversi massa ke volume dengan density udara = ${fmtS(rho_ar,2)} kg/m³:`,
+          eq: [mr('Vol Udara'), mr('  =  '), frac([mr('Air Required')], [mr(`ρ udara (${fmtS(rho_ar,2)} kg/m³)`)])] },
+        { note: 'Substitusi nilai:',
+          eq: [mr('Vol Udara'), mr('  =  '), frac([mr(`${fmtS(airReq_kghr,3)} kg/jam`)], [mr(`${fmtS(rho_ar,2)} kg/m³`)])] },
+        { isResult: true, eq: [mr('Vol Udara'), mr('  =  '), mr(`${fmtS(volUd_jam,3)} m³/jam   =   ${fmtS(volUd_menit,4)} m³/menit`)] },
+      ]));
+      // Step 5
+      aerasiBlocks.push(eqBlock(`5) Udara Dibutuhkan dengan Diffuser — ${diffLbl_ar} (Efisiensi ${fmtS(effDiff_ar,0)}%)`, [
+        { note: `Efisiensi transfer diffuser tipe ${diffLbl_ar} = ${fmtS(effDiff_ar,0)}%. Udara yang harus disuplai lebih besar dari kebutuhan oksigen teoritis:`,
+          eq: [mr('Udara+Diff'), mr('  =  '), frac([mr('Vol Udara (m³/menit)')], [mr(`Efisiensi Diffuser (${fmtS(effDiff_ar,0)}%)`)])] },
+        { note: 'Substitusi nilai:', eq: [mr('Udara+Diff'), mr('  =  '), frac([mr(`${fmtS(volUd_menit,4)}`)], [mr(`${fmtS(effDiff_ar/100,2)}`)])] },
+        { isResult: true, eq: [mr('Udara+Diff'), mr('  =  '), mr(`${fmtS(udDiff_menit,4)} m³ Udara/menit`)] },
+      ]));
+      // Step 6
+      aerasiBlocks.push(eqBlock(`6) Maka, Kebutuhan Udara Dibutuhkan — Efisiensi Blower ${fmtS(effBlower_ar,0)}%`, [
+        { note: `Efisiensi mekanik blower = ${fmtS(effBlower_ar,0)}% (tipikal 70–80%):`,
+          eq: [mr('Kebutuhan Udara'), mr('  =  '), frac([mr('Udara+Diff')], [mr(`Efisiensi Blower (${fmtS(effBlower_ar,0)}%)`)])] },
+        { note: 'Substitusi nilai:', eq: [mr('Kebutuhan Udara'), mr('  =  '), frac([mr(`${fmtS(udDiff_menit,4)}`)], [mr(`${fmtS(effBlower_ar/100,2)}`)])] },
+        { isResult: true, eq: [mr('Kebutuhan Udara'), mr('  =  '), mr(`${fmtS(udFinal_min,3)} m³ Udara/menit   (= ${fmtS(udFinal_jam,2)} m³/jam)`)] },
+      ]));
+      // Step 7 & 8 — table form
+      aerasiBlocks.push(eqBlock('7) Jumlah Diffuser (pcs) dan 8) Luas Area Aeration (m²)', [
+        { note: `Air flow per diffuser = ${fmtS(airPerDiff_ar,1)} m³/jam = ${fmtS(airPDm,4)} m³/menit. Coverage per diffuser = ${fmtS(luasPerDiff_ar,2)} m²/pcs:`,
+          eq: [mr('Jumlah Diff'), mr('  =  '), frac([mr(`Kebutuhan Udara (m³/menit)`)], [mr(`Air Flow per Diffuser (m³/menit)`)])] },
+        { note: 'Substitusi nilai:', eq: [mr('Jumlah Diff'), mr('  =  '), frac([mr(`${fmtS(udFinal_min,3)}`)], [mr(`${fmtS(airPDm,4)}`)]), mr('  =  '), mr(`${fmtS(udFinal_min/airPDm,2)} → dibulatkan ke atas`)] },
+        { isResult: true, eq: [mr('Jumlah Diffuser'), mr('  =  '), mr(`${jmlDiff} pcs`)] },
+        { note: `Luas Area Aeration = Jumlah Diffuser × Luas per Diffuser (${fmtS(luasPerDiff_ar,2)} m²/pcs):`,
+          eq: [mr('Luas Area'), mr('  =  '), mr(`${jmlDiff}`), mr(' × '), mr(`${fmtS(luasPerDiff_ar,2)} m²`)] },
+        { isResult: true, eq: [mr('Luas Area Aeration'), mr('  =  '), mr(`${fmtS(luasAerasi,1)} m²`)] },
+      ]));
+
+      // Summary table for aerasi results
+      const arSumRows = [
+        ['Parameter', 'Nilai', 'Satuan'],
+        ['O₂ Required',                      fmtS(O2_day,3),       'kg O₂/hari'],
+        ['O₂ Required',                      fmtS(O2_hour,4),      'kg O₂/jam'],
+        ['Air Required',                      fmtS(airReq_kghr,3),  'kg Udara/jam'],
+        ['Density Udara',                     fmtS(rho_ar,2),       'kg Udara/m³'],
+        ['Volumetric Udara',                  fmtS(volUd_jam,3),    'm³ Udara/jam'],
+        ['Volumetric Udara',                  fmtS(volUd_menit,4),  'm³ Udara/menit'],
+        [`Efisiensi Diffuser (${diffLbl_ar})`,fmtS(effDiff_ar,0),   '%'],
+        ['Udara dengan Diffuser',             fmtS(udDiff_menit,4), 'm³ Udara/menit'],
+        ['Maka, Kebutuhan Udara (Blower '+fmtS(effBlower_ar,0)+'%)', fmtS(udFinal_min,3), 'm³ Udara/menit'],
+        ['Tipe Diffuser',                     diffLbl_ar,           '—'],
+        ['Air Flow per Diffuser',             fmtS(airPerDiff_ar,1),'m³/jam/pcs'],
+        ['Jumlah Diffuser Dibutuhkan',        String(jmlDiff),      'pcs'],
+        ['Luas Area Aeration',                fmtS(luasAerasi,1),   'm²'],
+      ];
+      const COL_AR = [4200, 2760, 2400];
+      aerasiBlocks.push(new Table({
+        width: { size: 9360, type: WidthType.DXA },
+        columnWidths: COL_AR,
+        rows: arSumRows.map((row, ri) => new TableRow({
+          tableHeader: ri === 0,
+          children: row.map((cell_t, ci) => new TableCell({
+            width: { size: COL_AR[ci], type: WidthType.DXA },
+            shading: { type: ShadingType.CLEAR,
+              fill: ri===0 ? 'D0E8FF' : (ri === arSumRows.length-3||ri===arSumRows.length-2||ri===arSumRows.length-1) ? 'E8F5E8' : 'FFFFFF' },
+            borders: { top:{style:BorderStyle.SINGLE,size:2,color:'999999'}, bottom:{style:BorderStyle.SINGLE,size:2,color:'999999'}, left:{style:BorderStyle.SINGLE,size:2,color:'999999'}, right:{style:BorderStyle.SINGLE,size:2,color:'999999'} },
+            margins: { top:55, bottom:55, left:120, right:100 },
+            children: [new Paragraph({
+              children: [new TextRun({ text: cell_t, bold: ri===0||(ci===0&&ri>0), size: ri===0?18:19, color:'000000',
+                font: ci===1&&ri>0?'Courier New':'Times New Roman' })],
+              alignment: ci>0&&ri>0 ? AlignmentType.CENTER : AlignmentType.LEFT,
+            })],
+          })),
+        })),
+      }));
+
+      elems.push(arBlockHeader);
+      elems.push(gap(40));
+      elems.push(arRef);
+      elems.push(gap(60));
+      aerasiBlocks.forEach(b => { if(Array.isArray(b)){b.forEach(e=>elems.push(e));}else{elems.push(b);} elems.push(gap(40)); });
+
+      // Final summary line
+      elems.push(new Paragraph({
+        children: [
+          new TextRun({ text: '✓  Kebutuhan Udara Final: ', bold: true, size: 20, color: '1A6B1A', font: 'Times New Roman' }),
+          new TextRun({ text: `${fmtS(udFinal_min,3)} m³ Udara/menit`, bold: true, size: 20, color: '000000', font: 'Courier New' }),
+          new TextRun({ text: `   |   Diffuser (${diffLbl_ar}): `, bold: false, size: 20, color: '555555', font: 'Times New Roman' }),
+          new TextRun({ text: `${jmlDiff} pcs`, bold: true, size: 20, color: '000000', font: 'Courier New' }),
+          new TextRun({ text: `   |   Luas Area Aerasi: `, bold: false, size: 20, color: '555555', font: 'Times New Roman' }),
+          new TextRun({ text: `${fmtS(luasAerasi,1)} m²`, bold: true, size: 20, color: '000000', font: 'Courier New' }),
+        ],
+        border: { top: { style: BorderStyle.SINGLE, size: 4, color: '1A6B1A' } },
+        spacing: { before: 120, after: 120 },
+      }));
+      elems.push(gap(80));
+    } else {
+      elems.push(arBlockHeader);
+      elems.push(gap(40));
+      elems.push(p([
+        tx('Catatan: ', { bold: true, size: 19, color: C.mutedText }),
+        tx('Perhitungan kebutuhan udara belum dapat ditampilkan karena parameter BOD yang disisihkan (ar_BODrem) belum diisi pada kalkulator aerasi unit ini.',
+           { size: 19, italic: true, color: C.mutedText }),
+      ]));
+      elems.push(gap(80));
+    }
+  }
+
   // Result table
   if (resRows.length > 0) {
-    elems.push(secLabel('B.  Hasil Verifikasi terhadap Kriteria Permen LH No. 11 Tahun 2025'));
+    const hasilLabel = AEROBIC_UNIT_TYPES.has(u.type) ? 'C' : 'B';
+    elems.push(secLabel(`${hasilLabel}.  Hasil Verifikasi terhadap Kriteria Permen LH No. 11 Tahun 2025`));
     elems.push(gap(60));
     elems.push(resultTable(resRows));
     elems.push(gap(80));
@@ -40021,7 +41011,8 @@ function gatherReportData() {
   const tipe   = ipal.tipe || 'buang';
 
   const unitsData = (ipal.units||[]).map((u, idx) => {
-    const vol  = getVol(u.id);
+    const volBreakdown = getVolBreakdown(u.id);
+    const vol  = volBreakdown ? volBreakdown.volEffCair : null; // Volume Efektif Cair — basis HRT tunggal di seluruh laporan
     const area = getArea(u.id);
     const dims = {};
     if (u.shape === 'kotak') {
@@ -40037,7 +41028,7 @@ function gatherReportData() {
       const el = document.getElementById(`u${u.id}_${p}`);
       if (el) params[p] = el.tagName === 'SELECT' ? el.value : parseID(el.value);
     });
-    return { id: u.id, seq: idx+1, type: u.type, label: getUnitLabel(u), shape: u.shape, dims, vol, area, params };
+    return { id: u.id, seq: idx+1, type: u.type, label: getUnitLabel(u), shape: u.shape, dims, vol, area, params, volBreakdown };
   });
 
   const tgl = new Date().toLocaleDateString('id-ID', {day:'2-digit', month:'long', year:'numeric'});
@@ -40947,12 +41938,15 @@ function renderInfluentPanel(){
   }).join('');
 
   // Setelah render ulang, pastikan value input BOD/COD sinkron dengan state IPAL aktif.
+  // Catatan: state disimpan pada ipal.BOD / ipal.COD (lihat saveActiveIpalState()),
+  // BUKAN ipal.bodIn / ipal.codIn — sebelumnya salah nama field sehingga nilai
+  // yang sudah diinput hilang setiap kali panel ini dirender ulang.
   const ipal = (typeof getActiveIpal === 'function') ? getActiveIpal() : null;
   if(ipal){
     const bodEl = document.getElementById('bodIn');
     const codEl = document.getElementById('codIn');
-    if(bodEl && ipal.bodIn !== undefined) bodEl.value = ipal.bodIn || '';
-    if(codEl && ipal.codIn !== undefined) codEl.value = ipal.codIn || '';
+    if(bodEl && ipal.BOD !== undefined) bodEl.value = ipal.BOD || '';
+    if(codEl && ipal.COD !== undefined) codEl.value = ipal.COD || '';
   }
 }
 
@@ -41122,22 +42116,52 @@ function fluktToggleLine(scopeKey, label) {
 function fluktLegendPanelHtml(scopeKey, items) {
   // items: [{label, color, dashed}]
   return `
-    <div class="fl-legend-panel" style="display:flex;flex-wrap:wrap;gap:6px 14px;padding:10px 12px;background:var(--card);border:1px solid var(--line);border-radius:8px;margin-bottom:10px;">
-      ${items.map((it,idx)=>`
-        <label id="fluktChk_${scopeKey}_${idx}" class="fl-line-toggle" style="display:flex;align-items:center;gap:6px;font-size:.75rem;color:var(--ink-soft);cursor:pointer;user-select:none;">
-          <input type="checkbox" checked
-            onchange="fluktToggleLine('${scopeKey}', ${JSON.stringify(it.label).replace(/"/g,'&quot;')})"
-            style="accent-color:${it.color};width:14px;height:14px;cursor:pointer;">
-          <span style="display:inline-block;width:16px;height:0;border-top:${it.dashed?'2.5px dashed':'3px solid'} ${it.color};"></span>
-          <span class="fl-line-label">${escH(it.label)}</span>
-        </label>
-      `).join('')}
+    <div class="fl-legend-panel" style="display:flex;flex-direction:column;gap:8px;padding:10px 12px;background:var(--card);border:1px solid var(--line);border-radius:8px;margin-bottom:10px;">
+      <div style="font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;">Keterangan Garis</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px 14px;">
+        ${items.map((it,idx)=>`
+          <label id="fluktChk_${scopeKey}_${idx}" class="fl-line-toggle" style="display:flex;align-items:center;gap:6px;font-size:.75rem;color:var(--ink-soft);cursor:pointer;user-select:none;">
+            <input type="checkbox" checked
+              onchange="fluktToggleLine('${scopeKey}', ${JSON.stringify(it.label).replace(/"/g,'&quot;')})"
+              style="accent-color:${it.color};width:14px;height:14px;cursor:pointer;">
+            <span style="display:inline-block;width:16px;height:0;border-top:${it.dashed?'2.5px dashed':'3px solid'} ${it.color};"></span>
+            <span class="fl-line-label">${escH(it.label)}</span>
+          </label>
+        `).join('')}
+      </div>
     </div>
     <style>
       .fl-line-off .fl-line-label{ text-decoration:line-through; opacity:.5; }
       .fl-line-off span[style*="border-top"]{ opacity:.35; }
     </style>
   `;
+}
+
+// Legenda kustom di atas grafik fluktuasi: setiap item digambar sebagai GARIS murni
+// (border-top solid/dashed sesuai borderDash dataset), bukan kotak/swatch berisi warna,
+// karena Chart.js bawaan (termasuk pointStyle:'line') tetap menggambar kotak fillStyle.
+// Klik item untuk sembunyikan/tampilkan garis tersebut pada grafik.
+function renderFluktChartLegend(datasets) {
+  const el = document.getElementById('fluktChartLegend');
+  if (!el) return;
+  el.innerHTML = datasets.map((ds,i) => {
+    const dashed = ds.borderDash && ds.borderDash.length;
+    const borderStyle = dashed ? 'dashed' : 'solid';
+    const w = Math.max(2, Math.round(ds.borderWidth || 2));
+    return `<span class="fl-cl-item${ds.hidden?' fl-cl-off':''}" onclick="fluktLegendToggle(${i})">
+      <span class="fl-cl-swatch" style="border-top:${w}px ${borderStyle} ${ds.borderColor};"></span>
+      ${escH(ds.label)}
+    </span>`;
+  }).join('');
+}
+function fluktLegendToggle(idx) {
+  if (!fluktChart) return;
+  const meta = fluktChart.getDatasetMeta(idx);
+  meta.hidden = meta.hidden===null ? !fluktChart.data.datasets[idx].hidden : !meta.hidden;
+  fluktChart.update();
+  renderFluktChartLegend(fluktChart.data.datasets.map((ds,i)=>({
+    ...ds, hidden: !fluktChart.isDatasetVisible(i)
+  })));
 }
 
 function calcWeightedHourly(srcData) {
@@ -41148,6 +42172,77 @@ function calcWeightedHourly(srcData) {
   );
   return { hourlyQ, hourlyPct: hourlyQ.map(v=>v/totalQ*100), totalQ };
 }
+
+// ── RINGKASAN FLUKTUASI (Debit rata-rata, Peak Factor, Debit jam puncak, Durasi beban puncak) ──
+// Durasi beban puncak dihitung sebagai jumlah jam berturut-turut (melingkupi jam puncak,
+// termasuk wrap-around 23→00) yang debitnya ≥ 90% dari debit jam puncak — ambang umum
+// yang dipakai untuk menandai rentang "beban puncak" pada kurva fluktuasi harian.
+function calcFluktSummary(hourlyQ, totalQ, peakHour) {
+  const avgHourlyQ = totalQ / 24;
+  const peakQ = hourlyQ[peakHour] || 0;
+  const peakFactor = avgHourlyQ > 0 ? peakQ / avgHourlyQ : 0;
+
+  const THRESH = 0.9; // 90% dari debit jam puncak
+  const cut = peakQ * THRESH;
+  let durasiJam = 0;
+  if (peakQ > 0) {
+    // Merambat ke kiri & kanan dari jam puncak (wrap-around 24 jam) selama masih ≥ ambang
+    durasiJam = 1;
+    for (let i=1; i<24; i++) {
+      const h = (peakHour + i) % 24;
+      if (hourlyQ[h] >= cut) durasiJam++; else break;
+    }
+    for (let i=1; i<24; i++) {
+      const h = (peakHour - i + 24) % 24;
+      if (hourlyQ[h] >= cut) durasiJam++; else break;
+    }
+    durasiJam = Math.min(durasiJam, 24);
+  }
+  return { avgHourlyQ, peakFactor, peakQ, durasiJam };
+}
+
+// Tabel ringkasan untuk mode "Semua IPAL": satu kolom per unit IPAL + total gabungan.
+function fluktSummaryTableAllHtml(totalSummary, perIpalData) {
+  const cols = [
+    { label:'Total Gabungan', s: totalSummary },
+    ...perIpalData.map(d => ({ label: d.ipal.name, s: d.summary }))
+  ];
+  return `<div class="fl-tbl-wrap"><table class="fl-tbl" style="min-width:${180+cols.length*140}px;">
+    <thead>
+      <tr>
+        <th style="text-align:left;">Parameter</th>
+        ${cols.map(c=>`<th>${escH(c.label)}</th>`).join('')}
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td style="text-align:left;">Debit rata-rata per jam <span style="font-weight:400;font-size:.65rem;">(m³/jam)</span></td>
+        ${cols.map(c=>`<td>${fmtID(c.s.avgHourlyQ,3)}</td>`).join('')}</tr>
+      <tr><td style="text-align:left;">Peak Factor</td>
+        ${cols.map(c=>`<td>${fmtID(c.s.peakFactor,2)}</td>`).join('')}</tr>
+      <tr><td style="text-align:left;">Debit jam puncak <span style="font-weight:400;font-size:.65rem;">(m³/jam)</span></td>
+        ${cols.map(c=>`<td class="fl-peak">${fmtID(c.s.peakQ,3)}</td>`).join('')}</tr>
+      <tr><td style="text-align:left;">Durasi beban puncak <span style="font-weight:400;font-size:.65rem;">(jam, ≥90% debit puncak)</span></td>
+        ${cols.map(c=>`<td>${c.s.durasiJam} jam</td>`).join('')}</tr>
+    </tbody>
+  </table></div>`;
+}
+
+// Tabel ringkasan untuk mode per-IPAL: satu kolom saja untuk unit IPAL yang dipilih.
+function fluktSummaryTableSingleHtml(summary) {
+  return `<div class="fl-tbl-wrap"><table class="fl-tbl" style="min-width:320px;">
+    <tbody>
+      <tr><td style="text-align:left;">Debit rata-rata per jam <span style="font-weight:400;font-size:.65rem;">(m³/jam)</span></td>
+        <td>${fmtID(summary.avgHourlyQ,3)}</td></tr>
+      <tr><td style="text-align:left;">Peak Factor</td>
+        <td>${fmtID(summary.peakFactor,2)}</td></tr>
+      <tr><td style="text-align:left;">Debit jam puncak <span style="font-weight:400;font-size:.65rem;">(m³/jam)</span></td>
+        <td class="fl-peak">${fmtID(summary.peakQ,3)}</td></tr>
+      <tr><td style="text-align:left;">Durasi beban puncak <span style="font-weight:400;font-size:.65rem;">(jam, ≥90% debit puncak)</span></td>
+        <td>${summary.durasiJam} jam</td></tr>
+    </tbody>
+  </table></div>`;
+}
+
 
 function buildSrcData(ipal) {
   if (!ipal || typeof paRows==='undefined') return [];
@@ -41202,13 +42297,67 @@ function fluktSelectIpal(id) {
 
 function downloadFluktChart() {
   const canvas = document.getElementById('fluktCanvas');
-  if (!canvas) return;
-  const link = document.createElement('a');
+  if (!canvas || !fluktChart) return;
   const ipalName = fluktActiveIpalId==='all'
     ? 'Semua_IPAL'
     : (ipals.find(x=>x.id===fluktActiveIpalId)||{name:'IPAL'}).name.replace(/\s+/g,'_');
+
+  // Render ulang ke canvas offscreen: pita legenda (garis murni, bukan kotak)
+  // digambar di atas, lalu grafik chart.js di bawahnya — supaya file PNG yang
+  // diunduh ikut menampilkan keterangan garis yang benar bentuknya.
+  const datasets = fluktChart.data.datasets.filter((ds,i)=>fluktChart.isDatasetVisible(i));
+  const legendRowH = 26;
+  const legendPadX = 14, legendPadTop = 12, legendGap = 22;
+  const off = document.createElement('canvas');
+  const scale = window.devicePixelRatio || 1;
+  const chartW = canvas.width, chartH = canvas.height;
+  const cssW = canvas.clientWidth || chartW/scale, cssH = canvas.clientHeight || chartH/scale;
+
+  // Hitung berapa baris dibutuhkan legenda berdasar lebar teks (perkiraan)
+  const ctxMeasure = off.getContext('2d');
+  ctxMeasure.font = '600 12px Arial, sans-serif';
+  let rows = 1, curX = legendPadX;
+  const itemWidths = datasets.map(ds => 26 + ctxMeasure.measureText(ds.label).width + legendGap);
+  itemWidths.forEach(w=>{
+    if (curX + w > cssW - legendPadX) { rows++; curX = legendPadX; }
+    curX += w;
+  });
+  const legendH = legendPadTop*2 + rows*legendRowH;
+
+  off.width = Math.round(cssW * scale);
+  off.height = Math.round((cssH + legendH) * scale);
+  off.style.width = cssW + 'px';
+  const ctx = off.getContext('2d');
+  ctx.scale(scale, scale);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, cssW, cssH + legendH);
+
+  // Gambar legenda: garis solid/dashed sesuai dataset, lalu label teks
+  ctx.font = '600 12px Arial, sans-serif';
+  ctx.textBaseline = 'middle';
+  let lx = legendPadX, ly = legendPadTop + legendRowH/2;
+  datasets.forEach((ds,i)=>{
+    const w = itemWidths[i];
+    if (lx + w > cssW - legendPadX) { lx = legendPadX; ly += legendRowH; }
+    ctx.strokeStyle = ds.borderColor || '#333';
+    ctx.lineWidth = ds.borderWidth || 2;
+    ctx.setLineDash(ds.borderDash && ds.borderDash.length ? ds.borderDash : []);
+    ctx.beginPath();
+    ctx.moveTo(lx, ly);
+    ctx.lineTo(lx + 20, ly);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#222';
+    ctx.fillText(ds.label, lx + 26, ly);
+    lx += w;
+  });
+
+  // Tempel grafik chart.js di bawah pita legenda
+  ctx.drawImage(canvas, 0, legendH * scale, chartW, chartH, 0, legendH, cssW, cssH);
+
+  const link = document.createElement('a');
   link.download = `Fluktuasi_${ipalName}.png`;
-  link.href = canvas.toDataURL('image/png');
+  link.href = off.toDataURL('image/png');
   link.click();
 }
 
@@ -41227,6 +42376,8 @@ function fluktChartOpts(extraPlugins) {
     interaction: { mode:'index', intersect:false },
     plugins: {
       legend: { display:false },
+      // Legenda kustom (garis murni, bukan swatch kotak) dirender terpisah
+      // via renderFluktChartLegend() ke dalam div#fluktChartLegend di atas canvas.
       tooltip: {
         callbacks: { label: ctx => ` ${ctx.dataset.label}: ${fmtID(ctx.parsed.y,3)} m\u00b3/jam` }
       },
@@ -41289,12 +42440,14 @@ function renderFluktuasiContent() {
     }
     const { hourlyQ, hourlyPct, totalQ } = calcWeightedHourly(allSrc);
     const peakHour = hourlyQ.indexOf(Math.max(...hourlyQ));
+    const totalSummary = calcFluktSummary(hourlyQ, totalQ, peakHour);
 
     const perIpalData = ipals.map(ip => {
       const sd = buildSrcData(ip);
       if (!sd.length) return null;
       const { hourlyQ: hq, totalQ: tq } = calcWeightedHourly(sd);
-      return { ipal:ip, hourlyQ:hq, totalQ:tq };
+      const pk = hq.indexOf(Math.max(...hq));
+      return { ipal:ip, hourlyQ:hq, totalQ:tq, summary: calcFluktSummary(hq, tq, pk) };
     }).filter(Boolean);
 
     // Sumber belum ditugaskan tetap disertakan dalam total gabungan supaya
@@ -41302,7 +42455,8 @@ function renderFluktuasiContent() {
     // terpisah agar pengguna tahu ada bagian yang belum diberi unit IPAL tujuan.
     if (unassignedSrc.length) {
       const { hourlyQ: hq, totalQ: tq } = calcWeightedHourly(unassignedSrc);
-      perIpalData.push({ ipal:{ id:'__unassigned__', name:'Belum Ditugaskan' }, hourlyQ:hq, totalQ:tq });
+      const pk = hq.indexOf(Math.max(...hq));
+      perIpalData.push({ ipal:{ id:'__unassigned__', name:'Belum Ditugaskan' }, hourlyQ:hq, totalQ:tq, summary: calcFluktSummary(hq, tq, pk) });
     }
 
     const nIpalActive = perIpalData.filter(d=>d.ipal.id!=='__unassigned__').length;
@@ -41317,7 +42471,11 @@ function renderFluktuasiContent() {
         ≈ <strong>${fmtID(hourlyQ[peakHour],3)} m³/jam</strong>
         (${fmtID(hourlyPct[peakHour],1)}% debit harian total).${unassignedNote}
       </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:6px;">
+      <div class="fl-section-hd" style="margin:0;">Ringkasan Fluktuasi — Semua IPAL</div>
+      <p style="font-size:.75rem;color:var(--muted);margin:2px 0 10px;">Debit rata-rata per jam, Peak Factor, debit jam puncak, dan durasi beban puncak (≥90% debit puncak) untuk tiap unit IPAL.</p>
+      ${fluktSummaryTableAllHtml(totalSummary, perIpalData)}
+
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:6px;margin-top:20px;">
         <div class="fl-section-hd" style="margin:0;">Grafik Fluktuasi — Semua IPAL</div>
         ${fluktDlBtn()}
       </div>
@@ -41329,7 +42487,7 @@ function renderFluktuasiContent() {
         { label:'Total Gabungan', color:'#0D47A1', dashed:false },
         ...perIpalData.map((d,i)=>({ label:d.ipal.name, color:IPAL_COLORS[i%IPAL_COLORS.length], dashed:true }))
       ])}
-      <div class="fl-chart-wrap"><canvas id="fluktCanvas" height="270"></canvas></div>
+      <div class="fl-chart-wrap"><div id="fluktChartLegend" class="fl-chart-legend"></div><canvas id="fluktCanvas" height="270"></canvas></div>
 
       <div class="fl-section-hd">Tabel Fluktuasi — Gabungan Semua IPAL</div>
       <p style="font-size:.75rem;color:var(--muted);margin:-6px 0 10px;">Σ debit 24 jam = total debit harian seluruh IPAL. Kolom kuning = jam puncak.</p>
@@ -41373,6 +42531,7 @@ function renderFluktuasiContent() {
         }))
       ];
       fluktChart=new Chart(canvas,{type:'line',data:{labels:xLabels,datasets},options:fluktChartOpts({})});
+      renderFluktChartLegend(datasets);
       datasets.forEach((ds,idx)=>{
         if(ds.hidden){
           const row=document.getElementById(`fluktChk_all_${idx}`);
@@ -41397,6 +42556,7 @@ function renderFluktuasiContent() {
 
   const { hourlyQ, hourlyPct, totalQ } = calcWeightedHourly(srcData);
   const peakHour = hourlyQ.indexOf(Math.max(...hourlyQ));
+  const summary = calcFluktSummary(hourlyQ, totalQ, peakHour);
   const usedProfiles = [...new Set(srcData.map(d=>d.profileKey))];
   const multiSrc = srcData.length > 1;
 
@@ -41425,7 +42585,11 @@ function renderFluktuasiContent() {
       ≈ <strong>${fmtID(hourlyQ[peakHour],3)} m³/jam</strong> (${fmtID(hourlyPct[peakHour],1)}%).
     </div>
     ${bobotHtml}
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:6px;">
+    <div class="fl-section-hd" style="margin:0;">Ringkasan Fluktuasi — ${escH(ipal.name)}</div>
+    <p style="font-size:.75rem;color:var(--muted);margin:2px 0 10px;">Debit rata-rata per jam, Peak Factor, debit jam puncak, dan durasi beban puncak (≥90% debit puncak).</p>
+    ${fluktSummaryTableSingleHtml(summary)}
+
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:6px;margin-top:20px;">
       <div class="fl-section-hd" style="margin:0;">Grafik Fluktuasi — ${escH(ipal.name)}</div>
       ${fluktDlBtn()}
     </div>
@@ -41437,7 +42601,7 @@ function renderFluktuasiContent() {
       ...srcData.map(d=>({ label:`${d.nama} (${d.profile.label})`, color:d.profile.color, dashed:false })),
       { label:`Total — ${ipal.name}`, color:'#0D47A1', dashed:false }
     ])}
-    <div class="fl-chart-wrap"><canvas id="fluktCanvas" height="240"></canvas></div>
+    <div class="fl-chart-wrap"><div id="fluktChartLegend" class="fl-chart-legend"></div><canvas id="fluktCanvas" height="240"></canvas></div>
 
     <div class="fl-section-hd">Tabel Fluktuasi — ${escH(ipal.name)}</div>
     <p style="font-size:.75rem;color:var(--muted);margin:-6px 0 10px;">Σ debit 24 jam = total debit harian. Kolom kuning = jam puncak.</p>
@@ -41491,6 +42655,7 @@ function renderFluktuasiContent() {
       }
     ];
     fluktChart=new Chart(canvas,{type:'line',data:{labels:xLabels,datasets},options:fluktChartOpts({})});
+    renderFluktChartLegend(datasets);
     datasets.forEach((ds,idx)=>{
       if(ds.hidden){
         const row=document.getElementById(`fluktChk_byIpal_${idx}`);
