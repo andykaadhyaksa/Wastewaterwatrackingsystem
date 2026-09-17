@@ -348,21 +348,20 @@ footer{text-align:center;padding:26px 20px;font-size:.72rem;color:var(--faint);b
 .export-dd-item .edi-sub{font-size:0.72rem;color:var(--muted);line-height:1.35;white-space:normal;}
 
 /* ── IPAL TABS ──────────────────────────────────── */
-.ipal-tabs-bar{
-  background:var(--card);border-bottom:1px solid var(--line);
-  padding:0 20px;display:flex;align-items:center;gap:6px;
-  overflow-x:auto;flex-wrap:nowrap;max-width:900px;margin:0 auto;
-  min-height:52px;
-}
+
 .ipal-tab{
   display:flex;align-items:center;gap:6px;
   padding:8px 14px;
   border:1.5px solid transparent;
   border-radius:8px;
-  background:transparent;cursor:pointer;
+  background:transparent;cursor:grab;
   font-size:0.8rem;font-weight:600;color:var(--muted);
-  transition:all 0.15s;white-space:nowrap;
+  transition:background .15s,color .15s,border-color .15s,opacity .15s;
+  white-space:nowrap;flex-shrink:0;
 }
+.ipal-tab.dragging{opacity:0.4;cursor:grabbing;}
+.ipal-tab.drag-over-left{border-left:3px solid var(--accent);}
+.ipal-tab.drag-over-right{border-right:3px solid var(--accent);}
 .ipal-tab.active{
   background:var(--active);
   color:white;
@@ -536,7 +535,21 @@ footer{text-align:center;padding:26px 20px;font-size:.72rem;color:var(--faint);b
   padding:14px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;
   position:sticky;top:0;z-index:90;
 }
-.topbar-tabs{display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex:1;min-width:220px;}
+.topbar-tabs-wrap{display:flex;align-items:center;gap:4px;flex:1;min-width:0;}
+.topbar-tabs{display:flex;align-items:center;gap:8px;flex-wrap:nowrap;flex:1;min-width:0;overflow-x:auto;scroll-behavior:smooth;scrollbar-width:none;-ms-overflow-style:none;}
+.topbar-tabs::-webkit-scrollbar{display:none;}
+.tabs-scroll-btn{flex-shrink:0;background:var(--card);border:1.5px solid var(--line);border-radius:8px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);transition:background .15s,color .15s;}
+.tabs-scroll-btn:hover{background:var(--line-soft);color:var(--ink);}
+.tabs-scroll-btn:disabled{opacity:0.3;cursor:default;pointer-events:none;}
+.tabs-scroll-btn svg{width:15px;height:15px;}
+.tabs-more-btn{flex-shrink:0;background:var(--card);border:1.5px solid var(--line);border-radius:8px;padding:0 10px;height:30px;display:flex;align-items:center;gap:4px;cursor:pointer;color:var(--muted);font-size:0.75rem;font-weight:600;transition:background .15s,color .15s;}
+.tabs-more-btn:hover{background:var(--line-soft);color:var(--ink);}
+.tabs-more-menu{position:absolute;top:100%;right:0;margin-top:4px;background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 32px rgba(20,24,31,0.16);padding:6px;min-width:180px;max-height:320px;overflow-y:auto;z-index:200;display:none;}
+.tabs-more-menu.open{display:block;}
+.tabs-more-item{display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;background:none;border:none;border-radius:7px;padding:8px 10px;cursor:pointer;font-family:inherit;font-size:0.8rem;font-weight:600;color:var(--ink);transition:background .15s;}
+.tabs-more-item:hover{background:var(--line-soft);}
+.tabs-more-item.active{background:var(--accent-soft);color:var(--accent);}
+.tabs-more-wrap{position:relative;flex-shrink:0;}
 .topbar-actions{display:flex;align-items:center;gap:10px;margin-left:auto;flex-wrap:wrap;}
 
 /* summary card */
@@ -686,6 +699,14 @@ footer{text-align:center;padding:26px 20px;font-size:.72rem;color:var(--faint);b
 .pa-recap-group-table .td-muted{color:var(--muted);font-size:0.75rem;}
 .pa-recap-group-table tfoot td{background:#f4f7fb;font-weight:700;border-top:2px solid var(--line);color:var(--ink);}
 .pa-recap-group-ipal-tag{display:inline-block;font-size:0.65rem;font-weight:600;background:#e3f2fd;color:#0D47A1;border:1px solid #90caf9;border-radius:4px;padding:1px 6px;margin-left:6px;}
+.pa-recap-group-ipal-block{margin-bottom:16px;}
+.pa-recap-group-ipal-block:last-of-type{margin-bottom:0;}
+.pa-recap-group-ipal-title{font-size:0.78rem;font-weight:700;color:#0D47A1;background:#e3f2fd;border:1px solid #90caf9;border-radius:6px 6px 0 0;padding:6px 12px;}
+.pa-recap-group-ipal-block .pa-recap-group-table{border-radius:0 0 8px 8px;border-top:none;}
+.pa-recap-group-grandtotal{display:flex;align-items:center;justify-content:flex-end;gap:24px;background:#0D47A1;color:#fff;border-radius:8px;padding:10px 16px;margin-top:8px;font-size:0.8rem;font-weight:700;}
+.pa-recap-group-grandtotal .td-muted{color:rgba(255,255,255,0.75);font-weight:600;}
+.pa-recap-group-grandtotal .td-num{color:#fff;}
+.pa-recap-group-grandtotal .td-green{color:#a5d6a7;}
 .pa-diagram-hd{font-weight:700;font-size:0.92rem;color:var(--ink);margin-bottom:4px;}
 .pa-diagram-sub{font-size:0.78rem;color:var(--muted);margin-bottom:14px;}
 .pa-diagram-box{background:var(--card);border:1px solid var(--line);border-radius:var(--r-sm);padding:16px;overflow-x:auto;}
@@ -830,7 +851,21 @@ footer{text-align:center;padding:26px 20px;font-size:.72rem;color:var(--faint);b
 
     <!-- TOP BAR -->
     <div class="topbar">
-      <div class="topbar-tabs" id="ipalTabs"></div>
+      <div class="topbar-tabs-wrap">
+        <button class="tabs-scroll-btn" id="tabsScrollLeft" onclick="scrollIpalTabs(-1)" title="Geser ke kiri">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="topbar-tabs" id="ipalTabs"></div>
+        <button class="tabs-scroll-btn" id="tabsScrollRight" onclick="scrollIpalTabs(1)" title="Geser ke kanan">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <div class="tabs-more-wrap">
+          <button class="tabs-more-btn" id="tabsMoreBtn" onclick="toggleTabsMoreMenu(event)" title="Lihat semua IPAL">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+          </button>
+          <div class="tabs-more-menu" id="tabsMoreMenu"></div>
+        </div>
+      </div>
       <div class="topbar-actions">
         <span id="autosaveIndicator" style="display:none;align-items:center;gap:5px;font-size:0.72rem;color:var(--muted);margin-right:4px;white-space:nowrap;">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
@@ -895,6 +930,10 @@ footer{text-align:center;padding:26px 20px;font-size:.72rem;color:var(--faint);b
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               Tambah Kegiatan/Fasilitas
             </button>
+          </div>
+          <div id="paOrphanBanner" style="display:none;background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:12px 16px;margin-bottom:14px;font-size:0.82rem;color:#664d03;display:flex;align-items:center;justify-content:space-between;gap:12px;">
+            <span>⚠️ <strong id="paOrphanCount"></strong> ditemukan tidak terhubung ke IPAL manapun (kemungkinan tersisa dari IPAL yang pernah dihapus).</span>
+            <button onclick="paRecoverOrphanedData()" style="flex-shrink:0;background:#664d03;color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:0.78rem;font-weight:700;cursor:pointer;white-space:nowrap;">Pulihkan ke tab ini</button>
           </div>
           <div id="paCards" class="pa-cards"></div>
           <div id="paEmptyHint" class="pa-empty-hint" style="display:none;">
@@ -1228,7 +1267,7 @@ footer{text-align:center;padding:26px 20px;font-size:.72rem;color:var(--faint);b
                 <div class="toggle on" id="toggleSummary" onclick="toggleSummaryPanel()"></div>
               </div>
               <div class="settings-row">
-                <div><div class="s-lbl">Versi Aplikasi</div><div class="s-sub">Wastewater Tracking v1.2 · Permen LH/BPLH No. 11 Tahun 2025</div></div>
+                <div><div class="s-lbl">Versi Aplikasi</div><div class="s-sub">Wastewater Tracking v1.3 · Permen LH/BPLH No. 11 Tahun 2025</div></div>
               </div>
             </div>
           </div>
@@ -1276,7 +1315,7 @@ footer{text-align:center;padding:26px 20px;font-size:.72rem;color:var(--faint);b
   </div>
 </div>
 
-<footer>Wastewater Tracking v1.2 &nbsp;|&nbsp; Permen LH/BPLH No. 11 Tahun 2025 — Lampiran III &nbsp;|&nbsp; Format: titik (.) ribuan · koma (,) desimal</footer>
+<footer>Wastewater Tracking v1.3 &nbsp;|&nbsp; Permen LH/BPLH No. 11 Tahun 2025 — Lampiran III &nbsp;|&nbsp; Format: titik (.) ribuan · koma (,) desimal</footer>
 
 <script>
 // ── DAFTAR HALAMAN (dibutuhkan oleh showPage) ────────
@@ -3772,15 +3811,39 @@ function addIpal(){
   switchIpal(ipal.id);
   renderIpalTabs();
   refreshPenggunaanAirIfVisible();
+  scheduleAutosave();
 }
 
 function deleteIpal(id){
   if(ipals.length <= 1){alert('Minimal satu IPAL harus ada.');return;}
-  if(!confirm('Hapus IPAL ini beserta semua unit prosesnya?'))return;
+
+  // Warn clearly about everything that will be removed, so this is never a
+  // silent data-loss surprise (previously only the IPAL tab itself was
+  // removed while its Penggunaan Air rows/groups were silently orphaned).
+  const deletedIpal = ipals.find(x=>x.id===id);
+  const nFasilitas = paRows.filter(r=>String(r.ipalId)===String(id)).length;
+  const nGrup = paGroups.filter(g=>String(g.ipalId)===String(id)).length;
+  let warnMsg = `Hapus IPAL "${deletedIpal?deletedIpal.name:''}"?`;
+  if(nFasilitas || nGrup){
+    warnMsg += `\n\nIni juga akan menghapus:`;
+    if(nFasilitas) warnMsg += `\n• ${nFasilitas} kegiatan/fasilitas Penggunaan Air`;
+    if(nGrup) warnMsg += `\n• ${nGrup} grup kegiatan/fasilitas`;
+  }
+  warnMsg += `\n\nTindakan ini tidak bisa dibatalkan.`;
+  if(!confirm(warnMsg))return;
+
   ipals = ipals.filter(x=>x.id!==id);
+  // Clean up Penggunaan Air rows and groups that belonged to the deleted
+  // IPAL — previously these were left behind as orphaned data (never shown
+  // again, but never freed either), which is what caused a group to appear
+  // to "disappear" after its IPAL was removed and a new one created.
+  paRows = paRows.filter(r=>String(r.ipalId)!==String(id));
+  paGroups = paGroups.filter(g=>String(g.ipalId)!==String(id));
+
   if(activeIpalId===id) switchIpal(ipals[0].id);
   else renderIpalTabs();
   refreshPenggunaanAirIfVisible();
+  scheduleAutosave();
 }
 
 function renameIpal(id){
@@ -3792,6 +3855,7 @@ function renameIpal(id){
     renderIpalTabs();
     if(typeof updateSummary==='function') updateSummary();
     refreshPenggunaanAirIfVisible();
+    scheduleAutosave();
   }
 }
 
@@ -3911,13 +3975,131 @@ function loadActiveIpalState(){
 function renderIpalTabs(){
   const container = document.getElementById('ipalTabs');
   if(!container) return;
-  container.innerHTML = ipals.map(ipal => `
-    <div class="ipal-tab ${ipal.id===activeIpalId?'active':''}" onclick="switchIpal(${ipal.id})">
+  container.innerHTML = ipals.map((ipal,i) => `
+    <div class="ipal-tab ${ipal.id===activeIpalId?'active':''}"
+         draggable="true"
+         data-ipal-id="${ipal.id}"
+         data-ipal-idx="${i}"
+         onclick="switchIpal(${ipal.id})"
+         ondragstart="ipalTabDragStart(event,${ipal.id})"
+         ondragover="ipalTabDragOver(event,${ipal.id})"
+         ondragleave="ipalTabDragLeave(event)"
+         ondrop="ipalTabDrop(event,${ipal.id})"
+         ondragend="ipalTabDragEnd(event)">
       <span class="tab-name" ondblclick="renameIpal(${ipal.id})" title="Klik dua kali untuk ganti nama">${escH(ipal.name)}</span>
       <button class="tab-rename" onclick="event.stopPropagation();renameIpal(${ipal.id})" title="Ganti nama">✎</button>
       ${ipals.length>1?`<button class="tab-del" onclick="event.stopPropagation();deleteIpal(${ipal.id})" title="Hapus IPAL">✕</button>`:''}
     </div>
   `).join('') + `<button class="tab-add" onclick="addIpal()" title="Tambah IPAL baru">＋ IPAL</button>`;
+
+  renderTabsMoreMenu();
+  updateTabsScrollButtons();
+}
+
+// ── Horizontal scroll buttons ──────────────────────
+function scrollIpalTabs(dir){
+  const el = document.getElementById('ipalTabs');
+  if(!el) return;
+  el.scrollBy({ left: dir*160, behavior:'smooth' });
+}
+
+function updateTabsScrollButtons(){
+  const el = document.getElementById('ipalTabs');
+  const leftBtn = document.getElementById('tabsScrollLeft');
+  const rightBtn = document.getElementById('tabsScrollRight');
+  if(!el||!leftBtn||!rightBtn) return;
+  const update = ()=>{
+    leftBtn.disabled = el.scrollLeft <= 2;
+    rightBtn.disabled = el.scrollLeft >= (el.scrollWidth - el.clientWidth - 2);
+  };
+  update();
+  el.onscroll = update;
+}
+
+// ── "More" dropdown listing every IPAL ─────────────
+function renderTabsMoreMenu(){
+  const menu = document.getElementById('tabsMoreMenu');
+  if(!menu) return;
+  menu.innerHTML = ipals.map(ipal => `
+    <button class="tabs-more-item ${ipal.id===activeIpalId?'active':''}" onclick="switchIpal(${ipal.id});closeTabsMoreMenu();">
+      <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escH(ipal.name)}</span>
+    </button>
+  `).join('');
+}
+
+function toggleTabsMoreMenu(ev){
+  ev.stopPropagation();
+  const menu = document.getElementById('tabsMoreMenu');
+  if(!menu) return;
+  menu.classList.toggle('open');
+}
+
+function closeTabsMoreMenu(){
+  const menu = document.getElementById('tabsMoreMenu');
+  if(menu) menu.classList.remove('open');
+}
+
+document.addEventListener('click', (e)=>{
+  const wrap = document.querySelector('.tabs-more-wrap');
+  if(wrap && !wrap.contains(e.target)) closeTabsMoreMenu();
+});
+
+// ── Drag-and-drop reordering of IPAL tabs ──────────
+let _ipalDragId = null;
+
+function ipalTabDragStart(ev, id){
+  _ipalDragId = id;
+  ev.currentTarget.classList.add('dragging');
+  ev.dataTransfer.effectAllowed = 'move';
+  try{ ev.dataTransfer.setData('text/plain', String(id)); }catch(e){}
+}
+
+function ipalTabDragOver(ev, overId){
+  ev.preventDefault();
+  if(_ipalDragId===null || _ipalDragId===overId) return;
+  const target = ev.currentTarget;
+  const rect = target.getBoundingClientRect();
+  const midpoint = rect.left + rect.width/2;
+  target.classList.remove('drag-over-left','drag-over-right');
+  if(ev.clientX < midpoint) target.classList.add('drag-over-left');
+  else target.classList.add('drag-over-right');
+}
+
+function ipalTabDragLeave(ev){
+  ev.currentTarget.classList.remove('drag-over-left','drag-over-right');
+}
+
+function ipalTabDrop(ev, dropId){
+  ev.preventDefault();
+  ev.currentTarget.classList.remove('drag-over-left','drag-over-right');
+  if(_ipalDragId===null || _ipalDragId===dropId) return;
+
+  const fromIdx = ipals.findIndex(ip=>ip.id===_ipalDragId);
+  let toIdx = ipals.findIndex(ip=>ip.id===dropId);
+  if(fromIdx===-1||toIdx===-1) return;
+
+  const rect = ev.currentTarget.getBoundingClientRect();
+  const midpoint = rect.left + rect.width/2;
+  const insertAfter = ev.clientX >= midpoint;
+
+  const [moved] = ipals.splice(fromIdx,1);
+  // Recompute target index after removal
+  toIdx = ipals.findIndex(ip=>ip.id===dropId);
+  const insertIdx = insertAfter ? toIdx+1 : toIdx;
+  ipals.splice(insertIdx, 0, moved);
+
+  renderIpalTabs();
+  // Reordering the tab strip never changes which IPAL is active or its data,
+  // but keep the currently visible page (e.g. the IPAL recap cards) in sync
+  // in case it reads from ipals' array order rather than by id.
+  refreshPenggunaanAirIfVisible();
+  scheduleAutosave();
+}
+
+function ipalTabDragEnd(ev){
+  ev.currentTarget.classList.remove('dragging');
+  document.querySelectorAll('.ipal-tab').forEach(t=>t.classList.remove('drag-over-left','drag-over-right'));
+  _ipalDragId = null;
 }
 
 function escH(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -4977,7 +5159,7 @@ function saveFile(){
   // Flush ALL current DOM inputs into ipals[] before serialising
   captureAllIpalStates();
   const payload = {
-    version: '1.2',
+    version: '1.3',
     saved: new Date().toISOString(),
     ipals: JSON.parse(JSON.stringify(ipals)),
     activeIpalId,
@@ -5061,6 +5243,14 @@ function openFile(){
         if(resultsEl) resultsEl.style.display='none';
         const exportAreaEl = document.getElementById('exportArea');
         if(exportAreaEl) exportAreaEl.style.display='none';
+        // CRITICAL: refresh the Penggunaan Air page (and Fluktuasi page) so
+        // restored paRows/paGroups actually render if either page happens to
+        // be the one currently visible — without this, the data is loaded
+        // into memory correctly but the screen keeps showing the old/empty
+        // state until the user manually navigates away and back.
+        refreshPenggunaanAirIfVisible();
+        if(typeof updateSummary==='function') updateSummary();
+        alert('File berhasil dibuka.');
       } catch(err){
         alert('Gagal membuka file: ' + err.message);
       }
@@ -5264,18 +5454,20 @@ function paToggleCollapse(id){
 
 function newPaRow(){
   paRowCounter++;
-  return { id:paRowCounter, nama:'', sumberMode:'sni', sniIdx:0, jumlahUnit:'', airBakuManual:'', limbahMode:'template', limbahManual:'', ipalId: (typeof activeIpalId!=='undefined' ? activeIpalId : ''), groupId: null };
+  return { id:paRowCounter, nama:'', sumberMode:'sni', sniIdx:0, jumlahUnit:'', airBakuManual:'', limbahMode:'template', limbahManual:'', ipalId: (typeof activeIpalId!=='undefined' ? activeIpalId : ''), groupId: null, urutTampil: null };
 }
 
 function addPenggunaanAirRow(){
   paRows.push(newPaRow());
   renderPenggunaanAirPage();
+  scheduleAutosave();
 }
 
 function deletePenggunaanAirRow(id){
   paRows = paRows.filter(r=>r.id!==id);
   delete paCollapsed[id];
   renderPenggunaanAirPage();
+  scheduleAutosave();
 }
 
 function paNum(v){
@@ -5304,6 +5496,7 @@ function paSetSumberMode(id, mode){
   if(!row) return;
   row.sumberMode = mode;
   renderPenggunaanAirPage();
+  scheduleAutosave();
 }
 
 function paSetLimbahMode(id, mode){
@@ -5312,6 +5505,7 @@ function paSetLimbahMode(id, mode){
   if(!row) return;
   row.limbahMode = mode;
   renderPenggunaanAirPage();
+  scheduleAutosave();
 }
 
 function paRecalcRow(id){
@@ -5420,32 +5614,79 @@ function paHandleImportFile(input){
   const file = input.files[0];
   if(!file) return;
   const infoEl = document.getElementById('paImportFileInfo');
-  infoEl.textContent = `File: ${file.name} (${(file.size/1024).toFixed(1)} KB)`;
+  infoEl.textContent = `File: ${file.name} (${(file.size/1024).toFixed(1)} KB) — membaca...`;
 
   const reader = new FileReader();
   const isCSV = file.name.toLowerCase().endsWith('.csv');
 
   reader.onload = function(e){
-    try{
-      let wb;
-      if(isCSV){
-        wb = XLSX.read(e.target.result, {type:'string'});
-      } else {
-        wb = XLSX.read(new Uint8Array(e.target.result), {type:'array'});
-      }
-      const ws = wb.Sheets[wb.SheetNames[0]];
-      const json = XLSX.utils.sheet_to_json(ws, {header:1, defval:''});
+    if(typeof ExcelJS==='undefined'){
+      infoEl.textContent = 'Error: Library ExcelJS tidak tersedia. Coba refresh halaman.';
+      return;
+    }
 
+    // Build a 2D array (json) of raw cell values from the sheet, matching
+    // the structure previously produced by XLSX.utils.sheet_to_json(ws,{header:1})
+    function processSheet(ws){
+      const json = [];
+      let maxCol = 0;
+      ws.eachRow({includeEmpty:true}, (row)=>{ if(row.cellCount>maxCol) maxCol=row.cellCount; });
+      ws.eachRow({includeEmpty:true}, (row)=>{
+        const arr = [];
+        for(let c=1;c<=maxCol;c++){
+          const cell = row.getCell(c);
+          let v = cell.value;
+          if(v && typeof v==='object'){
+            if(v.richText) v = v.richText.map(rt=>rt.text).join('');
+            else if(v.result!==undefined) v = v.result;
+            else if(v.text!==undefined) v = v.text;
+            else if(v instanceof Date) v = v.toISOString().slice(0,10);
+            else v = '';
+          }
+          arr.push(v==null?'':v);
+        }
+        json.push(arr);
+      });
+      return json;
+    }
+
+    function finishParse(json){
       // Find header row (first non-empty row)
       let headerRowIdx = 0;
       for(let i=0;i<Math.min(json.length,10);i++){
-        if(json[i].some(c=>String(c).trim()!=='')){ headerRowIdx=i; break; }
+        if(json[i] && json[i].some(c=>String(c).trim()!=='')){ headerRowIdx=i; break; }
       }
-      paImportHeaders = json[headerRowIdx].map((h,i)=>String(h).trim()||`Kolom ${i+1}`);
-      paImportData = json.slice(headerRowIdx+1).filter(r=>r.some(c=>String(c).trim()!==''));
+      paImportHeaders = (json[headerRowIdx]||[]).map((h,i)=>String(h).trim()||`Kolom ${i+1}`);
+      paImportData = json.slice(headerRowIdx+1).filter(r=>r && r.some(c=>String(c).trim()!==''));
+      afterParseDone();
+    }
+
+    const wbLoad = new ExcelJS.Workbook();
+
+    if(isCSV){
+      // Simple manual CSV parse (handles quoted fields with commas)
+      try{
+        const text = typeof e.target.result === 'string' ? e.target.result : new TextDecoder('utf-8').decode(e.target.result);
+        const json = parseCSVText(text);
+        finishParse(json);
+      } catch(err){
+        infoEl.textContent = 'Error membaca file: ' + err.message;
+      }
+    } else {
+      wbLoad.xlsx.load(e.target.result).then(()=>{
+        const ws = wbLoad.worksheets[0];
+        if(!ws){ infoEl.textContent = 'Error: file Excel tidak memiliki sheet.'; return; }
+        const json = processSheet(ws);
+        finishParse(json);
+      }).catch(err=>{
+        infoEl.textContent = 'Error membaca file: ' + err.message;
+      });
+    }
+
+    function afterParseDone(){
 
       // Populate dropdowns
-      ['paMapNama','paMapJumlah','paMapAirBaku','paMapGrup'].forEach(id=>{
+      ['paMapNama','paMapUrut','paMapJumlah','paMapAirBaku','paMapGrup'].forEach(id=>{
         const s = document.getElementById(id);
         while(s.options.length > 1) s.remove(1);
         paImportHeaders.forEach((h,i)=>{
@@ -5463,6 +5704,10 @@ function paHandleImportFile(input){
            (hl.includes('nama') || hl.includes('fasilitas') || hl.includes('kegiatan') || hl.includes('name') || hl.includes('area'))){
           document.getElementById('paMapNama').value = i;
         }
+        if(document.getElementById('paMapUrut') && !document.getElementById('paMapUrut').value &&
+           (hl==='no.'||hl==='no'||hl.includes('urutan')||hl.includes('nomor')||hl==='#'||hl==='urut')){
+          document.getElementById('paMapUrut').value = i;
+        }
         if(!document.getElementById('paMapJumlah').value && document.getElementById('paMapJumlah').options.length > 1 &&
            (hl.includes('jumlah') || hl.includes('unit') || hl.includes('orang') || hl.includes('pegawai') || hl.includes('kapasitas'))){
           document.getElementById('paMapJumlah').value = i;
@@ -5479,9 +5724,11 @@ function paHandleImportFile(input){
 
       infoEl.textContent = `File: ${file.name} — ${paImportData.length} baris data ditemukan, ${paImportHeaders.length} kolom`;
       document.getElementById('paImportWarning').style.display = 'none';
-    } catch(err){
-      infoEl.textContent = `Error membaca file: ${err.message}`;
     }
+  };
+
+  reader.onerror = function(){
+    infoEl.textContent = 'Error: gagal membaca file.';
   };
 
   if(isCSV){
@@ -5489,6 +5736,34 @@ function paHandleImportFile(input){
   } else {
     reader.readAsArrayBuffer(file);
   }
+}
+
+// Simple CSV parser supporting quoted fields containing commas/newlines
+function parseCSVText(text){
+  const rows = [];
+  let row = [];
+  let field = '';
+  let inQuotes = false;
+  let i = 0;
+  const len = text.length;
+  while(i < len){
+    const ch = text[i];
+    if(inQuotes){
+      if(ch === '"'){
+        if(text[i+1] === '"'){ field += '"'; i += 2; continue; }
+        inQuotes = false; i++; continue;
+      }
+      field += ch; i++; continue;
+    } else {
+      if(ch === '"'){ inQuotes = true; i++; continue; }
+      if(ch === ','){ row.push(field); field=''; i++; continue; }
+      if(ch === '\r'){ i++; continue; }
+      if(ch === '\n'){ row.push(field); field=''; rows.push(row); row=[]; i++; continue; }
+      field += ch; i++; continue;
+    }
+  }
+  if(field.length || row.length){ row.push(field); rows.push(row); }
+  return rows.filter(r => r.length>1 || (r.length===1 && r[0]!==''));
 }
 
 function paPreviewImport(){
@@ -5499,10 +5774,27 @@ function paPreviewImport(){
   }
   const jumlahIdx = document.getElementById('paMapJumlah').value;
   const airBakuIdx = document.getElementById('paMapAirBaku').value;
+  const urutIdx = document.getElementById('paMapUrut')?.value;
 
-  const preview = paImportData.slice(0,5);
+  // Apply the same sort-by-urut logic used in paDoImport, so the preview
+  // matches exactly what will be imported.
+  let previewData = paImportData.slice();
+  if(urutIdx!==undefined && urutIdx!==''){
+    previewData = previewData
+      .map((row,originalIdx)=>({ row, originalIdx, urut: parseFloat(String(row[urutIdx]).replace(',','.')) }))
+      .sort((a,b)=>{
+        const av = isNaN(a.urut) ? Infinity : a.urut;
+        const bv = isNaN(b.urut) ? Infinity : b.urut;
+        if(av!==bv) return av-bv;
+        return a.originalIdx-b.originalIdx;
+      })
+      .map(x=>x.row);
+  }
+
+  const preview = previewData.slice(0,5);
   let html = '<table style="width:100%;border-collapse:collapse;">';
   html += '<thead><tr>';
+  if(urutIdx!==undefined && urutIdx!=='') html += `<th style="padding:6px 10px;background:#0D47A1;color:#fff;text-align:left;font-size:0.72rem;">No.</th>`;
   html += `<th style="padding:6px 10px;background:#0D47A1;color:#fff;text-align:left;font-size:0.72rem;">Nama Fasilitas</th>`;
   if(jumlahIdx!=='') html += `<th style="padding:6px 10px;background:#0D47A1;color:#fff;text-align:left;font-size:0.72rem;">Jumlah Unit</th>`;
   if(airBakuIdx!=='') html += `<th style="padding:6px 10px;background:#0D47A1;color:#fff;text-align:left;font-size:0.72rem;">Air Baku (m³/hari)</th>`;
@@ -5511,10 +5803,12 @@ function paPreviewImport(){
   preview.forEach((row,i)=>{
     const nama = String(row[namaIdx]||'').trim();
     if(!nama) return;
+    const urutVal = (urutIdx!==undefined && urutIdx!=='') ? String(row[urutIdx]||'').trim() : '';
     const jumlah = jumlahIdx!=='' ? String(row[jumlahIdx]||'').trim() : '';
     const airBaku = airBakuIdx!=='' ? String(row[airBakuIdx]||'').trim() : '';
     const mode = airBaku ? 'Manual' : 'Standar SNI';
     html += `<tr style="border-bottom:1px solid var(--line);${i%2===1?'background:var(--bg)':''}">`;
+    if(urutIdx!==undefined && urutIdx!=='') html += `<td style="padding:6px 10px;font-size:0.78rem;font-weight:700;">${escH(urutVal)||'—'}</td>`;
     html += `<td style="padding:6px 10px;font-size:0.78rem;">${escH(nama)}</td>`;
     if(jumlahIdx!=='') html += `<td style="padding:6px 10px;font-size:0.78rem;">${escH(jumlah)||'—'}</td>`;
     if(airBakuIdx!=='') html += `<td style="padding:6px 10px;font-size:0.78rem;">${escH(airBaku)||'—'}</td>`;
@@ -5522,6 +5816,9 @@ function paPreviewImport(){
     html += '</tr>';
   });
   html += '</tbody></table>';
+  if(urutIdx!==undefined && urutIdx!=='') {
+    html = '<div style="padding:6px 10px;font-size:0.7rem;color:var(--muted);">Diurutkan sesuai kolom No. Urut yang dipilih.</div>' + html;
+  }
   document.getElementById('paImportPreviewTable').innerHTML = html;
   document.getElementById('paImportPreview').style.display = 'block';
 }
@@ -5534,6 +5831,7 @@ function paDoImport(){
   }
   const jumlahIdx = document.getElementById('paMapJumlah').value;
   const airBakuIdx = document.getElementById('paMapAirBaku').value;
+  const urutIdx = document.getElementById('paMapUrut')?.value;
 
   let imported = 0, skipped = 0;
   const warnings = [];
@@ -5543,12 +5841,23 @@ function paDoImport(){
   const grupNameMap = {};
   paGroups.filter(g=>String(g.ipalId)===String(activeIpalId)).forEach(g=>{ grupNameMap[g.nama.trim().toLowerCase()]=g.id; });
 
-  paImportData.forEach((row, idx)=>{
+  // No pre-sorting: rows are pushed in file order, but each one carries an
+  // explicit urutTampil (display order) value taken straight from the mapped
+  // "No." column. The render function sorts by this field, so the display
+  // order never depends on push/array order or any sort-before-import step.
+  const dataToImport = paImportData;
+
+  dataToImport.forEach((row, idx)=>{
     const nama = String(row[namaIdx]||'').trim();
     if(!nama){ skipped++; return; }
 
     const newRow = newPaRow();
     newRow.nama = nama;
+
+    if(urutIdx!==undefined && urutIdx!==''){
+      const uv = parseFloat(String(row[urutIdx]).replace(',','.'));
+      newRow.urutTampil = isNaN(uv) ? null : uv;
+    }
     newRow.ipalId = activeIpalId || '';
 
     // Assign group if column mapped
@@ -5589,6 +5898,7 @@ function paDoImport(){
 
   paCloseImport();
   renderPenggunaanAirPage();
+  scheduleAutosave();
 
   // Show result
   let msg = `✅ ${imported} kegiatan/fasilitas berhasil diimport ke ${ipals.find(ip=>ip.id===activeIpalId)?.name||'IPAL aktif'}.`;
@@ -5611,11 +5921,49 @@ function paToggleAllCollapse(){
 
 // ── GROUP FUNCTIONS ──────────────────────────────────────────
 function paAddGroup(){
-  const nama = prompt('Nama grup baru:','');
-  if(!nama || !nama.trim()) return;
-  paGroupCounter++;
-  paGroups.push({ id:paGroupCounter, ipalId:activeIpalId, nama:nama.trim(), collapsed:false });
+  _paRenameTargetGid = null;
+  const modal = document.getElementById('paAddGroupModal');
+  const input = document.getElementById('paAddGroupInput');
+  const errEl = document.getElementById('paAddGroupError');
+  const titleEl = modal ? modal.querySelector('div[style*="font-weight:700"]') : null;
+  if(!modal || !input) return;
+  input.value = '';
+  if(errEl) errEl.style.display = 'none';
+  if(titleEl) titleEl.textContent = 'Tambah Grup Baru';
+  modal.style.display = 'flex';
+  setTimeout(()=>input.focus(), 50);
+}
+
+function paCloseAddGroupModal(){
+  const modal = document.getElementById('paAddGroupModal');
+  if(modal) modal.style.display = 'none';
+  _paRenameTargetGid = null;
+}
+
+function paSubmitAddGroup(){
+  const input = document.getElementById('paAddGroupInput');
+  const errEl = document.getElementById('paAddGroupError');
+  if(!input) return;
+  const nama = input.value.trim();
+  if(!nama){
+    if(errEl){ errEl.textContent = 'Nama grup tidak boleh kosong.'; errEl.style.display = 'block'; }
+    input.focus();
+    return;
+  }
+  if(_paRenameTargetGid!==null){
+    // Rename flow
+    const g = paGroups.find(g=>g.id===_paRenameTargetGid);
+    if(g) g.nama = nama;
+    _paRenameTargetGid = null;
+  } else {
+    // Add flow
+    paGroupCounter++;
+    const newGroup = { id:paGroupCounter, ipalId:activeIpalId, nama, collapsed:false };
+    paGroups.push(newGroup);
+  }
+  paCloseAddGroupModal();
   renderPenggunaanAirPage();
+  scheduleAutosave();
 }
 
 function paDeleteGroup(gid){
@@ -5623,21 +5971,31 @@ function paDeleteGroup(gid){
   paGroups = paGroups.filter(g=>g.id!==gid);
   paRows.forEach(r=>{ if(r.groupId===gid) r.groupId=null; });
   renderPenggunaanAirPage();
+  scheduleAutosave();
 }
 
+let _paRenameTargetGid = null;
 function paRenameGroup(gid){
   const g = paGroups.find(g=>g.id===gid);
   if(!g) return;
-  const nama = prompt('Nama grup:', g.nama);
-  if(!nama || !nama.trim()) return;
-  g.nama = nama.trim();
-  renderPenggunaanAirPage();
+  _paRenameTargetGid = gid;
+  const modal = document.getElementById('paAddGroupModal');
+  const input = document.getElementById('paAddGroupInput');
+  const errEl = document.getElementById('paAddGroupError');
+  const titleEl = modal ? modal.querySelector('div[style*="font-weight:700"]') : null;
+  if(!modal || !input) return;
+  input.value = g.nama;
+  if(errEl) errEl.style.display = 'none';
+  if(titleEl) titleEl.textContent = 'Ganti Nama Grup';
+  modal.style.display = 'flex';
+  setTimeout(()=>{ input.focus(); input.select(); }, 50);
 }
 
 function paToggleGroup(gid){
   const g = paGroups.find(g=>g.id===gid);
   if(g) g.collapsed = !g.collapsed;
   renderPenggunaanAirPage();
+  scheduleAutosave();
 }
 
 let paAssignTargetGroupId = null;
@@ -5676,6 +6034,7 @@ function paDoAssign(){
   });
   paCloseAssign();
   renderPenggunaanAirPage();
+  scheduleAutosave();
 }
 
 // Add group field to paCaptureRow
@@ -5688,12 +6047,91 @@ paCaptureRow = function(id){
   if(sel) row.groupId = sel.value ? parseInt(sel.value) : null;
 };
 
-function renderPenggunaanAirPage(){  const wrap = document.getElementById('paCards');
+function paCheckOrphanedData(){
+  // Detect Penggunaan Air rows/groups whose ipalId no longer matches any
+  // existing IPAL tab — this can happen if an IPAL tab was deleted before
+  // the cleanup fix above existed. Returns null if nothing orphaned.
+  const validIpalIds = new Set(ipals.map(ip=>String(ip.id)));
+  const orphanRows = paRows.filter(r=>r.ipalId && !validIpalIds.has(String(r.ipalId)));
+  const orphanGroups = paGroups.filter(g=>g.ipalId && !validIpalIds.has(String(g.ipalId)));
+  if(!orphanRows.length && !orphanGroups.length) return null;
+  return { orphanRows, orphanGroups };
+}
+
+function paRecoverOrphanedData(){
+  const orphan = paCheckOrphanedData();
+  if(!orphan){ alert('Tidak ada data yang tertinggal (orphan) untuk dipulihkan.'); return; }
+  const { orphanRows, orphanGroups } = orphan;
+  const nFasilitas = orphanRows.length;
+  const nGrup = new Set(orphanGroups.map(g=>g.id)).size;
+  const targetName = ipals.find(ip=>ip.id===activeIpalId)?.name || 'IPAL aktif';
+  const ok = confirm(`Ditemukan ${nFasilitas} kegiatan/fasilitas dan ${nGrup} grup yang datanya masih tersimpan namun tidak terhubung ke IPAL manapun (kemungkinan dari IPAL yang sudah dihapus).\n\nPindahkan semuanya ke "${targetName}" (tab yang sedang aktif)?`);
+  if(!ok) return;
+
+  // Remap orphaned groups to the active IPAL first, keeping their id/name
+  const remappedGroupIds = new Set();
+  orphanGroups.forEach(g=>{ g.ipalId = activeIpalId; remappedGroupIds.add(g.id); });
+  // Remap orphaned rows to the active IPAL, preserving their group membership
+  orphanRows.forEach(r=>{ r.ipalId = activeIpalId; });
+
+  renderIpalTabs();
+  refreshPenggunaanAirIfVisible();
+  scheduleAutosave();
+  alert(`✅ ${nFasilitas} kegiatan/fasilitas dan ${nGrup} grup berhasil dipulihkan ke "${targetName}".`);
+}
+
+function renderPenggunaanAirPage(){
+  try {
+  renderPenggunaanAirPageInner();
+  } catch(err) {
+    console.error('renderPenggunaanAirPage crashed:', err);
+    const wrap = document.getElementById('paCards');
+    if(wrap){
+      wrap.innerHTML = `<div style="background:#fdf0f0;border:1px solid #e57373;border-radius:8px;padding:16px 20px;color:#c0392b;font-size:0.85rem;">
+        <strong>⚠️ Terjadi error saat menampilkan data:</strong><br>
+        <code style="font-size:0.78rem;">${escH(err.message)}</code><br><br>
+        <span style="font-size:0.78rem;color:#8a4a4a;">Data Anda tetap aman (tersimpan), ini hanya masalah tampilan. Coba: (1) refresh halaman, atau (2) buka Console (F12) dan kirim screenshot error lengkapnya.</span>
+      </div>`;
+    }
+  }
+}
+
+function renderPenggunaanAirPageInner(){  const wrap = document.getElementById('paCards');
   const foot = document.getElementById('paTableFoot');
   const hint = document.getElementById('paEmptyHint');
   if(!wrap) return;
 
+  // Surface any orphaned data (rows/groups whose ipalId points to a deleted
+  // IPAL) as a visible, actionable banner instead of letting it silently
+  // vanish from view.
+  const orphanBanner = document.getElementById('paOrphanBanner');
+  if(orphanBanner){
+    const orphan = paCheckOrphanedData();
+    if(orphan){
+      const nRows = orphan.orphanRows.length;
+      const nGroups = new Set(orphan.orphanGroups.map(g=>g.id)).size;
+      const parts = [];
+      if(nRows) parts.push(`${nRows} kegiatan/fasilitas`);
+      if(nGroups) parts.push(`${nGroups} grup`);
+      document.getElementById('paOrphanCount').textContent = parts.join(' dan ');
+      orphanBanner.style.display = 'flex';
+    } else {
+      orphanBanner.style.display = 'none';
+    }
+  }
+
+  // Sort by explicit urutTampil when present (e.g. set during Excel/CSV import
+  // via the "No. Urut" column). Rows without urutTampil (null) keep their
+  // relative array order and sort after any rows that do have an explicit
+  // value, using a stable sort so ties/nulls never reshuffle unexpectedly.
+  function byUrutTampil(a,b){
+    const av = (a.urutTampil===null||a.urutTampil===undefined) ? Infinity : a.urutTampil;
+    const bv = (b.urutTampil===null||b.urutTampil===undefined) ? Infinity : b.urutTampil;
+    return av-bv;
+  }
+
   const visibleRows = paRows.filter(r=>String(r.ipalId)===String(activeIpalId));
+  visibleRows.sort(byUrutTampil);
   const visibleGroups = paGroups.filter(g=>String(g.ipalId)===String(activeIpalId));
 
   if(!visibleRows.length && !visibleGroups.length){
@@ -5745,7 +6183,7 @@ function renderPenggunaanAirPage(){  const wrap = document.getElementById('paCar
 
     const isCollapsed=!!paCollapsed[row.id];
     const ipalName=row.ipalId?(ipals.find(ip=>String(ip.id)===String(row.ipalId))?.name||'—'):'—';
-    const namaLabel=row.nama||`Fasilitas ${idx+1}`;
+    const namaLabel=row.nama||`Fasilitas ${idx}`;
 
     const col1=row.sumberMode==='sni'
       ?`<div class="pa-field-group">
@@ -5804,7 +6242,7 @@ function renderPenggunaanAirPage(){  const wrap = document.getElementById('paCar
 
     return `<div class="pa-card${isCollapsed?' is-collapsed':''}">
       <div class="pa-card-header">
-        <div class="pa-card-num">${idx+1}</div>
+        <div class="pa-card-num">${idx}</div>
         <input id="pa${row.id}_nama" class="pa-card-name-input" type="text" placeholder="Nama kegiatan / fasilitas" value="${escH(row.nama)}" oninput="paCaptureRow(${row.id})">
         <div class="pa-card-summary">
           <span class="pa-summary-name" title="${escH(namaLabel)}">${escH(namaLabel)}</span>
@@ -5916,81 +6354,93 @@ function renderPaRecap(){
         </div>`;
       }).join('');
 
-      // ── Rekap per Grup (semua IPAL, hanya grup yang ada datanya) ──
+      // ── Rekap per Grup, dikelompokkan per Unit IPAL ──
       let groupRecapHtml = '';
       if(paGroups.length){
-        // Build rows: one per group, sorted by IPAL then group order
-        let groupRows = [];
-        let totalAllBaku = 0, totalAllLimbah = 0;
+        let totalAllBaku = 0, totalAllLimbah = 0, totalAllFasilitas = 0;
+        const ipalBlocksHtml = [];
 
-        // Groups with data
-        paGroups.forEach(g=>{
-          const gRows = paRows.filter(r=>r.groupId===g.id);
-          if(!gRows.length) return;
-          const gBaku   = gRows.reduce((s,r)=>s+paAirBaku(r),0);
-          const gLimbah = gRows.reduce((s,r)=>s+paAirLimbah(r),0);
-          const ipalName = ipals.find(ip=>String(ip.id)===String(g.ipalId))?.name || '—';
-          totalAllBaku   += gBaku;
-          totalAllLimbah += gLimbah;
-          groupRows.push({ g, gRows, gBaku, gLimbah, ipalName });
-        });
+        // One block per IPAL that has at least one group or ungrouped row
+        ipals.forEach(ip=>{
+          const ipalGroups = paGroups.filter(g=>String(g.ipalId)===String(ip.id));
+          const ipalRowsAll = paRows.filter(r=>String(r.ipalId)===String(ip.id));
 
-        // Ungrouped per IPAL
-        const ungroupedByIpal = {};
-        paRows.filter(r=>!r.groupId).forEach(r=>{
-          const key = r.ipalId || '__none__';
-          if(!ungroupedByIpal[key]) ungroupedByIpal[key] = [];
-          ungroupedByIpal[key].push(r);
-        });
+          // Rows for each group belonging to this IPAL
+          const groupRowsForIpal = ipalGroups.map(g=>{
+            const gRows = paRows.filter(r=>r.groupId===g.id);
+            const gBaku   = gRows.reduce((s,r)=>s+paAirBaku(r),0);
+            const gLimbah = gRows.reduce((s,r)=>s+paAirLimbah(r),0);
+            return { g, gRows, gBaku, gLimbah };
+          }).filter(item=>item.gRows.length); // skip empty groups in the recap table
 
-        const ungroupedRows = Object.entries(ungroupedByIpal).map(([ipalId, rows])=>{
-          const gBaku   = rows.reduce((s,r)=>s+paAirBaku(r),0);
-          const gLimbah = rows.reduce((s,r)=>s+paAirLimbah(r),0);
-          const ipalName = ipalId==='__none__' ? '—' : (ipals.find(ip=>String(ip.id)===ipalId)?.name||'—');
-          totalAllBaku   += gBaku;
-          totalAllLimbah += gLimbah;
-          return { g:{ nama:'(Tanpa Grup)' }, gRows:rows, gBaku, gLimbah, ipalName, ungrouped:true };
-        });
+          // Ungrouped rows for this IPAL
+          const ungroupedForIpal = ipalRowsAll.filter(r=>!r.groupId);
+          const ungroupedItem = ungroupedForIpal.length ? {
+            g:{ nama:'(Tanpa Grup)' },
+            gRows: ungroupedForIpal,
+            gBaku: ungroupedForIpal.reduce((s,r)=>s+paAirBaku(r),0),
+            gLimbah: ungroupedForIpal.reduce((s,r)=>s+paAirLimbah(r),0),
+            ungrouped: true
+          } : null;
 
-        const allRows = [...groupRows, ...ungroupedRows];
+          const rowsForThisIpal = [...groupRowsForIpal, ...(ungroupedItem?[ungroupedItem]:[])];
+          if(!rowsForThisIpal.length) return; // nothing to show for this IPAL
 
-        if(allRows.length){
-          const rowsHtml = allRows.map((item,i)=>{
+          const ipalTotalBaku   = rowsForThisIpal.reduce((s,it)=>s+it.gBaku,0);
+          const ipalTotalLimbah = rowsForThisIpal.reduce((s,it)=>s+it.gLimbah,0);
+          const ipalTotalFasilitas = rowsForThisIpal.reduce((s,it)=>s+it.gRows.length,0);
+          totalAllBaku += ipalTotalBaku;
+          totalAllLimbah += ipalTotalLimbah;
+          totalAllFasilitas += ipalTotalFasilitas;
+
+          const rowsHtml = rowsForThisIpal.map(item=>{
             const isUngrouped = !!item.ungrouped;
             return `<tr>
               <td class="td-group" style="${isUngrouped?'color:var(--muted);font-style:italic;':''}">
                 ${isUngrouped?'':'📁 '}${escH(item.g.nama)}
               </td>
-              <td><span class="pa-recap-group-ipal-tag">${escH(item.ipalName)}</span></td>
               <td style="text-align:center;" class="td-muted">${item.gRows.length}</td>
               <td class="td-num">${paFmt(item.gBaku)}</td>
               <td class="td-green">${paFmt(item.gLimbah)}</td>
             </tr>`;
           }).join('');
 
+          ipalBlocksHtml.push(`
+            <div class="pa-recap-group-ipal-block">
+              <div class="pa-recap-group-ipal-title">${escH(ip.name)}</div>
+              <table class="pa-recap-group-table">
+                <thead>
+                  <tr>
+                    <th>Nama Grup</th>
+                    <th style="text-align:center;">Fasilitas</th>
+                    <th>Air Baku (m³/hari)</th>
+                    <th>Air Limbah (m³/hari)</th>
+                  </tr>
+                </thead>
+                <tbody>${rowsHtml}</tbody>
+                <tfoot>
+                  <tr>
+                    <td style="text-align:right;">Subtotal ${escH(ip.name)}</td>
+                    <td style="text-align:center;">${ipalTotalFasilitas}</td>
+                    <td>${paFmt(ipalTotalBaku)}</td>
+                    <td>${paFmt(ipalTotalLimbah)}</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>`);
+        });
+
+        if(ipalBlocksHtml.length){
           groupRecapHtml = `<div class="pa-recap-group-section">
             <div class="pa-recap-group-hd">Rekap per Grup</div>
-            <div class="pa-recap-group-sub">Subtotal kebutuhan air baku dan timbulan air limbah (m³/hari) per grup kegiatan/fasilitas.</div>
-            <table class="pa-recap-group-table">
-              <thead>
-                <tr>
-                  <th>Nama Grup</th>
-                  <th>Unit IPAL</th>
-                  <th style="text-align:center;">Fasilitas</th>
-                  <th>Air Baku (m³/hari)</th>
-                  <th>Air Limbah (m³/hari)</th>
-                </tr>
-              </thead>
-              <tbody>${rowsHtml}</tbody>
-              <tfoot>
-                <tr>
-                  <td colspan="2" style="text-align:right;">Total</td>
-                  <td style="text-align:center;">${paRows.length}</td>
-                  <td>${paFmt(totalAllBaku)}</td>
-                  <td>${paFmt(totalAllLimbah)}</td>
-                </tr>
-              </tfoot>
-            </table>
+            <div class="pa-recap-group-sub">Subtotal kebutuhan air baku dan timbulan air limbah (m³/hari) per grup kegiatan/fasilitas, dikelompokkan per unit IPAL.</div>
+            ${ipalBlocksHtml.join('')}
+            <div class="pa-recap-group-grandtotal">
+              <span>Total Keseluruhan</span>
+              <span class="td-muted">${totalAllFasilitas} fasilitas</span>
+              <span class="td-num">${paFmt(totalAllBaku)} m³/hari</span>
+              <span class="td-green">${paFmt(totalAllLimbah)} m³/hari</span>
+            </div>
           </div>`;
         }
       }
@@ -6190,8 +6640,9 @@ function scheduleAutosave(){
 function doAutosave(){
   try{
     saveActiveIpalState();
-    const payload = { version:'1.2', saved:new Date().toISOString(), ipals, activeIpalId,
+    const payload = { version:'1.3', saved:new Date().toISOString(), ipals, activeIpalId,
       removalInfluent, removalOverrides, klorinDoseOverrides, removalCustomParams, paRows,
+      paGroups, paGroupCounter,
       sludgeCaptureOverrides, fluktHiddenLines, fluktActiveIpalId };
     localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(payload));
     showAutosaveIndicator();
@@ -41183,7 +41634,7 @@ function buildReport(data) {
     ['COD Influent',    fmtID(COD,2) + ' mg/L'],
     ['Tanggal Laporan', tgl || new Date().toLocaleDateString('id-ID')],
     ['Referensi Regulasi', 'Permen LH/BPLH No. 11 Tahun 2025'],
-    ['Dibuat oleh',     'Wastewater Tracking v1.2'],
+    ['Dibuat oleh',     'Wastewater Tracking v1.3'],
   ];
 
   coverChildren.push(new Table({
@@ -41938,7 +42389,7 @@ async function buildPenggunaanAirReport() {
     ['Total Timbulan Air Limbah', fmtID(totalLimbah,2) + ' m³/hari'],
     ['Jumlah Unit IPAL Tujuan', String(ipals.length)],
     ['Tanggal Laporan', tgl],
-    ['Dibuat oleh', 'Wastewater Tracking v1.2'],
+    ['Dibuat oleh', 'Wastewater Tracking v1.3'],
   ];
   coverChildren.push(new Table({
     width: { size: 7200, type: WidthType.DXA },
@@ -43931,6 +44382,22 @@ function renderFluktuasiContent() {
   </script>
 
 <!-- ── ASSIGN MODAL ──────────────────────────────────────── -->
+<div id="paAddGroupModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9998;align-items:center;justify-content:center;">
+  <div style="background:var(--card);border-radius:12px;padding:24px 28px;width:min(420px,95vw);box-shadow:0 8px 40px rgba(0,0,0,0.18);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+      <div style="font-size:0.95rem;font-weight:700;color:var(--ink);">Tambah Grup Baru</div>
+      <button onclick="paCloseAddGroupModal()" style="background:none;border:none;font-size:1.2rem;color:var(--muted);cursor:pointer;">✕</button>
+    </div>
+    <label style="font-size:0.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:6px;">Nama Grup</label>
+    <input type="text" id="paAddGroupInput" placeholder="mis. Area Produksi" style="width:100%;border:1.3px solid var(--line);border-radius:7px;padding:9px 11px;font-size:0.88rem;background:var(--card);color:var(--ink);box-sizing:border-box;" onkeydown="if(event.key==='Enter')paSubmitAddGroup();">
+    <div id="paAddGroupError" style="display:none;color:#c0392b;font-size:0.76rem;margin-top:6px;"></div>
+    <div style="display:flex;gap:10px;margin-top:18px;justify-content:flex-end;">
+      <button onclick="paCloseAddGroupModal()" style="padding:8px 16px;border:1.3px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font-size:0.82rem;cursor:pointer;">Batal</button>
+      <button onclick="paSubmitAddGroup()" style="padding:8px 20px;border:none;border-radius:8px;background:#0D47A1;color:#fff;font-size:0.82rem;font-weight:700;cursor:pointer;">Tambah Grup</button>
+    </div>
+  </div>
+</div>
+
 <div id="paAssignModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9998;align-items:center;justify-content:center;">
   <div style="background:var(--card);border-radius:12px;padding:24px 28px;width:min(480px,95vw);max-height:80vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,0.18);">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
@@ -43967,6 +44434,13 @@ function renderFluktuasiContent() {
         <label style="font-size:0.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:4px;">Nama Kegiatan/Fasilitas <span style="color:#c0392b;">*</span></label>
         <select id="paMapNama" style="width:100%;border:1.3px solid var(--line);border-radius:7px;padding:7px 9px;font-size:0.82rem;background:var(--card);color:var(--ink);">
           <option value="">— Pilih kolom —</option>
+        </select>
+      </div>
+      <!-- No. Urut -->
+      <div>
+        <label style="font-size:0.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:4px;">No. Urut Tampil <span style="font-weight:400;color:var(--muted);">(opsional — urutan sesuai file)</span></label>
+        <select id="paMapUrut" style="width:100%;border:1.3px solid var(--line);border-radius:7px;padding:7px 9px;font-size:0.82rem;background:var(--card);color:var(--ink);">
+          <option value="">(tidak ada — urut sesuai baris file)</option>
         </select>
       </div>
       <!-- Jumlah Unit -->
