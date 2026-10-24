@@ -7129,6 +7129,7 @@ function renderPenggunaanAirPageInner(){  const wrap = document.getElementById('
   if(!visibleRows.length && !visibleGroups.length){
     wrap.innerHTML='';
     if(foot) foot.innerHTML='';
+    try{ renderPaRecap(); }catch(e){ const rw=document.getElementById('paRecapWrap'); if(rw) rw.innerHTML=''; } // rekap lintas-IPAL harus ikut diperbarui walau IPAL aktif kosong
     if(hint){
       hint.style.display='';
       const nameEl=document.getElementById('paEmptyIpalName');
@@ -7725,6 +7726,9 @@ function init(){
 function resetApp(){
   const ok = confirm('Hapus semua data yang tertampilkan? Tindakan ini tidak bisa dibatalkan.\n\nSemua IPAL, hasil perhitungan, dan data tersimpan otomatis akan dihapus.');
   if(!ok) return;
+
+  // Cadangkan dulu ke Riwayat agar reset tidak benar-benar menghilangkan data
+  try{ if(window.__hxBackup) window.__hxBackup('Cadangan sebelum Reset'); }catch(e){}
 
   // Batalkan autosave yang sedang dijadwalkan
   if(_autosaveTimer) clearTimeout(_autosaveTimer);
@@ -46429,167 +46433,136 @@ safe(function(){var raw=localStorage.getItem(AUTOSAVE_KEY);if(raw){var d=JSON.pa
 })();
 </script>
 
-<!-- ══ SAVE ONLINE (GitHub) ══ -->
-<style id="save-online-css">
-#olOv{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:none;align-items:center;justify-content:center;padding:12px}
-#olBox{background:var(--card,#fff);color:var(--ink,#222);border-radius:12px;width:min(560px,100%);max-height:90vh;overflow:auto;padding:18px;box-shadow:0 10px 40px rgba(0,0,0,.3);font-size:.85rem}
-#olBox h3{margin:0 0 10px;font-size:1rem} #olBox h4{margin:14px 0 6px;font-size:.85rem}
-#olBox input[type=text],#olBox input[type=password]{width:100%;box-sizing:border-box;padding:7px 9px;border:1px solid var(--line,#ccc);border-radius:7px;background:transparent;color:inherit;margin-bottom:6px}
-#olBox .ol-btn,.ol-tb{cursor:pointer;font-family:inherit}
-.ol-btn{padding:7px 13px;border:1px solid var(--line,#ccc);border-radius:8px;background:var(--card,#fff);color:inherit;font-size:.8rem;font-weight:600}
-.ol-btn:hover{background:var(--line-soft,#eef)} .ol-btn.pri{background:#1d6fe8;border-color:#1d6fe8;color:#fff} .ol-btn.pri:hover{background:#1a5fc7}
-.ol-tb{display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 12px;border:1px solid var(--line,#dde);border-radius:10px;background:transparent;color:var(--ink-soft,#445);font-size:.8rem;font-weight:600;white-space:nowrap}
-.ol-tb:hover{background:var(--line-soft,#eef);color:var(--ink,#111)} .ol-tb svg{width:18px;height:18px;flex:none}
-#olChip{font-size:.72rem;color:var(--muted,#888);margin:0 4px;white-space:nowrap;max-width:140px;overflow:hidden;text-overflow:ellipsis}
-@media(max-width:1250px){.ol-tb span{display:none}.ol-tb{width:40px;padding:0;justify-content:center}}
-.ol-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line,#ddd)}
-.ol-row span{flex:1;word-break:break-all}.ol-row small{color:var(--muted,#888)}
-#olMsg{margin-top:10px;font-size:.78rem;min-height:1.1em}
+<!-- ══ RIWAYAT VERSI (snapshot di browser) ══ -->
+<style id="hist-css">
+#hxOv{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:none;align-items:center;justify-content:center;padding:12px}
+#hxBox{background:var(--card,#fff);color:var(--ink,#222);border-radius:14px;width:min(620px,100%);max-height:88vh;display:flex;flex-direction:column;box-shadow:0 10px 40px rgba(0,0,0,.3);font-size:.85rem}
+#hxBox .hx-h{display:flex;align-items:center;justify-content:space-between;padding:16px 18px 10px}
+#hxBox h3{margin:0;font-size:1rem} #hxBox .hx-sub{padding:0 18px 10px;color:var(--muted,#777);font-size:.78rem;line-height:1.45}
+#hxBox .hx-save{display:flex;gap:8px;padding:0 18px 12px}
+#hxBox .hx-save input{flex:1;min-width:0;box-sizing:border-box;padding:8px 10px;border:1px solid var(--line,#ccc);border-radius:8px;background:transparent;color:inherit;font:inherit}
+#hxList{overflow:auto;padding:0 18px;border-top:1px solid var(--line,#e3e6ea);flex:1;min-height:80px}
+.hx-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line,#e3e6ea)}
+.hx-row .hx-i{flex:1;min-width:0}
+.hx-row .hx-n{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hx-row .hx-m{color:var(--muted,#777);font-size:.74rem;margin-top:2px}
+.hx-tag{display:inline-block;font-size:.65rem;font-weight:700;padding:1px 7px;border-radius:999px;margin-left:6px;vertical-align:middle;background:rgba(29,111,232,.12);color:#1d6fe8}
+.hx-tag.auto{background:rgba(120,130,140,.15);color:#667}
+.hx-b{cursor:pointer;font:inherit;font-size:.78rem;font-weight:600;padding:6px 11px;border:1px solid var(--line,#ccc);border-radius:8px;background:var(--card,#fff);color:inherit}
+.hx-b:hover{background:var(--line-soft,#eef)} .hx-b.pri{background:#1d6fe8;border-color:#1d6fe8;color:#fff} .hx-b.pri:hover{background:#1a5fc7} .hx-b.del{color:#c92a2a}
+.hx-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 18px;border-top:1px solid var(--line,#e3e6ea);font-size:.74rem;color:var(--muted,#777)}
+.hx-empty{padding:26px 0;text-align:center;color:var(--muted,#777)}
+.hx-tb{position:relative;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 12px;border:1px solid var(--line,#dde);border-radius:10px;background:transparent;color:var(--ink-soft,#445);font-size:.8rem;font-weight:600;white-space:nowrap}
+.hx-tb:hover{background:var(--line-soft,#eef);color:var(--ink,#111)} .hx-tb svg{width:18px;height:18px;flex:none}
+.hx-tb b{min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:#1d6fe8;color:#fff;font-size:.65rem;line-height:17px;text-align:center}
+@media(max-width:1250px){.hx-tb span{display:none}.hx-tb{padding:0 10px}}
 </style>
-<script id="save-online">
+<script id="hist-js">
 (function(){
 'use strict';
 var F=window.__fs; if(!F)return;
-/* ▼▼ ISI SEKALI sebelum upload ke GitHub (atau isi lewat jendela Pengaturan) ▼▼ */
-var DEFAULT={owner:'andykaadhyaksa',repo:'Wastewaterwatrackingsystem',branch:'main',dir:'saves'};
-/* ▲▲ */
-var LS_CFG='ipalOnlineCfg',LS_TOK='ipalOnlineToken',LS_AUTO='ipalOnlineAuto';
-var known={},curName='',busy=false,pend=false;
+var KEY='ipalHistory', MAX=30, AUTO_MS=120000;
+var pend=false,lastSig='';
+/* bersihkan sisa fitur GitHub lama (token tidak boleh tertinggal di browser) */
+try{['ipalOnlineToken','ipalOnlineCfg','ipalOnlineAuto'].forEach(function(k){localStorage.removeItem(k);});}catch(e){}
 
-function ls(k){try{return localStorage.getItem(k)||'';}catch(e){return '';}}
-function lset(k,v){try{if(v)localStorage.setItem(k,v);else localStorage.removeItem(k);}catch(e){}}
-function cfg(){var c={};try{c=JSON.parse(ls(LS_CFG)||'{}');}catch(e){}
-  return {owner:c.owner||DEFAULT.owner,repo:c.repo||DEFAULT.repo,branch:c.branch||DEFAULT.branch,dir:String(c.dir||DEFAULT.dir||'').replace(/^\/+|\/+$/g,'')};}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
-function clean(n){return String(n||'').replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'_').slice(0,60);}
-function fpath(n){var c=cfg();return (c.dir?c.dir+'/':'')+encodeURIComponent(n)+'.ipal';}
-function q(){return '?ref='+encodeURIComponent(cfg().branch);}
-function b64(s){var b=new TextEncoder().encode(s),o='',i;for(i=0;i<b.length;i+=32768)o+=String.fromCharCode.apply(null,b.subarray(i,i+32768));return btoa(o);}
-
-function api(path,o){
-  o=o||{}; var c=cfg();
-  if(!c.owner||!c.repo)return Promise.reject(new Error('Repo GitHub belum diatur (lihat Pengaturan).'));
-  var h={Accept:o.raw?'application/vnd.github.raw+json':'application/vnd.github+json'},t=ls(LS_TOK);
-  if(t)h.Authorization='Bearer '+t; if(o.body)h['Content-Type']='application/json';
-  return fetch('https://api.github.com/repos/'+c.owner+'/'+c.repo+'/contents/'+path,{method:o.method||'GET',headers:h,body:o.body})
-    .then(function(r){
-      if(!r.ok)return r.text().then(function(x){var m='';try{m=JSON.parse(x).message;}catch(e){}throw new Error('GitHub '+r.status+(m?': '+m:''));});
-      return o.raw?r.text():r.json();
-    });
-}
-function list(){
-  var c=cfg();
-  return api((c.dir?c.dir:'')+q()).then(function(a){
-    return (Array.isArray(a)?a:[]).filter(function(f){return f.type==='file'&&/\.ipal$/.test(f.name);});
-  }).catch(function(e){if(/ 404/.test(e.message))return [];throw e;});
-}
-function openOnline(name){
-  if(F.isDirty()&&!confirm('Ada perubahan yang belum disimpan. Buka file online dan menimpa data saat ini?'))return Promise.reject(new Error('Dibatalkan.'));
-  return api(fpath(name)+q()).then(function(meta){
-    return api(fpath(name)+q(),{raw:true}).then(function(txt){
-      var d=JSON.parse(txt); if(!d.ipals||!d.ipals.length)throw new Error('Format file tidak valid.');
-      F.restore(d); known[name]=meta.sha; curName=name; chip(); F.doAutosave();
-    });
-  });
-}
-function saveOnline(name,silent){
-  name=clean(name);
-  if(!name)return Promise.reject(new Error('Isi nama file.'));
-  if(!ls(LS_TOK))return Promise.reject(new Error('Token GitHub diperlukan untuk menyimpan (lihat Pengaturan).'));
-  return api(fpath(name)+q()).catch(function(e){if(/ 404/.test(e.message))return null;throw e;}).then(function(meta){
-    if(meta){
-      if(known[name]&&known[name]!==meta.sha){
-        if(silent){lset(LS_AUTO,'');throw new Error('File diubah orang lain; simpan otomatis dimatikan.');}
-        if(!confirm('File "'+name+'" sudah diubah orang lain sejak Anda membukanya. Timpa?'))throw new Error('Dibatalkan.');
-      }else if(!known[name]&&!confirm('File "'+name+'" sudah ada di GitHub. Timpa?'))throw new Error('Dibatalkan.');
+function load(){try{var a=JSON.parse(localStorage.getItem(KEY)||'[]');return Array.isArray(a)?a:[];}catch(e){return [];}}
+function store(a){
+  for(;;){
+    try{localStorage.setItem(KEY,JSON.stringify(a));return true;}
+    catch(e){ // penyimpanan penuh: buang yang otomatis terlama, lalu yang terlama
+      var i=-1,k; for(k=a.length-1;k>=0;k--){if(a[k].auto){i=k;break;}} if(i<0)i=a.length-1;
+      if(a.length<=1)return false; a.splice(i,1);
     }
-    var body={message:'Simpan '+name+' '+new Date().toISOString(),content:b64(JSON.stringify(F.collect(false))),branch:cfg().branch};
-    if(meta)body.sha=meta.sha;
-    return api(fpath(name),{method:'PUT',body:JSON.stringify(body)}).then(function(r){
-      known[name]=r.content.sha; curName=name; chip(); F.markSaved();
-    });
-  });
+  }
 }
+function sig(d){var c=JSON.parse(JSON.stringify(d));delete c.saved;delete c.changeLog;delete c.meta;return JSON.stringify(c);}
+function z(n){return (n<10?'0':'')+n;}
+function fmtT(t){var d=new Date(t);return z(d.getDate())+'/'+z(d.getMonth()+1)+'/'+d.getFullYear()+' '+z(d.getHours())+':'+z(d.getMinutes());}
+function ago(t){var s=Math.round((Date.now()-t)/1000);if(s<60)return 'baru saja';var m=Math.round(s/60);if(m<60)return m+' mnt lalu';var h=Math.round(m/60);if(h<24)return h+' jam lalu';return Math.round(h/24)+' hari lalu';}
+function kb(o){return Math.max(1,Math.round(JSON.stringify(o).length/1024))+' KB';}
 
-/* ── UI ── */
-function msg(t,bad){var m=document.getElementById('olMsg');if(m){m.textContent=t;m.style.color=bad?'#c92a2a':'inherit';}}
-function shareLink(n){return location.origin+location.pathname+'?save='+encodeURIComponent(n);}
-function renderList(){
-  var box=document.getElementById('olList'); box.textContent='Memuat…';
-  list().then(function(fs){
-    if(!fs.length){box.textContent='Belum ada file tersimpan.';return;}
-    box.innerHTML=fs.map(function(f){var n=f.name.replace(/\.ipal$/,'');
-      return '<div class="ol-row"><span>'+esc(n)+' <small>'+Math.round(f.size/1024)+' KB</small></span>'+
-        '<button class="ol-btn" data-open="'+esc(n)+'">Buka</button><button class="ol-btn" data-link="'+esc(n)+'">Salin link</button></div>';}).join('');
-  }).catch(function(e){box.textContent='';msg(e.message,true);});
+function snapshot(name,auto,force){
+  var d; try{d=F.collect(false);}catch(e){return false;}
+  if(!d.ipals||!d.ipals.length)return false;            // jangan simpan kondisi kosong
+  var s=sig(d); if(!force&&s===lastSig)return false;     // tidak ada perubahan sejak versi terakhir
+  var a=load();
+  a.unshift({id:Date.now().toString(36)+Math.random().toString(36).slice(2,5),t:Date.now(),name:name||'',auto:!!auto,
+    sum:d.meta||{},data:d});
+  // batasi jumlah: buang otomatis terlama dulu
+  while(a.length>MAX){var i=-1,k;for(k=a.length-1;k>=0;k--){if(a[k].auto){i=k;break;}} if(i<0)i=a.length-1; a.splice(i,1);}
+  if(!store(a)){F.flash('Riwayat gagal disimpan (penyimpanan browser penuh)','#c92a2a',5000);return false;}
+  lastSig=s; badge(); return true;
 }
+function badge(){var b=document.getElementById('hxCnt');if(b)b.textContent=load().length;}
+
+function render(){
+  var box=document.getElementById('hxList'),a=load();
+  if(!a.length){box.innerHTML='<div class="hx-empty">Belum ada riwayat.<br>Klik <b>Simpan versi ini</b> atau tunggu simpan otomatis (±2 menit setelah ada perubahan).</div>';}
+  else box.innerHTML=a.map(function(e){
+    var m=e.sum||{};
+    return '<div class="hx-row" data-id="'+e.id+'"><div class="hx-i"><div class="hx-n">'+esc(e.name||(e.auto?'Simpan otomatis':'Versi tanpa nama'))+
+      '<span class="hx-tag'+(e.auto?' auto':'')+'">'+(e.auto?'otomatis':'manual')+'</span></div>'+
+      '<div class="hx-m">'+fmtT(e.t)+' · '+ago(e.t)+' · '+(m.ipal||0)+' IPAL, '+(m.unit||0)+' unit, '+(m.barisPenggunaanAir||0)+' baris air · '+kb(e.data)+'</div></div>'+
+      '<button class="hx-b pri" data-a="open">Buka</button><button class="hx-b" data-a="ren" title="Ganti nama">Nama</button><button class="hx-b del" data-a="del" title="Hapus">Hapus</button></div>';
+  }).join('');
+  var f=document.getElementById('hxInfo'); if(f)f.textContent=a.length+' versi tersimpan (maks. '+MAX+') · disimpan di browser ini';
+  badge();
+}
+function open(id){
+  var a=load(),e=a.filter(function(x){return x.id===id;})[0]; if(!e)return;
+  if(!confirm('Buka versi "'+(e.name||fmtT(e.t))+'"?\nData saat ini otomatis dicadangkan ke riwayat dulu.'))return;
+  snapshot('Cadangan sebelum membuka riwayat',true,true);
+  var d=JSON.parse(JSON.stringify(e.data));
+  try{F.restore(d);F.doAutosave();lastSig=sig(F.collect(false));hide();F.flash('Riwayat dibuka: '+(e.name||fmtT(e.t)),'',3500);}
+  catch(err){alert('Gagal membuka riwayat: '+err.message);}
+  render();
+}
+function show(){var ov=document.getElementById('hxOv')||build();ov.style.display='flex';render();}
+function hide(){var ov=document.getElementById('hxOv');if(ov)ov.style.display='none';}
 function build(){
-  var ov=document.createElement('div'); ov.id='olOv';
-  ov.innerHTML='<div id="olBox"><h3>☁ Simpan &amp; Buka Online (GitHub)</h3>'+
-  '<h4>File tersimpan <button class="ol-btn" id="olRefresh" style="margin-left:6px">Muat ulang</button></h4><div id="olList"></div>'+
-  '<h4>Simpan ke GitHub</h4><input type="text" id="olName" placeholder="Nama file, mis. Proyek_Hotel_A">'+
-  '<button class="ol-btn pri" id="olSave">Simpan Online</button> '+
-  '<label style="margin-left:8px"><input type="checkbox" id="olAuto"> Simpan otomatis tiap ±1 menit setelah ada perubahan</label>'+
-  '<details style="margin-top:14px"><summary style="cursor:pointer">Pengaturan GitHub</summary>'+
-  '<div style="margin-top:8px"><input type="text" id="olOwner" placeholder="Owner / username GitHub"><input type="text" id="olRepo" placeholder="Nama repository">'+
-  '<input type="text" id="olBranch" placeholder="Branch (main)"><input type="text" id="olDir" placeholder="Folder penyimpanan (saves)">'+
-  '<input type="password" id="olTok" placeholder="Token GitHub (hanya untuk menyimpan; kosongkan bila hanya membuka)">'+
-  '<button class="ol-btn" id="olCfg">Simpan pengaturan</button>'+
-  '<p style="color:var(--muted,#888);font-size:.75rem;margin:8px 0 0">Token (fine-grained, izin <b>Contents: Read and write</b> hanya untuk repo ini) disimpan di browser ini saja, tidak ikut masuk ke file save. Repo publik = siapa pun bisa membuka file save tanpa token, tetapi juga bisa MELIHAT isinya.</p></div></details>'+
-  '<div id="olMsg"></div><div style="text-align:right;margin-top:10px"><button class="ol-btn" id="olClose">Tutup</button></div></div>';
+  var ov=document.createElement('div');ov.id='hxOv';
+  ov.innerHTML='<div id="hxBox"><div class="hx-h"><h3>Riwayat Versi</h3><button class="hx-b" id="hxClose">Tutup</button></div>'+
+  '<div class="hx-sub">Setiap versi data disimpan di browser ini, jadi bisa dikembalikan jika ada kesalahan. Untuk memindahkan data ke komputer lain gunakan tombol Simpan File / Buka File.</div>'+
+  '<div class="hx-save"><input type="text" id="hxName" placeholder="Nama versi (opsional), mis. Sebelum revisi ID 2"><button class="hx-b pri" id="hxSave">Simpan versi ini</button></div>'+
+  '<div id="hxList"></div>'+
+  '<div class="hx-foot"><span id="hxInfo"></span><button class="hx-b del" id="hxClear">Hapus semua</button></div></div>';
   document.body.appendChild(ov);
-  var $=function(i){return document.getElementById(i);};
-  ov.addEventListener('mousedown',function(e){if(e.target===ov)ov.style.display='none';});
-  $('olClose').onclick=function(){ov.style.display='none';};
-  $('olRefresh').onclick=renderList;
-  $('olList').onclick=function(e){
-    var b=e.target.closest('button'); if(!b)return;
-    if(b.dataset.open){msg('Membuka…');openOnline(b.dataset.open).then(function(){msg('File "'+b.dataset.open+'" dibuka.');$('olName').value=curName;}).catch(function(x){msg(x.message,true);});}
-    if(b.dataset.link){var l=shareLink(b.dataset.link);(navigator.clipboard?navigator.clipboard.writeText(l):Promise.reject()).then(function(){msg('Link disalin: '+l);},function(){prompt('Salin link ini:',l);});}
-  };
-  $('olSave').onclick=function(){msg('Menyimpan…');saveOnline($('olName').value).then(function(){msg('Tersimpan online sebagai "'+curName+'". Link: '+shareLink(curName));renderList();}).catch(function(x){msg(x.message,true);});};
-  $('olAuto').onchange=function(){lset(LS_AUTO,this.checked?'1':'');if(this.checked&&!curName)msg('Simpan manual sekali dulu agar nama file ditentukan.');};
-  $('olCfg').onclick=function(){
-    lset(LS_CFG,JSON.stringify({owner:$('olOwner').value.trim(),repo:$('olRepo').value.trim(),branch:$('olBranch').value.trim(),dir:$('olDir').value.trim()}));
-    lset(LS_TOK,$('olTok').value.trim()); msg('Pengaturan disimpan.'); renderList();
-  };
+  ov.addEventListener('click',function(ev){
+    var t=ev.target; if(t===ov||t.id==='hxClose'){hide();return;}
+    if(t.id==='hxSave'){var n=document.getElementById('hxName');
+      if(!snapshot((n.value||'').trim(),false,true))F.flash('Tidak ada data IPAL untuk disimpan','#c92a2a',3000);
+      else F.flash('Versi disimpan ke riwayat','',2500); n.value=''; render(); return;}
+    if(t.id==='hxClear'){if(load().length&&confirm('Hapus SEMUA riwayat? Tindakan ini tidak bisa dibatalkan.')){store([]);lastSig='';render();}return;}
+    var row=t.closest&&t.closest('.hx-row'),act=t.getAttribute&&t.getAttribute('data-a'); if(!row||!act)return;
+    var id=row.getAttribute('data-id');
+    if(act==='open')open(id);
+    else if(act==='del'){var a=load().filter(function(x){return x.id!==id;});store(a);render();}
+    else if(act==='ren'){var a2=load(),e=a2.filter(function(x){return x.id===id;})[0];if(!e)return;
+      var nn=prompt('Nama versi:',e.name||'');if(nn===null)return;e.name=nn.trim();store(a2);render();}
+  });
+  document.addEventListener('keydown',function(ev){if(ev.key==='Escape')hide();});
   return ov;
 }
-function show(mode){
-  var ov=document.getElementById('olOv')||build(),c=cfg(),$=function(i){return document.getElementById(i);};
-  $('olOwner').value=c.owner;$('olRepo').value=c.repo;$('olBranch').value=c.branch;$('olDir').value=c.dir;
-  $('olTok').value=ls(LS_TOK);$('olAuto').checked=ls(LS_AUTO)==='1';$('olName').value=curName||$('olName').value;
-  ov.querySelector('details').open=(mode==='cfg'); msg(''); ov.style.display='flex'; renderList();
-}
+
+window.__hxBackup=function(n){return snapshot(n,true,true);};
+/* tombol di toolbar, di samping Buka File */
 var ob=document.querySelector('button[onclick="openFile()"]');
-function mk(label,title,svg,fn){var x=document.createElement('button');x.className='ol-tb';x.title=title;x.setAttribute('aria-label',title);
-  x.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+svg+'</svg><span>'+label+'</span>';x.onclick=fn;return x;}
-function chip(){var c=document.getElementById('olChip');if(c){c.textContent=curName?'\u2601 '+curName:'';c.title=curName?'File online yang sedang dipakai: '+curName:'';c.style.display=curName?'inline-block':'none';}}
-function quickSave(){
-  var c=cfg();
-  if(!c.owner||!c.repo||!ls(LS_TOK)){show('cfg');msg('Untuk menyimpan online, tempel token GitHub di bawah lalu klik "Simpan pengaturan". (Untuk hanya membuka file, token tidak diperlukan.)',true);return;}
-  var n=curName||clean(prompt('Nama file online:','')||''); if(!n)return;
-  saveOnline(n).then(function(){chip();F.flash('Tersimpan online: '+curName,'',3000);}).catch(function(e){F.flash('Gagal menyimpan online: '+e.message,'#c92a2a',6000);});
-}
 if(ob){
-  var bo=mk('Buka Online','Buka file dari GitHub (online)','<polyline points="8 17 12 21 16 17"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29"/>',function(){show('open');});
-  var bs=mk('Simpan Online','Simpan ke GitHub (online)','<polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>',quickSave);
-  var ch=document.createElement('span');ch.id='olChip';ch.style.display='none';
-  var ref=ob.nextSibling;ob.parentNode.insertBefore(bo,ref);ob.parentNode.insertBefore(bs,ref);ob.parentNode.insertBefore(ch,ref);
+  var b=document.createElement('button');b.className='hx-tb';b.title='Riwayat versi (tersimpan di browser)';b.setAttribute('aria-label','Riwayat versi');
+  b.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 4 3 9 8 9"/><polyline points="12 7 12 12 15 14"/></svg><span>Riwayat</span><b id="hxCnt">0</b>';
+  b.onclick=show; ob.parentNode.insertBefore(b,ob.nextSibling);
 }
 
-/* simpan otomatis online */
-['input','change'].forEach(function(e){document.addEventListener(e,function(ev){if(!ev.target.closest||!ev.target.closest('#olOv'))pend=true;},true);});
-setInterval(function(){
-  if(busy||!pend||ls(LS_AUTO)!=='1'||!curName||!ls(LS_TOK))return;
-  busy=true;pend=false;
-  saveOnline(curName,true).then(function(){F.flash('Tersimpan online','',2500);})
-    .catch(function(e){pend=true;F.flash('Simpan online gagal: '+e.message,'#c92a2a',6000);}).then(function(){busy=false;});
-},60000);
-
-/* buka lewat link: ?save=NamaFile */
-var p=new URLSearchParams(location.search).get('save');
-if(p)openOnline(clean(p)).then(function(){F.flash('Dibuka dari GitHub: '+curName,'',3500);}).catch(function(e){alert('Gagal membuka save online: '+e.message);});
+/* simpan otomatis ke riwayat: setiap ±2 menit jika ada perubahan */
+try{new MutationObserver(function(){if(document.body.classList.contains('fs-dirty'))pend=true;}).observe(document.body,{attributes:true,attributeFilter:['class']});}catch(e){}
+['input','change'].forEach(function(e){document.addEventListener(e,function(ev){if(!ev.target.closest||!ev.target.closest('#hxOv'))pend=true;},true);});
+setInterval(function(){if(!pend)return;pend=false;snapshot('',true,false);},AUTO_MS);
+window.addEventListener('beforeunload',function(){if(pend){pend=false;snapshot('',true,false);}});
+/* versi awal: catat kondisi saat aplikasi dibuka (bila belum ada riwayat sama) */
+setTimeout(function(){try{var d=F.collect(false);lastSig=sig(d);var a=load();if(!a.length&&d.ipals&&d.ipals.length)snapshot('Saat aplikasi dibuka',true,true);}catch(e){}badge();},1500);
+badge();
 })();
 </script>
 
