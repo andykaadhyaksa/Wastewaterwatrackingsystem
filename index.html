@@ -868,6 +868,26 @@ footer{text-align:center;padding:26px 20px;font-size:.72rem;color:var(--faint);b
 .icon-btn svg{width:16px;height:16px;}
 .avatar-btn{width:34px;height:34px;border-radius:50%;background:var(--active);display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;flex-shrink:0;}
 .avatar-btn svg{width:17px;height:17px;}
+/* ── Geser urutan Penggunaan Air ── */
+.pr-n{display:flex;align-items:center;justify-content:flex-end;gap:3px}
+.pr-head .pr-n{padding-right:4px}
+.pr-n .pr-num{display:inline-block;min-width:20px;text-align:center}
+.pr-grip{display:inline-flex;align-items:center;justify-content:center;width:24px;height:32px;border-radius:8px;cursor:grab;color:#9aa8bf;user-select:none;-webkit-user-select:none;touch-action:none;transition:background .15s,color .15s}
+.pr-grip svg{pointer-events:none}
+#paCards .pa-card.pr:hover .pr-grip{color:#5f7191}
+.pr-grip:hover{background:#e3ecfd;color:#1560d8!important}
+.pr-grip:active{cursor:grabbing}
+.pr-grip:focus-visible{outline:2px solid #1560d8}
+body.pr-dragging-on,body.pr-dragging-on *{cursor:grabbing!important;user-select:none!important;-webkit-user-select:none!important}
+#paCards .pa-card.pr.pr-lifted{position:fixed!important;z-index:9999;margin:0;background:#fff;border:1px solid #1560d8!important;border-radius:10px!important;box-shadow:0 14px 34px rgba(15,40,90,.28),0 2px 6px rgba(15,40,90,.16)!important;pointer-events:none;transition:none;opacity:.98;box-sizing:border-box}
+.pr-ph{box-sizing:border-box;margin:0;background:#eef4ff;box-shadow:inset 0 0 0 2px #9dbcf5;border-bottom:1px solid var(--line-soft)}
+/* ── Undo / Redo Penggunaan Air ── */
+.pa-ur{display:inline-flex;gap:4px;margin-left:12px;vertical-align:middle}
+.pa-ur button{width:30px;height:30px;padding:0;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:8px;background:#fff;color:#33475f;cursor:pointer;transition:background .15s,color .15s,border-color .15s}
+.pa-ur button:hover:not(:disabled){background:#e3ecfd;border-color:#9dbcf5;color:#1560d8}
+.pa-ur button:disabled{opacity:.35;cursor:default}
+.pa-ur button svg{pointer-events:none}
+.pa-ur-toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:100000;background:#14233a;color:#fff;font-size:.8rem;padding:8px 16px;border-radius:999px;box-shadow:0 6px 20px rgba(0,0,0,.25);transition:opacity .3s;pointer-events:none}
 </style>
 <style id="ui-refresh">
 /* ═══ UI REFRESH v2 — modern, lapisan visual saja ═══ */
@@ -1434,9 +1454,9 @@ body{font-family:'Plus Jakarta Sans','Poppins',system-ui,sans-serif;font-variant
 #paHead .pa-search{width:170px;padding-left:32px;background-position:10px center}
 
 /* Daftar = satu tabel */
-#paCards{--pr-cols:26px minmax(110px,1fr) 112px minmax(220px,2.2fr) 78px 112px minmax(90px,.8fr) 78px 120px 26px;
+#paCards{--pr-cols:54px minmax(110px,1fr) 112px minmax(220px,2.2fr) 78px 112px minmax(90px,.8fr) 78px 120px 26px;
   display:block;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--sh2);overflow:hidden;container-type:inline-size}
-#paCards[data-grp="0"]{--pr-cols:26px minmax(110px,1fr) 112px minmax(220px,2.2fr) 78px 112px minmax(90px,.8fr) 78px 26px}
+#paCards[data-grp="0"]{--pr-cols:54px minmax(110px,1fr) 112px minmax(220px,2.2fr) 78px 112px minmax(90px,.8fr) 78px 26px}
 #paCards:empty{display:none}
 
 .pr-head,#paCards .pa-card.pr{display:grid;grid-template-columns:var(--pr-cols);column-gap:8px;align-items:center;padding:0 12px}
@@ -1501,7 +1521,7 @@ body{font-family:'Plus Jakarta Sans','Poppins',system-ui,sans-serif;font-variant
 /* Kontainer sempit: baris jadi 3 baris kecil */
 @container (max-width:1060px){
   .pr-head{display:none}
-  #paCards .pa-card.pr,#paCards[data-grp="0"] .pa-card.pr{grid-template-columns:24px 96px minmax(0,1fr) 78px 26px;
+  #paCards .pa-card.pr,#paCards[data-grp="0"] .pa-card.pr{grid-template-columns:52px 96px minmax(0,1fr) 78px 26px;
     grid-template-areas:"n nm nm nm x" ". bm bi bo ." ". lm li lo ." ". g g g .";row-gap:4px;padding-top:8px;padding-bottom:8px}
   .pr .pr-n{grid-area:n}.pr .pr-nm{grid-area:nm}.pr .pr-bm{grid-area:bm}.pr .pr-bi{grid-area:bi}.pr .pr-bo{grid-area:bo}
   .pr .pr-lm{grid-area:lm}.pr .pr-li{grid-area:li}.pr .pr-lo{grid-area:lo}.pr .pr-g{grid-area:g}.pr .pr-x{grid-area:x}
@@ -1515,8 +1535,8 @@ body{font-family:'Plus Jakarta Sans','Poppins',system-ui,sans-serif;font-variant
 /* ═══ PENGGUNAAN AIR v5 — nama kegiatan lebih lebar, spasi lebih lega, rekap IPAL ringkas ═══ */
 
 /* Tabel kegiatan: kolom nama diperlebar, jarak antar kolom & baris ditambah */
-#paCards{--pr-cols:28px minmax(190px,1.5fr) 104px minmax(200px,1.7fr) 76px 104px minmax(84px,.6fr) 76px 124px 28px;border-radius:14px}
-#paCards[data-grp="0"]{--pr-cols:28px minmax(190px,1.5fr) 104px minmax(200px,1.7fr) 76px 104px minmax(84px,.6fr) 76px 28px}
+#paCards{--pr-cols:58px minmax(190px,1.5fr) 104px minmax(200px,1.7fr) 76px 104px minmax(84px,.6fr) 76px 124px 28px;border-radius:14px}
+#paCards[data-grp="0"]{--pr-cols:58px minmax(190px,1.5fr) 104px minmax(200px,1.7fr) 76px 104px minmax(84px,.6fr) 76px 28px}
 .pr-head,#paCards .pa-card.pr{column-gap:12px;padding-left:16px;padding-right:16px}
 .pr-head{padding-top:11px;padding-bottom:11px;font-size:.7rem;letter-spacing:.01em}
 #paCards .pa-card.pr{padding-top:10px;padding-bottom:10px;min-height:56px}
@@ -1592,6 +1612,14 @@ body{font-family:'Plus Jakarta Sans','Poppins',system-ui,sans-serif;font-variant
   color:var(--muted);opacity:0;pointer-events:none;transition:opacity .15s,background .15s,color .15s}
 .ipal-tab .tab-rename{left:5px}
 .ipal-tab .tab-del{right:5px}
+/* Saklar aktif/nonaktif per IPAL */
+.ipal-tab .tab-pwr{flex:none;display:inline-block;position:relative;width:22px;height:12px;margin-left:7px;border-radius:999px;background:#c5ced9;cursor:pointer;transition:background .15s}
+.ipal-tab .tab-pwr i{position:absolute;top:2px;left:2px;width:8px;height:8px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.3);transition:left .15s}
+.ipal-tab .tab-pwr.on{background:#16a34a}
+.ipal-tab .tab-pwr.on i{left:12px}
+.ipal-tab .tab-pwr:focus-visible{outline:2px solid #1560d8;outline-offset:2px}
+.ipal-tab.off .tab-name{opacity:.5;text-decoration:line-through}
+.ipal-tab.off:not(.active){background:repeating-linear-gradient(135deg,transparent 0 6px,rgba(0,0,0,.035) 6px 12px)}
 .ipal-tab:hover .tab-rename,.ipal-tab:hover .tab-del,
 .ipal-tab.active .tab-rename,.ipal-tab.active .tab-del{opacity:.7;pointer-events:auto}
 .ipal-tab .tab-rename:hover,.ipal-tab .tab-del:hover{opacity:1;background:var(--line-soft)}
@@ -1907,6 +1935,9 @@ body{font-family:'Plus Jakarta Sans','Poppins',system-ui,sans-serif;font-variant
             <button class="btn-minimize-all" onclick="paOpenImport()" title="Import dari Excel atau CSV" style="background:var(--accent-soft);color:var(--accent);border-color:var(--accent-line);">
               ⬆ Import Excel/CSV
             </button>
+            <button class="btn-minimize-all" onclick="paOpenDrawio()" title="Buat diagram neraca air format draw.io (.drawio)">
+              📐 Diagram Neraca Air (draw.io)
+            </button>
             <button class="btn-minimize-all" onclick="paAddGroup()" title="Tambah grup baru" style="background:#e8f5e9;color:#2e7d32;border-color:#a5d6a7;">
               + Tambah Grup
             </button>
@@ -1914,6 +1945,9 @@ body{font-family:'Plus Jakarta Sans','Poppins',system-ui,sans-serif;font-variant
             <button class="btn-add" onclick="addPenggunaanAirRow()">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               Tambah Kegiatan/Fasilitas
+            </button>
+            <button class="btn-add btn-scan" type="button" onclick="paAiOpen()" title="Baca otomatis daftar kegiatan/fasilitas dari Excel, PDF, atau gambar (lewat Claude)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M12 2l1.8 5.2L19 9l-5.2 1.8L12 16l-1.8-5.2L5 9l5.2-1.8L12 2zm7 11l.9 2.6L22.5 16.5l-2.6.9L19 20l-.9-2.6-2.6-.9 2.6-.9L19 13zM5 14l.9 2.6 2.6.9-2.6.9L5 21l-.9-2.6L1.5 17.5l2.6-.9L5 14z"/></svg>Scan Excel / PDF / Gambar
             </button>
           </div>
           <div id="paOrphanBanner" style="display:none;background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:12px 16px;margin-bottom:14px;font-size:0.82rem;color:#664d03;display:flex;align-items:center;justify-content:space-between;gap:12px;">
@@ -2330,7 +2364,11 @@ function formatID(el){
 function gv(id){return parseID(document.getElementById(id)?.value);}
 function setAuto(id,n,d=3){
   const el=document.getElementById(id);
-  if(el)el.value=(!isNaN(n)&&n!==null)?fmtID(n,d):'';
+  if(el){
+    el.value=(!isNaN(n)&&n!==null)?fmtID(n,d):'';
+    // [REVISI] simpan nilai tak dibulatkan agar status kepatuhan tidak bergeser karena pembulatan tampilan
+    if(typeof n==='number'&&isFinite(n)) el.dataset.raw=String(n); else delete el.dataset.raw;
+  }
 }
 
 // ── TIPE ──────────────────────────────────────────
@@ -4736,15 +4774,15 @@ const FIELDS={
   anaerobic_filter:[{id:'olr',l:'Organic Loading Rate',u:'kg COD/m³.hari',type:'auto'},{id:'hrt_jam',l:'HRT',u:'jam',type:'auto'}],
   activated_sludge:[{id:'fm',l:'F/M Ratio',u:'kg BOD/kg MLVSS.hari',type:'auto'},{id:'hrt_jam',l:'HRT',u:'jam',type:'auto'}],
   sbr:[{id:'fm',l:'F/M Ratio',u:'kg BOD/kg MLVSS.hari',type:'auto'},{id:'hrt_jam',l:'HRT per siklus',u:'jam',type:'auto'}],
-  mbr:[{id:'flux',l:'Flux Membran',u:'liter/m².jam',type:'input',ph:'25'},{id:'hrt_jam',l:'HRT',u:'jam',type:'auto'}],
-  mbbr:[{id:'media_vol',l:'Volume Media',u:'m³',type:'input',ph:'1,00',hint:'Volume total media di reaktor'},{id:'bod_loading',l:'BOD Loading Rate',u:'g BOD/m².hari',type:'input',ph:'15'},{id:'nh3_loading',l:'Nitrogen Loading Rate',u:'g NH₃-N/m².hari',type:'input',ph:'0,5'},{id:'media_pct',l:'% Volume Media / Volume Reaktor',u:'%',type:'input',ph:'50',hint:'Maks 70%'}],
+  mbr:[{id:'luas_membran',l:'Luas Membran Total',u:'m²',type:'input',ph:'100',hint:'Total luas permukaan modul membran terpasang'},{id:'flux',l:'Flux Membran (J = Q / A)',u:'liter/m².jam',type:'auto'},{id:'hrt_jam',l:'HRT',u:'jam',type:'auto'}],
+  mbbr:[{id:'media_vol',l:'Volume Media (bulk carrier)',u:'m³',type:'auto'},{id:'surface_area',l:'Luas Permukaan Spesifik Carrier',u:'m²/m³ bulk',type:'input',ph:'500',hint:'Dari spesifikasi carrier (mis. 500 m²/m³)'},{id:'bod_loading',l:'BOD Loading Rate (SALR)',u:'g BOD/m².hari',type:'auto'},{id:'nh3_loading',l:'Nitrogen Loading Rate (SNLR)',u:'g NH₃-N/m².hari',type:'auto'},{id:'media_pct',l:'% Volume Media / Volume Reaktor',u:'%',type:'auto'}],
   biofilter:[{id:'bod_loading_vol',l:'BOD Loading Rate',u:'kg BOD/m³-media/hari',type:'auto'},{id:'surface_area',l:'Luas Permukaan Spesifik Media',u:'m²/m³',type:'input',ph:'200',hint:'Min 150 m²/m³'},{id:'hrt_jam',l:'HRT (Volume Efektif Cairan)',u:'jam',type:'auto'}],
-  pond_anaerobic:[{id:'olr',l:'VLR',u:'kg BOD/m³.hari',type:'auto'},{id:'hrt_hari',l:'HRT',u:'hari',type:'auto'},{id:'rasio_pl',l:'Rasio Panjang/Lebar',u:'',type:'input',ph:'2'}],
-  pond_facultative:[{id:'slr_surf',l:'Organic Surface Loading Rate',u:'kg BOD/hektar.hari',type:'input',ph:'280'},{id:'hrt_hari',l:'HRT',u:'hari',type:'auto'},{id:'rasio_pl',l:'Rasio Panjang/Lebar',u:'',type:'input',ph:'3'}],
+  pond_anaerobic:[{id:'olr',l:'VLR',u:'kg BOD/m³.hari',type:'auto'},{id:'hrt_hari',l:'HRT',u:'hari',type:'auto'},{id:'rasio_pl',l:'Rasio Panjang/Lebar',u:'',type:'auto'}],
+  pond_facultative:[{id:'slr_surf',l:'Organic Surface Loading Rate',u:'kg BOD/hektar.hari',type:'auto'},{id:'hrt_hari',l:'HRT',u:'hari',type:'auto'},{id:'rasio_pl',l:'Rasio Panjang/Lebar',u:'',type:'auto'}],
   pond_maturation:[{id:'hrt_hari',l:'HRT',u:'hari',type:'auto'}],
-  cw_fws:[{id:'bod_loading',l:'BOD Loading Rate',u:'g/m².hari',type:'input',ph:'6'},{id:'hrt_hari',l:'HRT',u:'hari',type:'auto'},{id:'rasio_pl',l:'Aspect Ratio (P/L)',u:'',type:'input',ph:'5'},{id:'bed_slope',l:'Bed Slope',u:'%',type:'input',ph:'1'}],
-  cw_ssf_h:[{id:'bod_loading',l:'BOD Loading Rate',u:'g/m².hari',type:'input',ph:'5'},{id:'cs_loading',l:'Cross-sectional Loading',u:'g BOD₅/m².hari',type:'input',ph:'150'},{id:'hrt_hari',l:'HRT',u:'hari',type:'auto'},{id:'rasio_pl',l:'Aspect Ratio (P/L)',u:'',type:'input',ph:'2'},{id:'bed_slope',l:'Bed Slope',u:'%',type:'input',ph:'1'}],
-  cw_ssf_v:[{id:'bod_loading',l:'BOD Loading Rate',u:'g/m².hari',type:'input',ph:'5'},{id:'hrt_hari',l:'HRT',u:'hari',type:'auto'},{id:'bed_slope',l:'Bed Slope',u:'%',type:'input',ph:'1'}],
+  cw_fws:[{id:'bod_loading',l:'BOD Loading Rate',u:'g/m².hari',type:'auto'},{id:'hrt_hari',l:'HRT',u:'hari',type:'auto'},{id:'rasio_pl',l:'Aspect Ratio (P/L)',u:'',type:'auto'},{id:'bed_slope',l:'Bed Slope',u:'%',type:'input',ph:'1'}],
+  cw_ssf_h:[{id:'bod_loading',l:'BOD Loading Rate',u:'g/m².hari',type:'auto'},{id:'cs_loading',l:'Cross-sectional Loading',u:'g BOD₅/m².hari',type:'auto'},{id:'hrt_hari',l:'HRT',u:'hari',type:'auto'},{id:'rasio_pl',l:'Aspect Ratio (P/L)',u:'',type:'auto'},{id:'bed_slope',l:'Bed Slope',u:'%',type:'input',ph:'1'}],
+  cw_ssf_v:[{id:'bod_loading',l:'BOD Loading Rate',u:'g/m².hari',type:'auto'},{id:'hrt_hari',l:'HRT',u:'hari',type:'auto'},{id:'bed_slope',l:'Bed Slope',u:'%',type:'input',ph:'1'}],
   filtrasi_lambat:[{id:'vf',l:'Kecepatan Aliran',u:'m/jam',type:'auto'}],
   filtrasi_cepat:[{id:'vf',l:'Kecepatan Aliran',u:'m/jam',type:'auto'}],
   filtrasi_tekanan:[{id:'vf',l:'Kecepatan Aliran',u:'m/jam',type:'auto'}],
@@ -4755,9 +4793,9 @@ const FIELDS={
   sumur_pengumpul:[{id:'hrt_menit',l:'HRT (waktu tinggal pompa)',u:'menit',type:'auto'}],
   neutralization:[{id:'hrt_menit',l:'HRT',u:'menit',type:'auto'},{id:'ph_target',l:'pH Target Efluen',u:'',type:'input',ph:'6,00 – 9,00',hint:'Sesuai baku mutu berlaku'}],
   anoxic_tank:[{id:'hrt_jam',l:'HRT',u:'jam',type:'auto'},{id:'nlr',l:'Nitrogen Loading Rate (Denitrifikasi)',u:'kg NO3-N/m³.hari',type:'input',ph:'0,10',hint:'Metcalf & Eddy 2014, tipikal 0,05–0,15'}],
-  anoxic_mbbr:[{id:'media_vol',l:'Volume Media',u:'m³',type:'input',ph:'1,00',hint:'Volume total media di reaktor anoxic'},{id:'media_pct',l:'% Volume Media / Volume Reaktor',u:'%',type:'input',ph:'50',hint:'Maks 70%'},{id:'hrt_jam',l:'HRT',u:'jam',type:'auto'}],
+  anoxic_mbbr:[{id:'media_vol',l:'Volume Media (bulk carrier)',u:'m³',type:'auto'},{id:'media_pct',l:'% Volume Media / Volume Reaktor',u:'%',type:'auto'},{id:'hrt_jam',l:'HRT',u:'jam',type:'auto'}],
   oxidation_ditch:[{id:'fm',l:'F/M Ratio',u:'kg BOD/kg MLVSS.hari',type:'auto'},{id:'hrt_jam',l:'HRT',u:'jam',type:'auto'}],
-  ifas:[{id:'media_pct',l:'% Volume Media / Volume Reaktor',u:'%',type:'input',ph:'30',hint:'Tipikal 20–50%'},{id:'fm',l:'F/M Ratio',u:'kg BOD/kg MLVSS.hari',type:'auto'},{id:'hrt_jam',l:'HRT',u:'jam',type:'auto'}],
+  ifas:[{id:'media_pct',l:'% Volume Media / Volume Reaktor',u:'%',type:'auto'},{id:'fm',l:'F/M Ratio',u:'kg BOD/kg MLVSS.hari',type:'auto'},{id:'hrt_jam',l:'HRT',u:'jam',type:'auto'}],
   polishing_pond:[{id:'hrt_hari',l:'HRT',u:'hari',type:'auto'}],
   sludge_drying_bed:[{id:'solid_loading',l:'Solid Loading Rate',u:'kg SS/m².tahun',type:'input',ph:'100',hint:'Metcalf & Eddy, tipikal 100–300'}],
   oil_water_separator:[{id:'hrt_menit',l:'HRT',u:'menit',type:'auto'},{id:'v_aliran',l:'Kecepatan Aliran (Rise Rate Minyak)',u:'m/menit',type:'input',ph:'0,03',hint:'API separator, tipikal 0,02–0,04 m/menit'}],
@@ -4772,12 +4810,30 @@ let unitCounter = 0;
 
 function newIpal(name='IPAL 1'){
   ipalCounter++;
-  return {id: ipalCounter, name, tipe:'buang', peruntukan:'', Q:'', qMode:'manual', BOD:'', COD:'', MLVSS:'', peakFF:'1,5', units:[], uc:0,
+  return {id: ipalCounter, name, aktif:true, tipe:'buang', peruntukan:'', Q:'', qMode:'manual', BOD:'', COD:'', MLVSS:'', peakFF:'1,5', units:[], uc:0,
     // Parameter Influent (Bagian 2) & state Removal Recap — per-IPAL agar TIDAK
     // hilang/tertukar saat pindah tab IPAL atau saat render ulang panel.
     removalInfluent: { TSS:'', NH3:'', Deterjen:'', MinyakLemak:'', FC:'10000', Klorin:'0' },
     removalOverrides: {}, klorinDoseOverrides: {}, disinfeksiSource: {},
     removalCustomParams: [], removalCustomCounter: 0 };
+}
+
+// ── IPAL ON/OFF ────────────────────────────────────
+// ip.aktif === false  → IPAL dinonaktifkan sementara: datanya tetap tersimpan,
+// tetapi tidak dihitung/ditampilkan di Fluktuasi, rekap & diagram Penggunaan Air,
+// serta tidak ikut export Word/Excel. (undefined/true = aktif)
+function ipalOn(ip){ return !ip || ip.aktif!==false; }
+function ipalsOn(){ return ipals.filter(ipalOn); }
+function _ipalOffIds(){ return new Set(ipals.filter(ip=>!ipalOn(ip)).map(ip=>String(ip.id))); }
+function paRowsOn(){ const off=_ipalOffIds(); return paRows.filter(r=>!off.has(String(r.ipalId))); }
+function paGroupsOn(){ const off=_ipalOffIds(); return paGroups.filter(g=>!off.has(String(g.ipalId))); }
+function toggleIpalAktif(id){
+  const ip = ipals.find(x=>x.id===id);
+  if(!ip) return;
+  ip.aktif = !ipalOn(ip);
+  renderIpalTabs();                 // juga me-refresh halaman Fluktuasi bila terbuka
+  refreshPenggunaanAirIfVisible();  // rekap, diagram & total ikut menyesuaikan
+  scheduleAutosave();
 }
 
 // ── IPAL MANAGEMENT ────────────────────────────────
@@ -4954,7 +5010,7 @@ function renderIpalTabs(){
   const container = document.getElementById('ipalTabs');
   if(!container) return;
   container.innerHTML = ipals.map((ipal,i) => `
-    <div class="ipal-tab ${ipal.id===activeIpalId?'active':''}"
+    <div class="ipal-tab ${ipal.id===activeIpalId?'active':''}${ipalOn(ipal)?'':' off'}"
          draggable="true"
          data-ipal-id="${ipal.id}"
          data-ipal-idx="${i}"
@@ -4965,6 +5021,10 @@ function renderIpalTabs(){
          ondrop="ipalTabDrop(event,${ipal.id})"
          ondragend="ipalTabDragEnd(event)">
       <span class="tab-name" ondblclick="renameIpal(${ipal.id})" title="Klik dua kali untuk ganti nama">${escH(ipal.name)}</span>
+      <span class="tab-pwr ${ipalOn(ipal)?'on':''}" role="switch" aria-checked="${ipalOn(ipal)}" tabindex="0"
+            onclick="event.stopPropagation();toggleIpalAktif(${ipal.id})"
+            onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();toggleIpalAktif(${ipal.id})}"
+            title="${ipalOn(ipal)?'IPAL aktif — klik untuk menonaktifkan sementara (tidak dihitung & tidak ikut export)':'IPAL nonaktif — klik untuk mengaktifkan kembali'}"><i></i></span>
       <button class="tab-rename" onclick="event.stopPropagation();renameIpal(${ipal.id})" title="Ganti nama">✎</button>
       ${ipals.length>1?`<button class="tab-del" onclick="event.stopPropagation();deleteIpal(${ipal.id})" title="Hapus IPAL">✕</button>`:''}
     </div>
@@ -5014,7 +5074,7 @@ function renderTabsMoreMenu(){
   menu.innerHTML = ipals.map(ipal => `
     <button class="tabs-more-item ${ipal.id===activeIpalId?'active':''}" onclick="switchIpal(${ipal.id});closeTabsMoreMenu();">
       <span class="tmi-name">${escH(ipal.name)}</span>
-      <span class="tmi-meta">${ipal.id===activeIpalId?'✓ aktif':(paRows.filter(r=>String(r.ipalId)===String(ipal.id)).length+' fasilitas')}</span>
+      <span class="tmi-meta">${!ipalOn(ipal)?'⏸ nonaktif':ipal.id===activeIpalId?'✓ aktif':(paRows.filter(r=>String(r.ipalId)===String(ipal.id)).length+' fasilitas')}</span>
     </button>
   `).join('');
 }
@@ -5124,7 +5184,7 @@ const ALL_UNIT_PARAMS = ['P','L','T','D',
   'v_aliran','hrt_menit','hrt_jam','hrt_hari','slr','hazen','proj_area','olr',
   'fm','sor','sor_pk','la','ll','ft','vf','wk','flux','bod_loading','bod_loading_vol',
   'nh3_loading','media_pct','media_vol','surface_area','slr_surf','rasio_pl',
-  'bed_slope','cs_loading','bpNH3','bpRatio',
+  'bed_slope','cs_loading','bpNH3','bpRatio','luas_membran',
   'klPctFC','klB','klN','klOut','klDecay','klKadar','klRho',
   // ── Freeboard / ruang lumpur / volume mati / rasio media (dasar volume efektif cair) ──
   'freeboard_pct','freeboard_m','kedalaman_efektif',
@@ -5136,7 +5196,14 @@ const ALL_UNIT_PARAMS = ['P','L','T','D',
 // Unit-unit yang menggunakan media isian (biofilter-family) sehingga perlu
 // input rasio isian media untuk memisahkan volume media dari volume efektif
 // cairan sebagai dasar HRT.
-const MEDIA_UNIT_TYPES = new Set(['biofilter','mbbr','anoxic_mbbr','ifas']);
+const MEDIA_UNIT_TYPES = new Set(['biofilter','mbbr','anoxic_mbbr','ifas','cw_fws','cw_ssf_h','cw_ssf_v']);
+// [REVISI] Constructed wetland: HRT = (P × L × y × n) / Q  (Crites & Tchobanoglous). Volume padatan media/vegetasi
+// (1 − n) harus dikeluarkan dari volume efektif cair. Bila "Rasio Padatan" dikosongkan dipakai nilai tipikal:
+// SSF (kerikil) n = 0,40 → 60% ; FWS (vegetasi) n = 0,70 → 30%.
+// [SIMPLIFIKASI] Volume mati tidak lagi dipotong otomatis (0%) agar HRT = V efektif / Q seperti perhitungan desain standar & vendor.
+// Isi 0.05 bila ingin kembali ke asumsi konservatif 5%.
+const DEAD_VOLUME_FRAC = 0;
+const CW_DEFAULT_RASIO_MEDIA = {cw_fws:30, cw_ssf_h:60, cw_ssf_v:60};
 
 function getUnitTypeById(uid){
   const ipal = getActiveIpal(); if(!ipal) return null;
@@ -5757,6 +5824,7 @@ function calcAerasi(uid){
 // seluruh bagian aplikasi (Verifikasi Kepatuhan, Neraca Massa, Laporan).
 function dimExtra(uid){
   const isMediaType = MEDIA_UNIT_TYPES.has(getUnitTypeById(uid));
+  const cwDef = CW_DEFAULT_RASIO_MEDIA[getUnitTypeById(uid)];
   return `
   <div class="dim-row dim-extra">
     <div class="fg"><label>Freeboard <span class="ab">% dari T</span></label>
@@ -5773,11 +5841,11 @@ function dimExtra(uid){
   <div class="dim-row dim-extra">
     <div class="fg"><label>Volume Mati <span class="ab">AUTO</span></label>
       <input type="text" id="u${uid}_vol_mati" class="af" readonly placeholder="—">
-      <span class="unit-hint">m³ — 5% × V efektif operasi (zona sudut/short-circuit)</span>
+      <span class="unit-hint">m³ — ${(DEAD_VOLUME_FRAC*100).toFixed(0)}% × V efektif operasi (zona sudut/short-circuit)</span>
     </div>
-    ${isMediaType?`<div class="fg"><label>Rasio Isian Media</label>
-      <input type="text" id="u${uid}_rasio_media" placeholder="0,00" oninput="maskID(this);calcVol(${uid})" onblur="formatID(this);calcVol(${uid})">
-      <span class="unit-hint">% dari volume efektif operasi</span>
+    ${isMediaType?`<div class="fg"><label>${cwDef?'Rasio Padatan Media/Vegetasi (1 − porositas)':'Rasio Isian Media'}</label>
+      <input type="text" id="u${uid}_rasio_media" placeholder="${cwDef?(cwDef+',00'):'0,00'}" oninput="maskID(this);calcVol(${uid})" onblur="formatID(this);calcVol(${uid})">
+      <span class="unit-hint">${cwDef?'% — kosong = default '+cwDef+'% (n = '+((100-cwDef)/100).toFixed(2).replace('.',',')+')':'% dari volume efektif operasi'}</span>
     </div>
     <div class="fg"><label>Volume Media <span class="ab">AUTO</span></label>
       <input type="text" id="u${uid}_vol_media" class="af" readonly placeholder="—"><span class="unit-hint">m³</span>
@@ -5855,7 +5923,8 @@ function getArea(uid){
 function getFlowAreaLT(uid){
   const d = getBaseDims(uid);
   if(!d || d.shape!=='kotak') return null;
-  return d.L * d.T;
+  const vbF=getVolBreakdown(uid);
+  return d.L * (vbF?vbF.kedalamanEfektif:d.T);
 }
 
 // Volume total kotor = P×L×T atau π×(D/2)²×T — dimensi geometris konstruksi.
@@ -5887,14 +5956,14 @@ function getVolBreakdown(uid){
   let rasioMedia = null, volMedia = 0, volSetelahMedia = volEfektifOperasi;
   if(isMedia){
     const rm = parseID(document.getElementById(`u${uid}_rasio_media`)?.value);
-    rasioMedia = (!isNaN(rm) && rm>=0) ? rm : 0;
+    rasioMedia = (!isNaN(rm) && rm>=0) ? rm : (CW_DEFAULT_RASIO_MEDIA[getUnitTypeById(uid)] || 0);
     volMedia = volEfektifOperasi * (rasioMedia/100);
     volSetelahMedia = Math.max(volEfektifOperasi - volMedia, 0);
   }
 
   // 6) Volume mati (dead zone) = 5% dari volume efektif operasi (otomatis)
   //    Memperhitungkan zona sudut bak persegi dan short-circuit hidrolik
-  const volMati = volSetelahMedia * 0.05;
+  const volMati = volSetelahMedia * DEAD_VOLUME_FRAC;
   const volEffCair = Math.max(volSetelahMedia - volMati, 0);
 
   return {
@@ -5941,24 +6010,72 @@ function recalcAll(){
   units.forEach(u=>calcVol(u.id));
 }
 
+// Konsentrasi BOD/COD yang MASUK ke suatu unit = influent IPAL dikurangi penyisihan semua unit di hulunya
+// (urutan daftar unit = urutan aliran). Dasar F/M, OLR, VLR, beban media per unit.
+function getUnitInlet(uid,p){
+  const ipal=getActiveIpal(); if(!ipal) return NaN;
+  let cur=(p==='NH3')?parseID(removalInfluent.NH3):gv(p==='COD'?'codIn':'bodIn');
+  for(const x of ipal.units){
+    if(x.id===uid) return cur;
+    if(isNaN(cur)) return NaN;
+    let pct=0; try{ pct=getParamPct(x.id,p)||0; }catch(e){}
+    cur=Math.max(0,cur*(1-pct/100));
+  }
+  return cur;
+}
+// Basis OLR mengikuti satuan kriteria (kg COD/... -> COD ; kg BOD/... -> BOD)
+function olrBasis(u,tipe){
+  const cr=(KR[u.type]?.[tipe]||[]).find(c=>c.p==='olr');
+  return (cr&&/COD/.test(cr.u))?'COD':'BOD';
+}
 function autoCalc(uid){
-  const Q=gv('qTotal'),BOD=gv('bodIn'),MLVSS=gv('mlvssG');
+  const Q=gv('qTotal'),MLVSS=gv('mlvssG');
   const rawPFF=gv('peakFF'); const pff=isNaN(rawPFF)?1.5:rawPFF;
   const vol=getVol(uid),area=getArea(uid);
   const ipal=getActiveIpal(); if(!ipal) return;
   const u=ipal.units.find(x=>x.id===uid); if(!u) return;
+  const BOD=getUnitInlet(uid,'BOD'), COD=getUnitInlet(uid,'COD');
+  const OLRc=(olrBasis(u,ipal.tipe)==='COD')?COD:BOD;
   const Qh=(Q>0&&!isNaN(Q))?Q/24:null;
   const hrt_jam=(vol&&Qh)?vol/Qh:null;
   const hrt_min=hrt_jam?hrt_jam*60:null;
   const slr=(area&&Qh)?Qh/area:null;
   const sa=(id,n,d=3)=>setAuto(`u${uid}_${id}`,n,d);
+  // [REVISI] Parameter kepatuhan yang sebelumnya input manual → diturunkan dari dimensi / beban
+  if(['pond_anaerobic','pond_facultative','cw_fws','cw_ssf_h'].includes(u.type)){
+    const ddR=getBaseDims(uid);                       // Rasio P/L = Panjang / Lebar (hanya bentuk kotak)
+    sa('rasio_pl',(ddR&&ddR.shape==='kotak'&&ddR.L>0)?ddR.P/ddR.L:NaN,2);
+  }
+  if(u.type==='mbbr'||u.type==='anoxic_mbbr'||u.type==='ifas'){
+    const vbM=getVolBreakdown(uid);
+    const hasMedia=!!(vbM&&vbM.isMedia&&vbM.rasioMedia>0);
+    sa('media_pct',hasMedia?vbM.rasioMedia:NaN,1);     // % media = rasio isian media (satu sumber data)
+    sa('media_vol',hasMedia?vbM.volMedia:NaN,3);
+    if(u.type==='mbbr'){
+      // SALR (g BOD/m².hari) = Q × S0 / (V_media × SSA) ; SNLR = Q × NH3-N / (V_media × SSA)
+      const ssa=parseID(document.getElementById(`u${uid}_surface_area`)?.value);
+      const Abio=(hasMedia&&!isNaN(ssa)&&ssa>0)?vbM.volMedia*ssa:NaN;
+      const NH3=getUnitInlet(uid,'NH3');
+      sa('bod_loading',(!isNaN(Abio)&&!isNaN(Q)&&!isNaN(BOD))?Q*BOD/Abio:NaN,2);
+      sa('nh3_loading',(!isNaN(Abio)&&!isNaN(Q)&&!isNaN(NH3))?Q*NH3/Abio:NaN,3);
+    }
+  }
+  if(u.type==='pond_facultative'){
+    // Ls (kg BOD/ha.hari) = Q x S0 / A x 10.000 /1000
+    sa('slr_surf',(area&&!isNaN(Q)&&!isNaN(BOD))?Q*BOD*10/area:NaN,1);
+  }
+  if(u.type==='cw_fws'||u.type==='cw_ssf_h'||u.type==='cw_ssf_v'){
+    const dd=getBaseDims(uid), vbc=getVolBreakdown(uid);
+    sa('bod_loading',(area&&!isNaN(Q)&&!isNaN(BOD))?Q*BOD/area:NaN,2);            // g/m2.hari = Q x S0 / A
+    if(u.type==='cw_ssf_h') sa('cs_loading',(dd&&dd.L&&vbc&&vbc.kedalamanEfektif>0&&!isNaN(Q)&&!isNaN(BOD))?Q*BOD/(dd.L*vbc.kedalamanEfektif):NaN,1); // Q x S0 / (Lebar x kedalaman)
+  }
   switch(u.type){
     case 'grease_trap': { const areaLT=getFlowAreaLT(uid); sa('v_aliran',(areaLT&&Qh)?Qh/60/areaLT:NaN,4); sa('hrt_menit',hrt_min,1); break; }
     case 'equalization': sa('hrt_jam',hrt_jam,2); break;
     case 'presed_konv': sa('slr',slr,3); sa('hrt_jam',hrt_jam,2); break;
     case 'presed_lamella':{ const pa=parseID(document.getElementById(`u${uid}_proj_area`)?.value); sa('hazen',(!isNaN(pa)&&pa>0&&Qh)?Qh/pa:NaN,3); sa('hrt_menit',hrt_min,1); break;}
-    case 'anaerobic': sa('olr',(vol&&!isNaN(Q)&&!isNaN(BOD))?(Q*BOD/1000)/vol:NaN,3); sa('hrt_jam',hrt_jam,2); break;
-    case 'biofilter': sa('bod_loading_vol',(vol&&!isNaN(Q)&&!isNaN(BOD))?(Q*BOD/1000)/vol:NaN,3); sa('hrt_jam',hrt_jam,2); break;
+    case 'anaerobic': sa('olr',(vol&&!isNaN(Q)&&!isNaN(OLRc))?(Q*OLRc/1000)/vol:NaN,3); sa('hrt_jam',hrt_jam,2); break;
+    case 'biofilter': { const vbB=getVolBreakdown(uid); const vm=(vbB&&vbB.volMedia>0)?vbB.volMedia:null; sa('bod_loading_vol',(vm&&!isNaN(Q)&&!isNaN(BOD))?(Q*BOD/1000)/vm:NaN,3); sa('hrt_jam',hrt_jam,2); break; }
     case 'aerobic': sa('fm',(vol&&!isNaN(Q)&&!isNaN(BOD)&&!isNaN(MLVSS)&&MLVSS>0)?(Q*BOD)/(MLVSS*vol):NaN,4); sa('hrt_jam',hrt_jam,2); break;
     case 'secondary_clarifier': sa('sor',slr,3); sa('sor_pk',(slr&&!isNaN(pff))?slr*pff:NaN,3); sa('hrt_jam',hrt_jam,2); break;
     case 'secondary_clarifier_lamella':{ const pa=parseID(document.getElementById(`u${uid}_proj_area`)?.value); sa('sor',(!isNaN(pa)&&pa>0&&Qh)?Qh/pa:NaN,3); break;}
@@ -5979,12 +6096,12 @@ function autoCalc(uid){
     case 'anaerobic_lagoon':
     case 'anaerobic_digester':
     case 'septic_tank':
-      sa('olr',(vol&&!isNaN(Q)&&!isNaN(BOD))?(Q*BOD/1000)/vol:NaN,3);
+      sa('olr',(vol&&!isNaN(Q)&&!isNaN(OLRc))?(Q*OLRc/1000)/vol:NaN,3);
       sa('hrt_hari',hrt_jam?hrt_jam/24:NaN,2);
       break;
     case 'baffled_reactor':
     case 'anaerobic_filter':
-      sa('olr',(vol&&!isNaN(Q)&&!isNaN(BOD))?(Q*BOD/1000)/vol:NaN,3);
+      sa('olr',(vol&&!isNaN(Q)&&!isNaN(OLRc))?(Q*OLRc/1000)/vol:NaN,3);
       sa('hrt_jam',hrt_jam,2);
       break;
     // ── Aerobik spesifik ──
@@ -5993,9 +6110,13 @@ function autoCalc(uid){
       sa('fm',(vol&&!isNaN(Q)&&!isNaN(BOD)&&!isNaN(MLVSS)&&MLVSS>0)?(Q*BOD)/(MLVSS*vol):NaN,4);
       sa('hrt_jam',hrt_jam,2);
       break;
-    case 'mbr':
+    case 'mbr': {
+      // Flux J (L/m².jam) = Q rata-rata (L/jam) / luas membran total (m²)
+      const Amem=parseID(document.getElementById(`u${uid}_luas_membran`)?.value);
+      sa('flux',(!isNaN(Amem)&&Amem>0&&Qh)?(Qh*1000)/Amem:NaN,1);
       sa('hrt_jam',hrt_jam,2);
       break;
+    }
     // ── Kolam stabilisasi ──
     case 'pond_anaerobic':
     case 'pond_facultative':
@@ -6035,12 +6156,12 @@ function getPV(uid,p,u){
   // Helper: read from DOM first, fallback to saved state
   const domOrSaved = (param) => {
     const el = document.getElementById(`u${uid}_${param}`);
-    if(el) return parseID(el.value);
+    if(el){ if(el.readOnly && el.dataset && el.dataset.raw!==undefined) return parseFloat(el.dataset.raw); return parseID(el.value); }
     // Fallback to saved state
     const saved = u['_'+param];
     return saved !== undefined ? parseID(saved) : NaN;
   };
-  if(p==='kedalaman') return domOrSaved('T');
+  if(p==='kedalaman'){ const vbK=getVolBreakdown(uid); return vbK?vbK.kedalamanEfektif:domOrSaved('T'); }
   if(u.type==='filtrasi'){
     const el = document.getElementById(`u${uid}_ft`);
     const ft = el ? el.value : (u._ft || 'lambat');
@@ -6094,14 +6215,14 @@ function runCheck(){
       if(vb.isMedia){
         sumRows += `<tr><td class="td-p">Volume Media</td><td class="td-v" colspan="3">${mv(vb.volMedia)} <span class="td-ref">rasio isian ${fmtS(vb.rasioMedia,1)}%</span></td></tr>`;
       }
-      sumRows += `<tr><td class="td-p">Volume Mati (Dead Zone)</td><td class="td-v" colspan="3">${mv(vb.volMati)} <span class="td-ref">5% × V efektif operasi — zona sudut &amp; short-circuit</span></td></tr>`;
+      sumRows += `<tr><td class="td-p">Volume Mati (Dead Zone)</td><td class="td-v" colspan="3">${mv(vb.volMati)} <span class="td-ref">${(DEAD_VOLUME_FRAC*100).toFixed(0)}% × V efektif operasi — zona sudut &amp; short-circuit</span></td></tr>`;
       sumRows += `<tr><td class="td-p"><strong>Volume Efektif Cair</strong></td><td class="td-v" colspan="3"><strong>${mv(vb.volEffCair)}</strong></td></tr>`;
     }else{
       sumRows = `<tr><td class="td-p" colspan="4">Lengkapi dimensi (P/L/T atau D/T) untuk menghitung volume.</td></tr>`;
     }
     const sumTableHtml = `<table class="rt sum-vol-table"><thead><tr><th colspan="4">Ringkasan Dimensi &amp; Volume</th></tr></thead><tbody>${sumRows}</tbody></table>`;
 
-    let rows=`<tr><td class="td-p">Volume Efektif Cair (basis HRT)</td><td class="td-v">${vol!==null?fmtS(vol,3)+' m³':'—'}</td><td class="td-c">—<span class="td-ref">Volume operasi dikurangi freeboard, media &amp; volume mati (5% auto)</span></td><td><span class="dot na">Info</span></td></tr>`;
+    let rows=`<tr><td class="td-p">Volume Efektif Cair (basis HRT)</td><td class="td-v">${vol!==null?fmtS(vol,3)+' m³':'—'}</td><td class="td-c">—<span class="td-ref">Volume operasi dikurangi freeboard, media &amp; volume mati</span></td><td><span class="dot na">Info</span></td></tr>`;
     if(EXTERNAL_REF_TYPES.has(u.type)){
       rows+=`<tr><td class="td-p" colspan="4" style="color:#8a6100;background:#fff9e6;font-style:italic;">⚠️ Unit ini tidak tercantum dalam Lampiran III Permen LH/BPLH No. 11 Tahun 2025, sehingga tidak memiliki kriteria kepatuhan baku dari regulasi tersebut. Parameter desain pada kartu unit mengacu pada referensi literatur/praktik lapangan eksternal — lihat keterangan pada masing-masing field.</td></tr>`;
     }
@@ -6535,12 +6656,25 @@ function paUpdateComputedCells(){
     }
   });
 
+  // Subtotal per grup (footer grup + ringkasan header saat dilipat) — realtime
+  paGroups.filter(g=>String(g.ipalId)===String(activeIpalId)).forEach(g=>{
+    const gRows = visibleRows.filter(r=>r.groupId===g.id);
+    let gB=0, gL=0;
+    gRows.forEach(r=>{ gB+=paAirBaku(r); gL+=paAirLimbah(r); });
+    const eB=document.getElementById(`paGrpBaku_${g.id}`);
+    const eL=document.getElementById(`paGrpLimbah_${g.id}`);
+    const eH=document.getElementById(`paGrpHd_${g.id}`);
+    if(eB) eB.textContent = `${paFmt(gB)} m³/hari`;
+    if(eL) eL.textContent = `${paFmt(gL)} m³/hari`;
+    if(eH) eH.textContent = `🚰${paFmt(gB)} 💧${paFmt(gL)} · ${gRows.length} fasilitas`;
+  });
+
   if(foot){
     const activeIpalName = ipals.find(ip=>ip.id===activeIpalId)?.name || '';
     foot.innerHTML = `<div class="pa-total-bar">
       ${activeIpalName ? `<div class="pa-total-item" style="border-right:1px solid rgba(255,255,255,0.2);padding-right:20px;margin-right:4px;">
         <span class="pa-total-label">Unit IPAL</span>
-        <span class="pa-total-val" style="font-size:0.88rem;">${escH(activeIpalName)}</span>
+        <span class="pa-total-val" style="font-size:0.88rem;">${escH(activeIpalName)}${ipalOn(ipals.find(ip=>ip.id===activeIpalId))?'':' ⏸ NONAKTIF'}</span>
       </div>` : ''}
       <div class="pa-total-item">
         <span class="pa-total-label">Total Kebutuhan Air Baku</span>
@@ -7206,8 +7340,8 @@ function renderPenggunaanAirPageInner(){  const wrap = document.getElementById('
       grpCell=`<div class="pr-c pr-g"><select id="pa${row.id}_groupId" title="Grup" onchange="paCaptureRow(${row.id});renderPenggunaanAirPage();">${gopts}</select></div>`;
     }
 
-    return `<div class="pa-card pr">
-      <div class="pr-c pr-n">${idx}</div>
+    return `<div class="pa-card pr" data-rid="${row.id}">
+      <div class="pr-c pr-n"><span class="pr-grip" tabindex="0" role="button" data-rid="${row.id}" title="Tahan & geser untuk memindahkan (atau Alt+↑ / Alt+↓)" aria-label="Pindahkan urutan"><svg width="12" height="18" viewBox="0 0 12 18"><g fill="currentColor"><circle cx="3" cy="3" r="1.7"/><circle cx="9" cy="3" r="1.7"/><circle cx="3" cy="9" r="1.7"/><circle cx="9" cy="9" r="1.7"/><circle cx="3" cy="15" r="1.7"/><circle cx="9" cy="15" r="1.7"/></g></svg></span><span class="pr-num">${idx}</span></div>
       <div class="pr-c pr-nm"><input id="pa${row.id}_nama" class="pa-card-name-input" type="text" placeholder="Nama kegiatan / fasilitas" title="${escH(row.nama)}" value="${escH(row.nama)}" oninput="this.title=this.value;paCaptureRow(${row.id})"></div>
       ${bakuSeg}${bakuIn}${bakuOut}${limSeg}${limIn}${limOut}${grpCell}
       <div class="pr-c pr-x"><button type="button" class="pr-del" title="Hapus" onclick="deletePenggunaanAirRow(${row.id})">✕</button></div>
@@ -7227,21 +7361,21 @@ function renderPenggunaanAirPageInner(){  const wrap = document.getElementById('
     const footerHtml = g.collapsed ? '' :
       `<div class="pa-group-footer">
         <span class="pa-group-footer-label">Subtotal Grup:</span>
-        <span>🚰 <span class="pa-group-footer-val">${paFmt(gBaku)} m³/hari</span> Air Baku</span>
-        <span>💧 <span class="pa-group-footer-val">${paFmt(gLimbah)} m³/hari</span> Air Limbah</span>
+        <span>🚰 <span id="paGrpBaku_${g.id}" class="pa-group-footer-val">${paFmt(gBaku)} m³/hari</span> Air Baku</span>
+        <span>💧 <span id="paGrpLimbah_${g.id}" class="pa-group-footer-val">${paFmt(gLimbah)} m³/hari</span> Air Limbah</span>
         <span style="color:var(--muted);">${gRows.length} fasilitas</span>
       </div>`;
 
     html += `<div class="pa-group-wrap${g.collapsed?' is-collapsed':''}">
       <div class="pa-group-header" onclick="paToggleGroup(${g.id})">
         <span class="pa-group-name">📁 ${escH(g.nama)}</span>
-        ${g.collapsed?`<span class="pa-group-subtotal">🚰${paFmt(gBaku)} 💧${paFmt(gLimbah)} · ${gRows.length} fasilitas</span>`:''}
+        ${g.collapsed?`<span id="paGrpHd_${g.id}" class="pa-group-subtotal">🚰${paFmt(gBaku)} 💧${paFmt(gLimbah)} · ${gRows.length} fasilitas</span>`:''}
         <button class="pa-group-btn" onclick="event.stopPropagation();paOpenAssign(${g.id})">+ Assign</button>
         <button class="pa-group-btn" onclick="event.stopPropagation();paRenameGroup(${g.id})">✏️</button>
         <button class="pa-group-btn" onclick="event.stopPropagation();paDeleteGroup(${g.id})" style="border-color:rgba(255,100,100,0.5);">✕</button>
         <span style="color:rgba(255,255,255,0.7);font-size:0.8rem;">${g.collapsed?'▼':'▲'}</span>
       </div>
-      ${g.collapsed?'':`<div class="pa-group-body">${cardHtml||'<div style="font-size:0.78rem;color:var(--muted);text-align:center;padding:12px;">Belum ada fasilitas. Klik "+ Assign" untuk menambahkan.</div>'}</div>`}
+      ${g.collapsed?'':`<div class="pa-group-body" data-gid="${g.id}">${cardHtml||'<div style="font-size:0.78rem;color:var(--muted);text-align:center;padding:12px;">Belum ada fasilitas. Klik "+ Assign" untuk menambahkan.</div>'}</div>`}
       ${footerHtml}
     </div>`;
   });
@@ -7268,7 +7402,7 @@ function renderPenggunaanAirPageInner(){  const wrap = document.getElementById('
     foot.innerHTML=`<div class="pa-total-bar">
       ${activeIpalName?`<div class="pa-total-item" style="border-right:1px solid rgba(255,255,255,0.2);padding-right:20px;margin-right:4px;">
         <span class="pa-total-label">Unit IPAL</span>
-        <span class="pa-total-val" style="font-size:0.88rem;">${escH(activeIpalName)}</span>
+        <span class="pa-total-val" style="font-size:0.88rem;">${escH(activeIpalName)}${ipalOn(ipals.find(ip=>ip.id===activeIpalId))?'':' ⏸ NONAKTIF'}</span>
       </div>`:''}
       <div class="pa-total-item"><span class="pa-total-label">Total Kebutuhan Air Baku</span><span class="pa-total-val">${paFmt(totalBaku)} m³/hari</span></div>
       <div class="pa-total-item"><span class="pa-total-label">Total Timbulan Air Limbah</span><span class="pa-total-val">${paFmt(totalLimbah)} m³/hari</span></div>
@@ -7288,6 +7422,7 @@ function renderPenggunaanAirPageInner(){  const wrap = document.getElementById('
 
 // ── REKAP AIR LIMBAH PER UNIT IPAL ─────────────────
 function renderPaRecap(){
+  const ipals = ipalsOn(), paRows = paRowsOn(), paGroups = paGroupsOn();   // abaikan IPAL nonaktif
   const wrap = document.getElementById('paRecapWrap');
   if(wrap){
     if(!paRows.length){ wrap.innerHTML=''; }
@@ -7439,6 +7574,7 @@ function paDiagramColor(i){
 }
 
 function renderPaDiagram(){
+  const ipals = ipalsOn(), paRows = paRowsOn();   // abaikan IPAL nonaktif
   const wrap = document.getElementById('paDiagramWrap');
   if(!wrap) return;
 
@@ -41177,7 +41313,7 @@ function buildUnitSection(u, tipe, Q, BOD, MLVSS, peakFF, COD) {
   const resRows = [];
   const _preCompute = () => {
     if (u.type === 'grease_trap') {
-      const areaLT = (u.shape === 'kotak' && !isNaN(u.dims.L) && !isNaN(u.dims.T)) ? (u.dims.L * u.dims.T) : NaN;
+      const areaLT = (u.shape === 'kotak' && !isNaN(u.dims.L) && !isNaN(u.dims.T)) ? (u.dims.L * ((u.volBreakdown&&u.volBreakdown.kedalamanEfektif)||u.dims.T)) : NaN;
       const vAl = (Qh/60) / areaLT;
       resRows.push({ param:'Kecepatan Aliran', nilai:vAl, dec:4, satuan:'m/menit', kriteria:kritStr(0.021,0.035,'m/menit'), status:chkStatus(vAl,0.021,0.035) });
       resRows.push({ param:'HRT', nilai:hrt_min, dec:1, satuan:'menit', kriteria:kritStr(30,null,'menit'), status:chkStatus(hrt_min,30,null) });
@@ -41203,7 +41339,7 @@ function buildUnitSection(u, tipe, Q, BOD, MLVSS, peakFF, COD) {
       resRows.push({ param:'Kedalaman', nilai:T, dec:2, satuan:'m', kriteria:kritStr(1,null,'m'), status:chkStatus(T,1,null) });
       resRows.push({ param:'HRT', nilai:hrt_min, dec:1, satuan:'menit', kriteria:kritStr(hrtMin2,null,'menit'), status:chkStatus(hrt_min,hrtMin2,null) });
     } else if (u.type === 'anaerobic') {
-      const olr = (Q * BOD / 1000) / vol;
+      const olr = (Q * (tipe==='buang'?COD:BOD) / 1000) / vol;
       const [oMin, oMax, oUnit] = tipe === 'buang' ? [0.5,2.5,'kg COD/m³.hari'] : [0.25,0.75,'kg BOD/m³.hari'];
       resRows.push({ param:'Organic Loading Rate', nilai:olr, dec:3, satuan:oUnit, kriteria:kritStr(oMin,oMax,oUnit), status:chkStatus(olr,oMin,oMax) });
       resRows.push({ param:'HRT', nilai:hrt_jam, dec:2, satuan:'jam', kriteria:'Bergantung jenis reaktor (lihat SNI)', status:'na' });
@@ -41454,7 +41590,7 @@ function buildUnitSection(u, tipe, Q, BOD, MLVSS, peakFF, COD) {
       rows.push(['Volume Media', `${fmtS(vb.rasioMedia,1)}% × V efektif operasi = ${fmtS(vb.volMedia,3)} m³`]);
       rows.push(['Volume Efektif Cairan (setelah media)', `${fmtS(vb.volSetelahMedia,3)} m³`]);
     }
-    rows.push(['Volume Mati (Dead Zone)', `5% × V efektif operasi = ${fmtS(vb.volMati,3)} m³`]);
+    rows.push(['Volume Mati (Dead Zone)', `${(DEAD_VOLUME_FRAC*100).toFixed(0)}% × V efektif operasi = ${fmtS(vb.volMati,3)} m³`]);
     rows.push(['Volume Efektif Cair (basis HRT)', `${fmtS(vb.volEffCair,3)} m³`]);
 
     const kaskadeElems = [];
@@ -41517,7 +41653,7 @@ function buildUnitSection(u, tipe, Q, BOD, MLVSS, peakFF, COD) {
   const unitBlocks = [];
 
   if (u.type === 'grease_trap') {
-    const L = u.dims.L, T = u.dims.T;
+    const L = u.dims.L, T = (u.volBreakdown&&u.volBreakdown.kedalamanEfektif)||u.dims.T;
     const areaLT = (u.shape === 'kotak' && !isNaN(L) && !isNaN(T)) ? (L * T) : NaN;
     const vAl = (Qh/60) / areaLT;
     unitBlocks.push(eqBlock('Luas Penampang Aliran (A)', [
@@ -41549,7 +41685,7 @@ function buildUnitSection(u, tipe, Q, BOD, MLVSS, peakFF, COD) {
       ]));
     }
   } else if (u.type === 'anaerobic') {
-    const olr = (Q * BOD / 1000) / vol;
+    const olr = (Q * (tipe==='buang'?COD:BOD) / 1000) / vol;
     const [oMin, oMax, oUnit] = tipe === 'buang' ? [0.5,2.5,'kg COD/m³.hari'] : [0.25,0.75,'kg BOD/m³.hari'];
     unitBlocks.push(eqBlock('Organic Loading Rate (OLR)', [
       { note: 'Beban organik per satuan volume reaktor:', eq: [mr('OLR'), mr('  =  '), frac([mr('Q'), mr(' × '), mr('S')], [mr('V')])] },
@@ -41763,8 +41899,8 @@ function buildUnitSection(u, tipe, Q, BOD, MLVSS, peakFF, COD) {
     ]));
     if (!isNaN(flux)) {
       unitBlocks.push(p([
-        tx('Flux Membran (input desain): ', {bold:true, size:20, color:'000000'}),
-        tx(`${fmtS(flux,1)} L/m².jam — parameter ini merupakan input langsung dari spesifikasi membran yang digunakan, bukan hasil turunan dari dimensi tangki.`, {size:20, color:'000000'}),
+        tx('Flux Membran (J = Q / A membran): ', {bold:true, size:20, color:'000000'}),
+        tx(`${fmtS(flux,1)} L/m².jam — dihitung dari Q rata-rata (L/jam) dibagi luas membran total yang diinput.`, {size:20, color:'000000'}),
       ]));
     }
     unitBlocks.push(p([tx('Referensi: ', {bold:true, size:17, color:C.mutedText}), tx('Judd & Judd, The MBR Book, 2006; Lampiran III Permen LH/BPLH No. 11 Tahun 2025.', {size:17, color:C.mutedText})]));
@@ -41779,8 +41915,8 @@ function buildUnitSection(u, tipe, Q, BOD, MLVSS, peakFF, COD) {
     ]));
     if (!isNaN(bodLoad) || !isNaN(mediaPct)) {
       unitBlocks.push(p([
-        tx('BOD Loading Rate & % Media (input desain): ', {bold:true, size:20, color:'000000'}),
-        tx(`BOD Loading = ${!isNaN(bodLoad)?fmtS(bodLoad,2):'—'} g BOD/m².hari; % Volume Media = ${!isNaN(mediaPct)?fmtS(mediaPct,1):'—'}% — parameter ini merupakan input langsung dari spesifikasi media biofilm, bukan hasil turunan dari dimensi tangki.`, {size:20, color:'000000'}),
+        tx('BOD Loading Rate (SALR) & % Media: ', {bold:true, size:20, color:'000000'}),
+        tx(`BOD Loading = ${!isNaN(bodLoad)?fmtS(bodLoad,2):'—'} g BOD/m².hari; % Volume Media = ${!isNaN(mediaPct)?fmtS(mediaPct,1):'—'}% — SALR = Q × S₀ / (V media × luas permukaan spesifik carrier); % media = rasio isian media terhadap volume efektif operasi.`, {size:20, color:'000000'}),
       ]));
     }
     unitBlocks.push(p([tx('Referensi: ', {bold:true, size:17, color:C.mutedText}), tx('Ødegaard, Innovations in Wastewater Treatment, 2006; Lampiran III Permen LH/BPLH No. 11 Tahun 2025.', {size:17, color:C.mutedText})]));
@@ -42330,6 +42466,13 @@ function buildOutletCalcNarrative(rg) {
       return;
     }
 
+    // Parameter tanpa data removal per unit (mis. Streptococcus) tidak ada di trace → jangan dihitung
+    if(!trace.length || !trace[0] || !trace[0][param.key]) {
+      elems.push(p([tx('Parameter ini tidak dihitung melalui persamaan removal per unit (tidak ada data % removal pada rangkaian unit). Bandingkan langsung dengan hasil pengujian efluen.', {size:19, italic:true, color:C.mutedText})], {indent:360}));
+      elems.push(gap(80));
+      return;
+    }
+
     let curVal = param.infVal;
     if(param.key !== 'BOD' && param.key !== 'COD') {
       const stored = parseID(removalInfluent[param.infKey]);
@@ -42337,7 +42480,7 @@ function buildOutletCalcNarrative(rg) {
     }
 
     units.forEach((u, ui) => {
-      const tEntry = trace[ui][param.key];
+      const tEntry = trace[ui][param.key] || { pct:0, inVal:null, outVal:null, kAdd:0 };
       const pct = tEntry.pct;
       const inVal = tEntry.inVal;
       const outVal = tEntry.outVal;
@@ -42727,7 +42870,7 @@ function buildReport(data) {
       spacing: { before: ui===0?80:320, after: 100 },
     }));
     children.push(gap(60));
-    const { elems, resRows } = buildUnitSection(u, tipe, Q, BOD, MLVSS, peakFF, COD);
+    const { elems, resRows } = buildUnitSection(u, tipe, Q, getUnitInlet(u.id,'BOD'), MLVSS, peakFF, getUnitInlet(u.id,'COD'));
     elems.forEach(e => children.push(e));
     allResRows = allResRows.concat(resRows);
   });
@@ -43121,6 +43264,11 @@ async function exportWord() {
   btn.disabled = true;
   status.textContent = 'Menyusun laporan...';
   try {
+    if (!ipalOn(getActiveIpal())) {
+      alert('IPAL "' + (getActiveIpal()?.name||'') + '" sedang nonaktif. Aktifkan dulu lewat saklar pada tab IPAL untuk mengekspor laporannya.');
+      btn.disabled = false; status.textContent = '';
+      return;
+    }
     (getActiveIpal()?.units||[]).forEach(u => calcVol(u.id));
     const data = gatherReportData();
     if (isNaN(data.Q) || data.Q <= 0) {
@@ -43333,6 +43481,9 @@ function buildFluktTableDocx(hourlyQ, hourlyPct, peakHour) {
 
 // ── EXPORT: LAPORAN PENGGUNAAN AIR (standalone, .docx) ─────────────────────
 async function buildPenggunaanAirReport() {
+  return _buildPenggunaanAirReportImpl(ipalsOn(), paRowsOn(), paGroupsOn());   // IPAL nonaktif tidak ikut
+}
+async function _buildPenggunaanAirReportImpl(ipals, paRows, paGroups) {
   const tgl = new Date().toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' });
 
   const coverChildren = [];
@@ -43769,7 +43920,10 @@ async function buildPenggunaanAirReport() {
 // ===================================================================
 function exportPenggunaanAirExcel(){
   paRows.forEach(row=>paCaptureRow(row.id));
-  if(!paRows.length){ alert('Belum ada data kegiatan/fasilitas pada menu Penggunaan Air.'); return; }
+  return _exportPenggunaanAirExcelImpl(ipalsOn(), paRowsOn(), paGroupsOn());   // IPAL nonaktif tidak ikut
+}
+function _exportPenggunaanAirExcelImpl(ipals, paRows, paGroups){
+  if(!paRows.length){ alert('Belum ada data kegiatan/fasilitas pada IPAL yang aktif (IPAL nonaktif tidak ikut diexport).'); return; }
   if(typeof ExcelJS==='undefined'){ alert('Library ExcelJS tidak tersedia. Coba refresh halaman.'); return; }
 
 
@@ -44332,6 +44486,101 @@ function exportPenggunaanAirExcel(){
   setCell(SR,8,'',BH,font(9),{left:B_GRAY,right:B_THICK,top:B_THICK,bottom:B_THICK},aln('center','middle'));
   ws2.getRow(SR).height=26;
 
+  // ────────────────────────────────────────────────────────
+  // Sheet "Kapasitas" — Tabel Kapasitas Kegiatan Penunjang
+  // (Kegiatan Penunjang | Kapasitas | Satuan), dikelompokkan per grup
+  // ────────────────────────────────────────────────────────
+  (function buildKapasitasSheet(){
+    // Turunkan satuan kapasitas dari satuan standar, mis.
+    // "Liter/penghuni/hari" -> "Orang/Penghuni", "Liter/kg cucian" -> "kg cucian/hari"
+    function kapSatuan(row){
+      if(row.sumberMode!=='sni') return '';
+      const o=SNI_PEMAKAIAN_AIR[row.sniIdx]; if(!o) return '';
+      let s=String(o.satuan||'').replace(/\(.*?\)/g,'').trim();
+      if(/^liter\/kg cucian/i.test(s)) return 'kg cucian/hari';
+      s=s.replace(/^liter\//i,'').replace(/^detik\//i,'');
+      s=s.replace(/\/(hari|detik)$/i,'');
+      s=s.replace(/\/(hari|detik)$/i,'').trim();
+      if(!s) return '';
+      if(/^m2$/i.test(s)) return 'm²';
+      // Satuan orang (pegawai/penghuni/siswa/murid/penumpang) disamakan menjadi "Orang"
+      if(/^(orang|pegawai|penghuni|siswa|murid|penumpang)\b/i.test(s)) return 'Orang';
+      if(/^tempat duduk$/i.test(s)) return 'Kursi';
+      if(/^(bed|tempat tidur)/i.test(s)) return 'Tempat tidur';
+      return s.charAt(0).toUpperCase()+s.slice(1);
+    }
+
+    const KB={style:'thin',color:{argb:'FF000000'}};
+    const box={left:KB,right:KB,top:KB,bottom:KB};
+    const KF=function(sz,bold,italic){ return {name:'Arial',size:sz,bold:!!bold,italic:!!italic,color:{argb:'FF000000'}}; };
+
+    // Struktur: IPAL -> (kegiatan tanpa grup) + grup -> kegiatan
+    const blocks=[];
+    ipals.forEach(ip=>{
+      const iR=paRows.filter(r=>String(r.ipalId)===String(ip.id));
+      if(!iR.length) return;
+      const groups=[];
+      paGroups.filter(g=>String(g.ipalId)===String(ip.id)).forEach(g=>{
+        const gr=iR.filter(r=>r.groupId===g.id);
+        if(gr.length) groups.push({name:g.nama,rows:gr});
+      });
+      const ung=iR.filter(r=>!r.groupId);
+      blocks.push({name:ip.name,direct:ung,groups:groups});
+    });
+    if(!blocks.length) return;
+
+    const wsK=wb.addWorksheet('Kapasitas');
+    wsK.getColumn(1).width=46; wsK.getColumn(2).width=16; wsK.getColumn(3).width=24;
+    wsK.pageSetup={orientation:'portrait',fitToPage:true,fitToWidth:1,fitToHeight:0};
+
+    // Header kolom
+    ['Kegiatan Penunjang','Kapasitas','Satuan'].forEach(function(h,i){
+      const c=wsK.getCell(1,i+1);
+      c.value=h; c.font=KF(11,true); c.border=box;
+      c.alignment={horizontal:'center',vertical:'middle'};
+    });
+    wsK.getRow(1).height=22;
+
+    let r=2;
+    function headRow(text,fillArgb,sz){
+      wsK.mergeCells(r,1,r,3);
+      for(let c=1;c<=3;c++){ const cc=wsK.getCell(r,c); cc.fill=fill(fillArgb); cc.border=box; }
+      const gc=wsK.getCell(r,1);
+      gc.value=text; gc.font=KF(sz,true);
+      gc.alignment={horizontal:'center',vertical:'middle'};
+      wsK.getRow(r).height=20; r++;
+    }
+    function itemRows(rows){
+      rows.forEach(function(row){
+        const cn=wsK.getCell(r,1);
+        cn.value=row.nama||''; cn.font=KF(11,false,true); cn.border=box;
+        cn.alignment={horizontal:'left',vertical:'middle',wrapText:true};
+
+        const hasCap=row.sumberMode==='sni' && row.jumlahUnit!=='' && row.jumlahUnit!=null && !isNaN(parseFloat(row.jumlahUnit));
+        const ck=wsK.getCell(r,2);
+        ck.value=hasCap?parseFloat(row.jumlahUnit):'-';
+        ck.font=KF(11,false); ck.border=box;
+        ck.alignment={horizontal:'center',vertical:'middle'};
+        if(hasCap) ck.numFmt='#,##0';
+
+        const cs=wsK.getCell(r,3);
+        cs.value=hasCap?kapSatuan(row):'-';
+        cs.font=KF(11,false); cs.border=box;
+        cs.alignment={horizontal:'left',vertical:'middle'};
+        wsK.getRow(r).height=18; r++;
+      });
+    }
+
+    blocks.forEach(function(b){
+      headRow(b.name,'FFD9D9D9',11);          // baris IPAL
+      itemRows(b.direct);                      // kegiatan tanpa grup
+      b.groups.forEach(function(g){
+        headRow(g.name,'FFF2F2F2',11);         // grup di dalam IPAL
+        itemRows(g.rows);
+      });
+    });
+  })();
+
   // ── Write & download ──
   wb.xlsx.writeBuffer().then(function(buf){
     const blob=new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
@@ -44364,8 +44613,8 @@ async function exportPenggunaanAirWord() {
   if (btn) btn.disabled = true;
   if (status) status.textContent = 'Menyusun laporan penggunaan air...';
   try {
-    if (!paRows.length) {
-      alert('Belum ada data kegiatan/fasilitas pada menu Penggunaan Air.');
+    if (!paRowsOn().length) {
+      alert('Belum ada data kegiatan/fasilitas pada IPAL yang aktif (IPAL nonaktif tidak ikut diexport).');
       if (status) status.textContent = '';
       if (btn) btn.disabled = false;
       return;
@@ -44983,7 +45232,7 @@ function fxPeakBandPlugin(s) {
 
 
 function buildSrcData(ipal) {
-  if (!ipal || typeof paRows==='undefined') return [];
+  if (!ipal || !ipalOn(ipal) || typeof paRows==='undefined') return [];
   return paRows
     .filter(r => String(r.ipalId)===String(ipal.id))
     .map(row => {
@@ -45008,12 +45257,13 @@ function buildUnassignedSrcData() {
 }
 
 function renderFluktuasiPage() {
+  const ipals = ipalsOn();   // IPAL nonaktif tidak ditampilkan/dihitung
   const btnWrap = document.getElementById('fluktIpalBtns');
   if (!btnWrap) return;
   if (!ipals||ipals.length===0) {
-    btnWrap.innerHTML='<span style="font-size:.8rem;color:var(--muted);">Belum ada unit IPAL.</span>';
+    btnWrap.innerHTML='<span style="font-size:.8rem;color:var(--muted);">Belum ada unit IPAL aktif.</span>';
     const fc=document.getElementById('fluktContent');
-    if(fc) fc.innerHTML='<div class="es"><div class="ei">📈</div><p>Belum ada unit IPAL yang dibuat.</p></div>';
+    if(fc) fc.innerHTML='<div class="es"><div class="ei">📈</div><p>Belum ada unit IPAL aktif.<br>Aktifkan IPAL lewat saklar pada tab IPAL di bagian atas.</p></div>';
     return;
   }
   if (fluktActiveIpalId!=='all' && !ipals.find(x=>x.id===fluktActiveIpalId)) {
@@ -45177,6 +45427,7 @@ function fluktMakeChart(canvas, series, total, summary, totalQ, scopeKey) {
 }
 
 function renderFluktuasiContent() {
+  const ipals = ipalsOn();   // IPAL nonaktif tidak ditampilkan/dihitung
   const wrap = document.getElementById('fluktContent');
   if (!wrap) return;
   const hours = Array.from({length:24},(_,i)=>i);
@@ -46233,22 +46484,654 @@ function renderFluktuasiContent() {
 })();
 </script>
 
+<style id="paAiStyle">
+.pax-grid{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 0 36px}
+.pax-grid .fg{flex:1 1 120px;min-width:0;margin:0}
+.pax-grid .fg.pax-wide{flex:3 1 260px}
+.pax-grid label{font-size:.7rem;color:var(--muted,#64748b);display:block;margin-bottom:3px}
+.pax-out{font-size:.8rem;margin:8px 0 0 36px;display:flex;flex-wrap:wrap;gap:4px 16px;align-items:center;color:var(--ink-soft,#3a4b5e)}
+.pax-out b{color:var(--active,#1560d8)}
+.pax-ft-tot{margin-right:auto;font-size:.78rem;color:var(--ink-soft,#3a4b5e);align-self:center;line-height:1.45}
+.pax-ft-tot b{color:var(--ink,#0e1c2b)}
+@media(max-width:640px){.pax-grid,.pax-out{margin-left:0}.pax-ft-tot{flex:1 1 100%;margin-bottom:4px}}
+</style>
+<script id="paAiScan">
+/* ═══════════════════════════════════════════════════════════════
+   SCAN PENGGUNAAN AIR DARI EXCEL / PDF / GAMBAR (via Claude.ai)
+   Alur: salin prompt → claude.ai + lampirkan file → tempel JSON → verifikasi → terapkan ke IPAL aktif
+   Tidak memerlukan API key. Hasil masuk sebagai baris Penggunaan Air (SNI atau Manual) pada IPAL yang aktif.
+   ═══════════════════════════════════════════════════════════════ */
+(function(){
+  'use strict';
+  var LS_PREF='paAiScanPref';
+  var result=null, keySeq=0, prevOv='';
+  function $(id){return document.getElementById(id);}
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function lsGet(k){try{return localStorage.getItem(k)||'';}catch(e){return '';}}
+  function lsSet(k,v){try{if(v)localStorage.setItem(k,v);else localStorage.removeItem(k);}catch(e){}}
+  function toast(msg){var t=document.createElement('div');t.className='ai-toast';t.textContent=msg;document.body.appendChild(t);setTimeout(function(){t.style.opacity='0';},4600);setTimeout(function(){t.remove();},5200);}
+
+  /* Angka dari JSON AI: number murni; string diterima bila perlu (koma = desimal, 1.500 = ribuan) */
+  function jsonNum(v){
+    if(v===null||v===undefined||v==='')return NaN;
+    if(typeof v==='number')return isFinite(v)?v:NaN;
+    var s=String(v).trim().replace(/\s/g,'');if(!s)return NaN;
+    if(s.indexOf(',')>=0)s=s.replace(/\./g,'').replace(',','.');
+    else if(/^\d{1,3}(\.\d{3})+$/.test(s))s=s.replace(/\./g,'');
+    var n=parseFloat(s);return isNaN(n)?NaN:n;
+  }
+  /* Angka yang diketik pengguna: aturan sama dengan aplikasi (titik = ribuan, koma = desimal) */
+  function inNum(s){s=String(s==null?'':s).trim();if(!s)return NaN;var x=parseFloat(s.replace(/\./g,'').replace(',','.'));return isNaN(x)?NaN:x;}
+  function numStr(v){var x=jsonNum(v);if(isNaN(x))return '';return String(+x.toFixed(4)).replace('.',',');}
+  function fmt(n){return (typeof paFmt==='function')?paFmt(n):String(Math.round(n*100)/100);}
+
+  /* ── Prompt ── */
+  function sniList(){
+    return SNI_PEMAKAIAN_AIR.map(function(s,i){
+      return '['+i+'] '+s.label+' — '+s.nilai+' '+s.satuan+(s.perDetik?' (nilai per DETIK)':'')+' · '+s.sumber;
+    }).join('\n');
+  }
+  function prefRule(pref){
+    if(pref==='sni')return 'MODE PRIORITAS SNI/STANDAR: pakai sumber="sni" setiap kali ada jumlah pengguna/kapasitas dan ada acuan yang sesuai di daftar, walaupun dokumen juga menyebut kebutuhan air (catat nilai dokumen itu di note). Pakai sumber="manual" hanya bila tidak ada acuan yang cocok.';
+    if(pref==='dokumen')return 'MODE PRIORITAS NILAI DOKUMEN: pakai sumber="manual" dan isi air_baku_m3_hari dari nilai kebutuhan air/debit yang tertulis di dokumen. Pakai sumber="sni" hanya bila dokumen sama sekali tidak menyebut nilai air untuk baris itu tetapi ada jumlah pengguna/kapasitas dan acuan yang sesuai.';
+    return 'MODE OTOMATIS: bila dokumen menyebut langsung kebutuhan air/debit (m3/hari, L/hari, L/detik, dst.) untuk suatu baris → sumber="manual" dengan air_baku_m3_hari dari dokumen. Bila hanya ada jumlah pengguna/kapasitas (orang, pegawai, siswa, tempat tidur, kursi, m2, kg cucian, dst.) dan ada acuan yang sesuai → sumber="sni". Bila keduanya ada, utamakan nilai air dari dokumen dan sebut jumlahnya di note. Bila tidak satu pun tertulis → keduanya null dan jelaskan di note.';
+  }
+  function buildPrompt(pref,ctx){
+    var L=[];
+    L.push('Anda adalah asisten teknik lingkungan yang membaca dokumen daftar kegiatan/fasilitas pengguna air (tabel Excel, PDF, foto/screenshot tabel, denah, brosur, data hunian & karyawan) dan mengekstrak KEGIATAN/FASILITAS beserta kuantitas pemakaian airnya untuk aplikasi perhitungan kebutuhan air baku dan timbulan air limbah (dasar perencanaan IPAL).');
+    L.push('');
+    L.push('Balas HANYA dengan satu objek JSON valid (tanpa teks lain, tanpa markdown) dengan skema:');
+    L.push('{"items":[{"group":"<kelompok/zona/area di dokumen, atau kosong>","nama":"<nama kegiatan/fasilitas persis seperti di dokumen>","sumber":"sni|manual","sni_idx":<nomor acuan dari daftar | null>,"sni_label":"<label acuan persis dari daftar | kosong>","jumlah":<jumlah satuan acuan | null>,"jumlah_satuan":"<satuan jumlah di dokumen, mis. orang, pegawai, bed, kursi, m2>","air_baku_m3_hari":<angka m³/hari | null>,"air_limbah_m3_hari":<angka m³/hari | null>,"confidence":"high|medium|low","note":"<sheet/halaman/baris sumber, asumsi, konversi, atau keraguan>"}],"diabaikan":[{"nama":"<baris yang sengaja tidak dimasukkan>","alasan":"<mis. baris total, judul kolom, catatan>"}],"catatan":"<ringkasan masalah umum: satuan, sheet/halaman tak terbaca>"}');
+    L.push('');
+    L.push('DEFINISI ITEM: satu item = satu sumber pemakaian air yang punya kuantitas, mis. kantor, mess/asrama, kantin, masjid, klinik, laundry, bengkel, wash bay, toilet umum, penyiraman, atau satu gedung/ruang/kegiatan pada tabel.');
+    L.push('BUKAN item (masukkan ke "diabaikan", jangan ke "items"): judul tabel, header kolom, baris Total/Subtotal/Jumlah/Grand Total (dimasukkan sebagai item akan terhitung ganda), catatan kaki, keterangan, rumus, kop surat, tanda tangan, nomor halaman.');
+    L.push('');
+    L.push(prefRule(pref));
+    L.push('');
+    L.push('DAFTAR ACUAN SNI/STANDAR (sni_idx = nomor di dalam kurung siku; sni_label = tulisan setelahnya, salin PERSIS):');
+    L.push(sniList());
+    L.push('');
+    L.push('ATURAN ACUAN SNI:');
+    L.push('A. Pilih acuan menurut FUNGSI bangunan/kegiatan, bukan kemiripan kata. Prioritaskan acuan SNI 03-7065-2005; acuan Ditjen Cipta Karya hanya bila tidak ada padanan SNI atau dokumen menyebut kategori kota/desa. Isi sni_idx DAN sni_label (keduanya harus cocok).');
+    L.push('B. jumlah = banyaknya satuan acuan: acuan "Liter/pegawai/hari" → jumlah pegawai; "Liter/tempat tidur/hari" → jumlah tempat tidur; "Liter/m2" → luas m2; dst. JANGAN mengalikan dengan nilai acuan — aplikasi yang menghitungnya.');
+    L.push('C. Hindari acuan bertanda "nilai per DETIK" kecuali dokumen memang memakainya.');
+    L.push('D. Bila tidak ada acuan yang cocok dan dokumen tidak menyebut nilai air: sumber="manual", air_baku_m3_hari=null, jelaskan di note.');
+    L.push('');
+    L.push('ATURAN ANGKA:');
+    L.push('1. Di JSON tulis angka murni (bukan string), titik sebagai desimal, tanpa pemisah ribuan. Pada dokumen berbahasa Indonesia titik = pemisah ribuan ("1.500" = 1500) dan koma = desimal ("12,5" = 12.5).');
+    L.push('2. air_baku_m3_hari harus dalam m³/hari. Konversi: L/hari ÷ 1.000; L/detik × 86,4; L/menit × 1,44; m³/jam × jam operasi per hari (hanya bila jam operasi tertulis; jika tidak, isi null dan jelaskan); m³/bulan ÷ jumlah hari tertulis (bila tak tertulis pakai 30, catat asumsi, confidence "medium"). Tulis rumus konversi singkat di note.');
+    L.push('3. air_limbah_m3_hari diisi HANYA bila dokumen menyebut eksplisit debit air limbah/timbulan limbah untuk baris itu. Bila tidak ada → null (aplikasi menghitung 80% × air baku). Jangan menghitung sendiri.');
+    L.push('4. JANGAN MENEBAK jumlah atau debit yang tidak tertulis: isi null dan jelaskan di note.');
+    L.push('');
+    L.push('ATURAN BARIS:');
+    L.push('1. Urutkan item sesuai urutan di dokumen. SATU BARIS DATA = SATU ITEM; nama persis seperti tertulis. Jangan menggabung beberapa baris dan jangan memecah satu baris.');
+    L.push('2. group = judul kelompok/zona/lokasi/area di dokumen (mis. "Camp A", "Area Workshop"); kosongkan ("") bila dokumen tidak mengelompokkan.');
+    L.push('3. Bila ada beberapa sheet/halaman, gabungkan berurutan tanpa duplikasi (bila ada ringkasan dan rincian untuk kegiatan yang sama, pakai rincian saja).');
+    L.push('4. File Excel: baca SEMUA sheet; abaikan sheet rekap/grafik/referensi. File gambar/PDF denah: hanya masukkan fasilitas yang punya kuantitas tertulis (jumlah pengguna atau kebutuhan air).');
+    L.push('5. confidence: high = nama dan angka jelas, acuan pasti; medium = ada asumsi/konversi atau acuan kurang pasti; low = tebakan/ambigu.');
+    L.push('6. PEMERIKSAAN AKHIR: hitung jumlah baris data pada dokumen — jumlah "items" harus sama (tidak termasuk total/subtotal). Pastikan tidak ada item bernama Total/Subtotal dan tidak ada nilai yang ditebak.');
+    var out=L.join('\n')+'\n\nTUGAS: Ekstrak kegiatan/fasilitas pengguna air dari file yang saya lampirkan sesuai skema JSON di atas. Balas hanya dengan JSON.';
+    if(ctx)out+='\n\nKonteks dari pengguna: '+ctx;
+    return out;
+  }
+
+  /* ── Modal ── */
+  function ensureModal(){
+    if($('paAiOv'))return;
+    var d=document.createElement('div');d.id='paAiOv';d.className='ai-ov';d.style.display='none';
+    d.innerHTML='<div class="ai-modal" role="dialog" aria-modal="true"><div class="ai-hd"><div><div class="ai-ttl">✨ Scan Penggunaan Air dari Excel / PDF / Gambar</div><div class="ai-sub">Claude membaca daftar kegiatan/fasilitas, Anda memverifikasi sebelum data masuk ke Penggunaan Air.</div></div><button class="ai-x" id="paAiX" aria-label="Tutup">✕</button></div><div class="ai-body" id="paAiBody"></div><div class="ai-ft" id="paAiFt"></div></div>';
+    document.body.appendChild(d);
+    d.addEventListener('mousedown',function(e){if(e.target===d)close();});
+    $('paAiX').onclick=close;
+    document.addEventListener('keydown',function(e){if(e.key==='Escape'&&$('paAiOv')&&$('paAiOv').style.display!=='none')close();});
+    var body=$('paAiBody');
+    body.addEventListener('input',onField);
+    body.addEventListener('change',onField);
+    body.addEventListener('click',function(e){
+      var b=e.target.closest?e.target.closest('[data-mv]'):null;
+      if(b&&result){moveRow(parseInt(b.getAttribute('data-i'),10),parseInt(b.getAttribute('data-mv'),10));}
+    });
+  }
+  function close(){var o=$('paAiOv');if(o)o.style.display='none';document.body.style.overflow=prevOv;}
+
+  /* ── Tahap 1: salin prompt & tempel hasil ── */
+  function currentCtx(){return($('paAiCtx')&&$('paAiCtx').value.trim())||'';}
+  function currentPref(){return($('paAiPref')&&$('paAiPref').value)||lsGet(LS_PREF)||'auto';}
+  function refreshPromptView(){var v=$('paAiPromptView');if(v)v.value=buildPrompt(currentPref(),currentCtx());}
+  function renderPick(msg,keep){
+    keep=keep||{};
+    var pref=keep.pref||lsGet(LS_PREF)||'auto';
+    $('paAiBody').innerHTML=
+      (msg?'<div class="ai-err">'+esc(msg)+'</div>':'')+
+      '<div class="ai-free-note">Memakai langganan Claude Anda lewat claude.ai — <b>tanpa API key dan tanpa biaya tambahan</b>. Bisa untuk file <b>Excel (.xlsx/.xls/.csv), PDF, atau gambar</b> (foto/screenshot tabel).</div>'+
+      '<div class="fg" style="margin-bottom:12px"><label>Prioritas sumber angka air baku</label><select id="paAiPref" class="ai-in">'+
+        '<option value="auto"'+(pref==='auto'?' selected':'')+'>Otomatis — nilai di dokumen diutamakan, jika tidak ada pakai SNI</option>'+
+        '<option value="sni"'+(pref==='sni'?' selected':'')+'>Utamakan SNI/standar (hitung dari jumlah pengguna)</option>'+
+        '<option value="dokumen"'+(pref==='dokumen'?' selected':'')+'>Utamakan angka kebutuhan air yang tertulis di dokumen (Manual)</option>'+
+      '</select></div>'+
+      '<div class="fg"><label>Konteks tambahan (opsional)</label><textarea id="paAiCtx" class="ai-ta" rows="2" placeholder="Mis.: kolom &quot;Pax&quot; = jumlah penghuni; abaikan sheet Rekap; debit di tabel dalam L/detik; lokasi: tambang Site A."></textarea></div>'+
+      '<ol class="ai-steps">'+
+        '<li><button class="ai-b1" id="paAiCopy" style="padding:8px 14px" type="button">📋 Salin Prompt</button></li>'+
+        '<li>Buka <a href="https://claude.ai/new" target="_blank" rel="noopener">claude.ai</a> → chat baru → <b>tempel prompt</b> → <b>lampirkan file Excel / PDF / gambar</b> → kirim.</li>'+
+        '<li>Salin <b>seluruh jawaban</b> Claude (berupa JSON), tempel di kotak ini:</li>'+
+      '</ol>'+
+      '<textarea id="paAiPaste" class="ai-ta" rows="8" placeholder=\'Tempel jawaban JSON dari Claude di sini… {"items":[…]}\' style="font-family:ui-monospace,Consolas,monospace;font-size:.78rem"></textarea>'+
+      '<details class="ai-det"><summary>👁 Lihat isi prompt yang disalin</summary><textarea id="paAiPromptView" class="ai-ta" rows="10" readonly style="font-family:ui-monospace,Consolas,monospace;font-size:.72rem;margin-top:8px"></textarea></details>'+
+      '<div class="ai-note" style="margin-top:8px">Hasil tetap melewati layar verifikasi sebelum masuk ke daftar. Data ditambahkan ke <b>'+esc(activeIpalName())+'</b> (IPAL yang sedang aktif); baris yang sudah ada tidak diubah.</div>';
+    $('paAiFt').innerHTML='<button class="ai-b2" id="paAiCancel" type="button">Batal</button><button class="ai-b1" id="paAiRead" type="button">✓ Baca Hasil</button>';
+    if(keep.ctx)$('paAiCtx').value=keep.ctx;
+    if(keep.paste)$('paAiPaste').value=keep.paste;
+    refreshPromptView();
+    $('paAiPref').onchange=function(){lsSet(LS_PREF,this.value);refreshPromptView();};
+    $('paAiCtx').oninput=refreshPromptView;
+    $('paAiCopy').onclick=copyPrompt;
+    $('paAiCancel').onclick=close;
+    $('paAiRead').onclick=readPaste;
+  }
+  function activeIpalName(){
+    try{var ip=ipals.find(function(x){return String(x.id)===String(activeIpalId);});return ip?ip.name:'IPAL aktif';}catch(e){return 'IPAL aktif';}
+  }
+  function copyPrompt(){
+    var t=buildPrompt(currentPref(),currentCtx());
+    function ok(){toast('Prompt disalin. Tempel di claude.ai bersama file Excel/PDF/gambar.');}
+    function fb(){var ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');ok();}catch(e){alert('Gagal menyalin otomatis. Buka "Lihat isi prompt" lalu salin manual.');}ta.remove();}
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(ok,fb);else fb();
+  }
+  function readPaste(){
+    var txt=($('paAiPaste')&&$('paAiPaste').value)||'',err=null,parsed=null;
+    var a=txt.indexOf('{'),b=txt.lastIndexOf('}');
+    if(a<0||b<=a)err='Tidak ada JSON pada teks yang ditempel. Salin seluruh jawaban Claude.';
+    else{try{parsed=JSON.parse(txt.slice(a,b+1));}catch(e){err='JSON tidak valid (mungkin tersalin sebagian). Salin ulang jawaban Claude secara utuh.';}}
+    if(!err&&(!parsed||!Array.isArray(parsed.items)))err='Format JSON tidak sesuai — pastikan memakai prompt dari tombol Salin Prompt (harus berisi "items").';
+    if(err){renderPick(err,{ctx:currentCtx(),paste:txt,pref:currentPref()});return;}
+    result=sanitize(parsed);renderReview();
+  }
+
+  /* ── Normalisasi hasil AI → state baris yang bisa diedit ── */
+  var TOTAL_RE=/^\s*((sub\s*-?\s*)?total|jumlah|grand\s*total|jumlah\s+total)\b/i;
+  function sanitize(r){
+    var N=SNI_PEMAKAIAN_AIR.length,byLabel={};
+    SNI_PEMAKAIAN_AIR.forEach(function(s,i){byLabel[s.label.trim().toLowerCase()]=i;});
+    var items=(r.items||[]).filter(function(x){return x&&typeof x==='object';}).map(function(x){
+      var idx=parseInt(x.sni_idx,10);if(!(idx>=0&&idx<N))idx=-1;
+      var lbl=String(x.sni_label||'').trim().toLowerCase();
+      if(lbl&&byLabel[lbl]!==undefined)idx=byLabel[lbl];          /* label lebih dapat dipercaya daripada nomor */
+      var baku=jsonNum(x.air_baku_m3_hari),hasBaku=!isNaN(baku)&&baku>0;
+      var sumber=x.sumber==='manual'?'manual':(x.sumber==='sni'?'sni':(hasBaku?'manual':'sni'));
+      if(sumber==='sni'&&idx<0&&hasBaku)sumber='manual';
+      var lim=jsonNum(x.air_limbah_m3_hari),hasLim=!isNaN(lim)&&lim>=0;
+      var u={_k:++keySeq,on:true,group:String(x.group||'').trim().slice(0,80),nama:String(x.nama||'').trim().slice(0,160),
+        sumber:sumber,sniIdx:idx>=0?idx:'',jumlah:numStr(x.jumlah),airBaku:numStr(x.air_baku_m3_hari),
+        limMode:hasLim?'manual':'template',limbah:hasLim?numStr(lim):'',
+        confidence:/^(high|medium|low)$/.test(x.confidence)?x.confidence:'medium',note:String(x.note||''),satuan:String(x.jumlah_satuan||'')};
+      if(TOTAL_RE.test(u.nama)){u.on=false;u._susp='Terbaca sebagai baris total/subtotal — dinonaktifkan agar air tidak terhitung ganda. Centang bila ini memang satu kegiatan.';}
+      else if(!u.nama&&isNaN(jsonNum(u.jumlah))&&isNaN(jsonNum(u.airBaku))){u.on=false;u._susp='Tanpa nama dan tanpa angka — kemungkinan bukan kegiatan.';}
+      return u;
+    });
+    r.items=items;
+    var ign=Array.isArray(r.diabaikan)?r.diabaikan:[];
+    r.diabaikan=ign.filter(function(x){return x&&(x.nama||x.alasan);}).map(function(x){return {nama:String(x.nama||'').slice(0,120),alasan:String(x.alasan||'').slice(0,160)};});
+    return r;
+  }
+
+  /* ── Perhitungan (memakai fungsi inti aplikasi) ── */
+  function calc(u){
+    var row={sumberMode:u.sumber,sniIdx:u.sniIdx===''?0:u.sniIdx,jumlahUnit:u.jumlah,airBakuManual:u.airBaku,limbahMode:u.limMode,limbahManual:u.limbah};
+    var baku=(u.sumber==='sni'&&u.sniIdx==='')?0:paAirBaku(row);
+    return {baku:baku,limbah:u.limMode==='manual'?paNum(u.limbah):baku*0.8};
+  }
+  function existingNames(){
+    var s={};
+    try{paRows.forEach(function(r){if(String(r.ipalId)===String(activeIpalId)&&r.nama)s[String(r.nama).trim().toLowerCase()]=1;});}catch(e){}
+    return s;
+  }
+  function warnings(u,dup){
+    var w=[];
+    if(!u.nama.trim())w.push('Nama kosong.');
+    if(u.sumber==='sni'){
+      if(u.sniIdx==='')w.push('Acuan SNI belum dipilih — pilih acuan atau ubah ke Manual.');
+      else if(!(inNum(u.jumlah)>0))w.push('Jumlah belum terisi — air baku terhitung 0.');
+    }else if(!(inNum(u.airBaku)>0))w.push('Air baku (m³/hari) belum terisi.');
+    if(u.limMode==='manual'&&isNaN(inNum(u.limbah)))w.push('Air limbah manual belum terisi.');
+    if(u.nama.trim()&&dup[u.nama.trim().toLowerCase()])w.push('Nama yang sama sudah ada di IPAL ini — hindari entri ganda.');
+    return w;
+  }
+
+  /* ── Tahap 2: verifikasi ── */
+  var CONF={high:['Yakin','ai-c-hi'],medium:['Cukup','ai-c-md'],low:['Ragu','ai-c-lo']};
+  function sniOpts(sel){
+    var groups={},order=[];
+    SNI_PEMAKAIAN_AIR.forEach(function(s,i){var g=s.sumber||'Lainnya';if(!groups[g]){groups[g]=[];order.push(g);}groups[g].push(i);});
+    return '<option value=""'+(sel===''?' selected':'')+'>— pilih acuan —</option>'+order.map(function(g){
+      return '<optgroup label="'+esc(g)+'">'+groups[g].map(function(i){var s=SNI_PEMAKAIAN_AIR[i];return '<option value="'+i+'"'+(sel===i?' selected':'')+'>'+esc(s.label)+' ('+s.nilai+' '+esc(s.satuan)+')</option>';}).join('')+'</optgroup>';
+    }).join('');
+  }
+  function rowHtml(i,u,total,optsCache){
+    var cf=CONF[u.confidence]||CONF.medium;
+    return '<div class="ai-row" id="paAiRow'+i+'" data-k="'+u._k+'">'+
+      '<div class="ai-row-top"><div class="ai-mv"><button type="button" class="ai-arw" data-mv="-1" data-i="'+i+'" title="Naikkan"'+(i===0?' disabled':'')+'>▲</button><button type="button" class="ai-arw" data-mv="1" data-i="'+i+'" title="Turunkan"'+(i===total-1?' disabled':'')+'>▼</button></div>'+
+      '<input type="checkbox" data-f="on" data-i="'+i+'"'+(u.on?' checked':'')+' title="Sertakan baris ini">'+
+      '<div class="ai-grow"><input type="text" class="ai-in" data-f="nama" data-i="'+i+'" placeholder="Nama kegiatan / fasilitas" value="'+esc(u.nama)+'"></div>'+
+      '<div class="ai-badges"><span class="ai-conf '+cf[1]+'">'+cf[0]+'</span></div></div>'+
+      '<div class="pax-grid">'+
+        '<div class="fg"><label>Grup</label><input type="text" class="ai-in" list="paAiGrpList" data-f="group" data-i="'+i+'" placeholder="Tanpa grup" value="'+esc(u.group)+'"></div>'+
+        '<div class="fg"><label>Air baku</label><select class="ai-in" data-f="sumber" data-i="'+i+'"><option value="sni"'+(u.sumber==='sni'?' selected':'')+'>SNI / standar</option><option value="manual"'+(u.sumber==='manual'?' selected':'')+'>Manual</option></select></div>'+
+        '<div class="fg pax-wide pax-sni"><label>Acuan</label><select class="ai-in" data-f="sniIdx" data-i="'+i+'">'+sniOpts(u.sniIdx)+'</select></div>'+
+        '<div class="fg pax-sni"><label>Jumlah</label><input type="text" class="ai-in" inputmode="decimal" data-f="jumlah" data-i="'+i+'" placeholder="0" value="'+esc(u.jumlah)+'"></div>'+
+        '<div class="fg pax-man"><label>Air baku (m³/hari)</label><input type="text" class="ai-in" inputmode="decimal" data-f="airBaku" data-i="'+i+'" placeholder="0" value="'+esc(u.airBaku)+'"></div>'+
+        '<div class="fg"><label>Air limbah</label><select class="ai-in" data-f="limMode" data-i="'+i+'"><option value="template"'+(u.limMode==='template'?' selected':'')+'>80% × air baku</option><option value="manual"'+(u.limMode==='manual'?' selected':'')+'>Manual</option></select></div>'+
+        '<div class="fg pax-lim"><label>Air limbah (m³/hari)</label><input type="text" class="ai-in" inputmode="decimal" data-f="limbah" data-i="'+i+'" placeholder="0" value="'+esc(u.limbah)+'"></div>'+
+      '</div>'+
+      '<div class="pax-out" id="paAiOut'+i+'"></div>'+
+      '<div class="ai-nt" id="paAiNt'+i+'"></div>'+
+    '</div>';
+  }
+  function renderReview(keepScroll){
+    var st=keepScroll&&$('paAiBody')?$('paAiBody').scrollTop:0;
+    var items=result.items,total=items.length,lastGrp=null;
+    var rows=items.map(function(u,i){
+      var grp=(u.group||'').trim(),gh='';
+      if(grp&&grp!==lastGrp){gh='<div class="ai-grp">'+esc(grp)+'</div>';}
+      lastGrp=grp||lastGrp;
+      return gh+rowHtml(i,u,total);
+    }).join('');
+    var gnames={};
+    try{paGroups.forEach(function(g){if(String(g.ipalId)===String(activeIpalId))gnames[g.nama]=1;});}catch(e){}
+    items.forEach(function(u){if(u.group)gnames[u.group]=1;});
+    $('paAiBody').innerHTML=
+      '<div class="ai-banner">Claude menemukan <b>'+total+' kegiatan/fasilitas</b>. <b>Periksa setiap nilai dengan dokumen asli</b> sebelum menerapkan — pembacaan dapat keliru (satuan, jumlah vs kapasitas, acuan yang dipilih). Pada kolom angka, <b>titik = ribuan dan koma = desimal</b> (sama seperti di daftar Penggunaan Air). Akan ditambahkan ke <b>'+esc(activeIpalName())+'</b>.</div>'+
+      (result.catatan?'<div class="ai-cat">📝 '+esc(result.catatan)+'</div>':'')+
+      '<datalist id="paAiGrpList">'+Object.keys(gnames).map(function(n){return '<option value="'+esc(n)+'">';}).join('')+'</datalist>'+
+      (total?rows:'<div class="ai-empty">Tidak ada kegiatan/fasilitas yang terbaca. Coba file yang lebih jelas atau tambahkan konteks.</div>')+
+      ((result.diabaikan&&result.diabaikan.length)?'<details class="ai-det" style="margin-top:12px"><summary>🚫 Baris yang diabaikan Claude ('+result.diabaikan.length+')</summary><div class="ai-ign">'+result.diabaikan.map(function(x){return '<div class="ai-ign-i"><b>'+esc(x.nama)+'</b>'+(x.alasan?' — '+esc(x.alasan):'')+'</div>';}).join('')+'<div class="ai-note" style="margin-top:6px">Periksa daftar ini. Bila ada kegiatan asli yang ikut terabaikan, tambahkan lewat tombol "+ Tambah Kegiatan/Fasilitas" setelah menerapkan.</div></div></details>':'');
+    $('paAiFt').innerHTML='<span class="pax-ft-tot" id="paAiTot"></span><button class="ai-b2" id="paAiBack" type="button">← Scan Ulang</button><button class="ai-b1" id="paAiApply" type="button">✓ Terapkan<span class="ai-hm"> ke IPAL Aktif</span></button>';
+    $('paAiBack').onclick=function(){renderPick();};
+    $('paAiApply').onclick=function(){window.paAiApply();};   /* lewat window agar tercatat di riwayat perubahan */
+    items.forEach(function(_,i){refreshRow(i,true);});
+    refreshTotal();
+    $('paAiBody').scrollTop=st;
+  }
+  function refreshRow(i,skipTotal){
+    var u=result.items[i],el=$('paAiRow'+i);if(!el)return;
+    var sni=u.sumber==='sni',lm=u.limMode==='manual';
+    Array.prototype.forEach.call(el.querySelectorAll('.pax-sni'),function(n){n.style.display=sni?'':'none';});
+    Array.prototype.forEach.call(el.querySelectorAll('.pax-man'),function(n){n.style.display=sni?'none':'';});
+    Array.prototype.forEach.call(el.querySelectorAll('.pax-lim'),function(n){n.style.display=lm?'':'none';});
+    el.style.opacity=u.on?'':'.55';
+    var c=calc(u),ref=(sni&&u.sniIdx!=='')?SNI_PEMAKAIAN_AIR[u.sniIdx]:null;
+    $('paAiOut'+i).innerHTML='<span>🚰 Air baku: <b>'+fmt(c.baku)+'</b> m³/hari</span><span>💧 Air limbah: <b>'+fmt(c.limbah)+'</b> m³/hari</span>'+
+      (ref?'<span style="color:var(--muted,#64748b)">Acuan: '+ref.nilai+' '+esc(ref.satuan)+(u.satuan?' · satuan di dokumen: '+esc(u.satuan):'')+'</span>':'');
+    var w=warnings(u,existingNames()),nt='';
+    if(u._susp)nt+='<span class="ai-warn">🚫 '+esc(u._susp)+'</span> ';
+    if(w.length)nt+='<span class="ai-warn">⚠ '+w.map(esc).join(' ')+'</span> ';
+    if(u.note)nt+=esc(u.note);
+    $('paAiNt'+i).innerHTML=nt;$('paAiNt'+i).style.display=nt?'':'none';
+    if(!skipTotal)refreshTotal();
+  }
+  function refreshTotal(){
+    var n=0,b=0,l=0;
+    result.items.forEach(function(u){if(!u.on)return;n++;var c=calc(u);b+=c.baku;l+=c.limbah;});
+    var t=$('paAiTot');if(t)t.innerHTML='Terpilih: <b>'+n+'</b> dari '+result.items.length+' · air baku <b>'+fmt(b)+'</b> · air limbah <b>'+fmt(l)+'</b> m³/hari';
+  }
+  function onField(e){
+    var t=e.target,f=t.getAttribute&&t.getAttribute('data-f');
+    if(!f||!result)return;
+    var i=parseInt(t.getAttribute('data-i'),10),u=result.items[i];if(!u)return;
+    if(f==='on')u.on=t.checked;
+    else if(f==='sniIdx')u.sniIdx=t.value===''?'':parseInt(t.value,10);
+    else u[f]=t.value;
+    if(f==='on'&&t.checked)u._susp='';
+    refreshRow(i);
+  }
+  function moveRow(i,d){
+    var j=i+d,a=result.items;if(j<0||j>=a.length)return;
+    var m=a.splice(i,1)[0];a.splice(j,0,m);
+    renderReview(true);
+  }
+
+  /* ── Terapkan ── */
+  window.paAiApply=function(){
+    if(!result)return;
+    var items=result.items.filter(function(u){return u.on;});
+    if(!items.length){alert('Tidak ada baris yang dicentang.');return;}
+    var bad=[];
+    items.forEach(function(u){if(u.sumber==='sni'&&u.sniIdx==='')bad.push(u.nama||'(tanpa nama)');});
+    if(bad.length){alert('Ada '+bad.length+' baris bersumber SNI yang acuannya belum dipilih:\n• '+bad.slice(0,8).join('\n• ')+(bad.length>8?'\n• …':'')+'\n\nPilih acuannya, ubah ke Manual, atau hilangkan centangnya.');return;}
+    var noQty=items.filter(function(u){var c=calc(u);return !(c.baku>0);}).length;
+    if(noQty&&!confirm(noQty+' baris yang dicentang memiliki air baku 0 (jumlah/angka belum terisi). Tetap terapkan?'))return;
+    try{paRows.forEach(function(r){paCaptureRow(r.id);});}catch(e){}   /* amankan isian yang belum tersimpan */
+    var gmap={};
+    paGroups.filter(function(g){return String(g.ipalId)===String(activeIpalId);}).forEach(function(g){gmap[String(g.nama).trim().toLowerCase()]=g.id;});
+    var newGrp=0;
+    items.forEach(function(u){
+      var row=newPaRow();
+      row.nama=u.nama.trim()||'Kegiatan/Fasilitas (hasil scan)';
+      row.sumberMode=u.sumber;
+      if(u.sumber==='sni'){row.sniIdx=u.sniIdx;row.jumlahUnit=String(u.jumlah||'').trim();}
+      else row.airBakuManual=String(u.airBaku||'').trim();
+      row.limbahMode=u.limMode;
+      if(u.limMode==='manual')row.limbahManual=String(u.limbah||'').trim();
+      row.ipalId=activeIpalId||'';
+      var g=(u.group||'').trim();
+      if(g){
+        var k=g.toLowerCase();
+        if(!gmap[k]){paGroupCounter++;paGroups.push({id:paGroupCounter,ipalId:activeIpalId,nama:g,collapsed:false});gmap[k]=paGroupCounter;newGrp++;}
+        row.groupId=gmap[k];
+      }
+      paRows.push(row);
+    });
+    var n=items.length;
+    close();
+    renderPenggunaanAirPage();
+    scheduleAutosave();
+    toast(n+' kegiatan/fasilitas ditambahkan ke '+activeIpalName()+(newGrp?' ('+newGrp+' grup baru)':'')+'. Mohon verifikasi ulang.');
+    result=null;
+  };
+
+  window.paAiOpen=function(){
+    if(typeof activeIpalId==='undefined'||!activeIpalId){alert('Tambahkan/pilih IPAL terlebih dahulu.');return;}
+    ensureModal();
+    prevOv=document.body.style.overflow;document.body.style.overflow='hidden';
+    $('paAiOv').style.display='flex';result=null;renderPick();
+  };
+})();
+</script>
+
+<style id="paDrawioStyle">
+.pa-toolbar .btn-minimize-all[onclick^="paOpenDrawio"]{order:3}
+.pdx-prev{border:1px solid var(--line,#e3e9f1);border-radius:10px;background:#fff;padding:8px;margin-top:12px;overflow:auto;max-height:min(60vh,600px)}
+.pdx-prev svg{display:block;width:100%;height:auto;min-width:420px}
+.pdx-cnt{font-size:.8rem;color:var(--ink-soft,#3a4b5e);margin-top:10px;line-height:1.5}
+.pdx-chk{display:flex;align-items:center;gap:8px;font-size:.85rem;margin-top:12px;cursor:pointer}
+.pdx-row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:560px){.pdx-row2{grid-template-columns:1fr}}
+</style>
+<script id="paDrawio">
+/* ═══════════════════════════════════════════════════════════════
+   DIAGRAM NERACA AIR → FILE DRAW.IO (.drawio)
+   Format per kegiatan/fasilitas:  [panah biru: air baku] → [kotak: nama] → [panah merah: air limbah]
+   Satu halaman (tab) draw.io per IPAL. Angka mengikuti tabel Penggunaan Air (paAirBaku / paAirLimbah).
+   ═══════════════════════════════════════════════════════════════ */
+(function(){
+  'use strict';
+  var LS='paDrawioPref';
+  var BLUE='#0000CC',RED='#CC0000',GREEN='#3A5431',FONT='Helvetica';
+  var SRC_X=20,SRC_W=150,SRC_H=64,X_IN=210,X_BUS=210,LBL_W=140,BOX_X=360,BOX_W=280,BOX_H=48,OUT_X=640,PITCH=72,HDR_H=46,TOP=84,LBL_H=24;
+  var LOSS_X=840,X_M=1010,IPAL_X=1170,IPAL_W=230,IPAL_H=90,OUTL_H=70;
+  function $(id){return document.getElementById(id);}
+  function xe(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+  function he(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function lsGet(){try{return JSON.parse(localStorage.getItem(LS)||'{}')||{};}catch(e){return {};}}
+  function lsSet(o){try{localStorage.setItem(LS,JSON.stringify(o));}catch(e){}}
+  function toast(msg){var t=document.createElement('div');t.className='ai-toast';t.textContent=msg;document.body.appendChild(t);setTimeout(function(){t.style.opacity='0';},4200);setTimeout(function(){t.remove();},4800);}
+  /* Format Indonesia: 1.234,50 */
+  function fmtD(n,d){n=Number(n)||0;var s=Math.abs(n).toFixed(d),p=s.split('.');p[0]=p[0].replace(/\B(?=(\d{3})+(?!\d))/g,'.');return (n<0?'-':'')+p.join(',');}
+  function fmtT(n,d){return fmtD(n,d).replace(/,0+$/,'').replace(/(,\d*?)0+$/,'$1');}   /* tanpa nol di belakang koma */
+  function num(v){var n=parseFloat(String(v==null?'':v).replace(',','.'));return n>0?n:0;}
+  function ipalById(id){return ipals.filter(function(x){return String(x.id)===String(id);})[0];}
+
+  /* ── Urutan baris sama seperti halaman Penggunaan Air: grup dulu, lalu tanpa grup ── */
+  function sections(ipalId){
+    var key=function(r){return (r.urutTampil===null||r.urutTampil===undefined)?Infinity:r.urutTampil;};
+    var rows=paRows.filter(function(r){return String(r.ipalId)===String(ipalId);})
+      .map(function(r,i){return {r:r,i:i};})
+      .sort(function(a,b){var d=key(a.r)-key(b.r);return (d!==d||d===0)?a.i-b.i:d;})
+      .map(function(x){return x.r;});
+    var gs=paGroups.filter(function(g){return String(g.ipalId)===String(ipalId);});
+    var secs=gs.map(function(g){return {title:g.nama,rows:rows.filter(function(r){return r.groupId===g.id;})};});
+    var rest=rows.filter(function(r){return !r.groupId||!gs.some(function(g){return g.id===r.groupId;});});
+    secs.push({title:gs.length?'Tanpa Grup':'',rows:rest});
+    return secs;
+  }
+
+  /* ── Model layout (dipakai untuk file draw.io DAN pratinjau) ──
+     [air baku ➜] [kotak kegiatan] ─ air limbah (merah) ─┐
+                                   ┄ loss (putus-putus) ┄│┄➜ ↑ Loss, Evaporation, Consumption
+                                                         └─➜ [IPAL] ➜ [badan air penerima]      */
+  function layout(ipalId,opt,maxRows){
+    var ip=ipalById(ipalId)||{name:'IPAL'};
+    var shapes=[],y=TOP,n=0,skipped=0,seq=0,done=false;
+    var totB=0,totL=0,total=0,secs=[];
+    sections(ipalId).forEach(function(sec){
+      var draw=sec.rows.filter(function(r){return paAirBaku(r)>0||paAirLimbah(r)>0;});
+      skipped+=sec.rows.length-draw.length;
+      draw.forEach(function(r){totB+=paAirBaku(r);totL+=paAirLimbah(r);total++;});
+      secs.push({title:sec.title,draw:draw});
+    });
+    var firstBoxY=null,firstAy=null,lastAy=null,lossLow=null;
+    secs.forEach(function(sec){
+      if(!sec.draw.length||done)return;
+      if(opt.groups&&sec.title){shapes.push({k:'hdr',x:X_IN,y:y,w:BOX_X+BOX_W-X_IN,h:34,text:sec.title});y+=HDR_H;}
+      sec.draw.forEach(function(r){
+        if(maxRows&&n>=maxRows){done=true;return;}
+        seq++;n++;
+        var ay=y+BOX_H/2,baku=paAirBaku(r),lim=paAirLimbah(r);
+        if(firstBoxY===null){firstBoxY=y;firstAy=ay;}
+        lastAy=ay;
+        shapes.push({k:'box',id:'b'+seq,x:BOX_X,y:y,w:BOX_W,h:BOX_H,text:r.nama||'(tanpa nama)'});
+        shapes.push({k:'in',id:'ei'+seq,box:'b'+seq,x:X_BUS,y:ay,w:BOX_X-X_BUS});
+        shapes.push({k:'lbl',id:'li'+seq,x:X_BUS+5,y:ay-LBL_H-2,w:BOX_X-X_BUS-10,h:LBL_H,val:baku});
+        shapes.push({k:'out',id:'eo'+seq,box:'b'+seq,x:OUT_X,y:ay,w:X_M-OUT_X});
+        shapes.push({k:'lbl',id:'lo'+seq,x:OUT_X+6,y:ay-LBL_H-2,w:150,h:LBL_H,val:lim});
+        if(opt.loss&&baku-lim>0.0005){
+          var ly=y+BOX_H*0.8;
+          shapes.push({k:'lossH',id:'ls'+seq,box:'b'+seq,x:OUT_X,y:ly,w:LOSS_X-OUT_X});
+          lossLow=ly;
+        }
+        y+=PITCH;
+      });
+      y+=14;
+    });
+    var height=y;
+    if(n){
+      var yMid=(firstAy+lastAy)/2;
+      shapes.forEach(function(q){if(q.k==='out'||q.k==='in')q.ym=yMid;});
+      shapes.push({k:'src',id:'src',x:SRC_X,y:yMid-SRC_H/2,w:SRC_W,h:SRC_H,val:totB});
+      shapes.push({k:'srcL',id:'srcl',x:SRC_X+SRC_W,y:yMid,w:X_BUS-SRC_X-SRC_W});
+      if(n>1)shapes.push({k:'busB',id:'busb',x:X_BUS,y:firstAy,y2:lastAy});
+      if(n>1)shapes.push({k:'bar',id:'bar',x:X_M,y:firstAy,y2:lastAy});
+      shapes.push({k:'tot',id:'etot',box:'ipal',x:X_M,y:yMid,w:IPAL_X-X_M});
+      shapes.push({k:'lbl',id:'ltot',x:X_M+10,y:yMid-LBL_H-2,w:IPAL_X-X_M-20,h:LBL_H,val:totL});
+      var cap=num(ip.Q);
+      shapes.push({k:'ipal',id:'ipal',x:IPAL_X,y:yMid-IPAL_H/2,w:IPAL_W,h:IPAL_H,text:ip.name||'IPAL',cap:cap?fmtT(cap,2):''});
+      var bottom=yMid+IPAL_H/2;
+      if(opt.outlet){
+        var oy=yMid+IPAL_H/2+60;
+        shapes.push({k:'link',id:'elink',box:'ipal',to:'outlet',x:IPAL_X+IPAL_W/2,y:yMid+IPAL_H/2,y2:oy});
+        shapes.push({k:'outlet',id:'outlet',x:IPAL_X,y:oy,w:IPAL_W,h:OUTL_H,text:opt.outlet});
+        bottom=oy+OUTL_H;
+      }
+      if(lossLow!==null){
+        var top=firstBoxY-12,loss=totB-totL,pct=totB>0?loss/totB*100:0;
+        shapes.push({k:'lossV',id:'elv',x:LOSS_X,y:lossLow,y2:top});
+        shapes.push({k:'lossLbl',id:'llos',x:LOSS_X-110,y:top-58,w:220,h:54,pct:Math.round(pct*10)/10,val:loss});
+      }
+      height=Math.max(y,bottom+20);
+    }
+    return {shapes:shapes,height:height,count:total,drawn:n,skipped:skipped};
+  }
+
+  /* ── XML draw.io ── */
+  function geoPts(a,b){return '<mxGeometry width="50" height="50" relative="1" as="geometry">'+(a?'<mxPoint x="'+a[0]+'" y="'+a[1]+'" as="sourcePoint"/>':'')+(b?'<mxPoint x="'+b[0]+'" y="'+b[1]+'" as="targetPoint"/>':'')+'</mxGeometry>';}
+  function cellXml(s,d){
+    var f='fontFamily='+FONT+';fontSize=14;';
+    var vtx=function(id,val,style,x,y,w,h){return '<mxCell id="'+id+'" value="'+xe(val)+'" style="'+style+'" vertex="1" parent="1"><mxGeometry x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" as="geometry"/></mxCell>';};
+    var edge=function(id,style,attrs,a,b){return '<mxCell id="'+id+'" style="html=1;rounded=0;strokeWidth=2;'+style+'" edge="1" parent="1"'+(attrs||'')+'>'+geoPts(a,b)+'</mxCell>';};
+    switch(s.k){
+      case 'box': return vtx(s.id,he(s.text),'rounded=0;whiteSpace=wrap;html=1;strokeColor=#000000;strokeWidth=2;fillColor=#FFFFFF;fontStyle=3;fontFamily='+FONT+';fontSize=15;',s.x,s.y,s.w,s.h);
+      case 'hdr': return vtx('h'+s.x+'_'+s.y,he(s.text),'text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontStyle=1;strokeColor=none;fillColor=none;fontFamily='+FONT+';fontSize=24;',s.x,s.y,s.w,s.h);
+      case 'lbl': return vtx(s.id,fmtD(s.val,d)+' m³/hari','text;html=1;align=center;verticalAlign=bottom;whiteSpace=wrap;strokeColor=none;fillColor=none;fontStyle=1;'+f,s.x,s.y,s.w,s.h);
+      case 'in': {
+        var ip2=(Math.abs(s.y-s.ym)>0.5)?'<Array as="points"><mxPoint x="'+s.x+'" y="'+s.ym+'"/><mxPoint x="'+s.x+'" y="'+s.y+'"/></Array>':'';
+        return '<mxCell id="'+s.id+'" style="html=1;rounded=0;strokeWidth=2;edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;curved=0;endArrow=classic;endFill=1;strokeColor='+BLUE+';exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="src" target="'+s.box+'"><mxGeometry relative="1" as="geometry">'+ip2+'</mxGeometry></mxCell>';
+      }
+      case 'src': return vtx(s.id,'Air Bersih<br>'+fmtD(s.val,d)+' m³/hari','rounded=0;whiteSpace=wrap;html=1;strokeColor=#6c8ebf;strokeWidth=2;fillColor=#dae8fc;fontStyle=1;fontFamily='+FONT+';fontSize=14;',s.x,s.y,s.w,s.h);
+      case 'srcL': case 'busB': return '';
+      case 'out': {
+        var pts=(Math.abs(s.y-s.ym)>0.5)?'<Array as="points"><mxPoint x="'+(s.x+s.w)+'" y="'+s.y+'"/><mxPoint x="'+(s.x+s.w)+'" y="'+s.ym+'"/></Array>':'';
+        return '<mxCell id="'+s.id+'" style="html=1;rounded=0;strokeWidth=2;edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;curved=0;endArrow=classic;endFill=1;strokeColor='+RED+';exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="'+s.box+'" target="ipal"><mxGeometry relative="1" as="geometry">'+pts+'</mxGeometry></mxCell>';
+      }
+      case 'lossH': return edge(s.id,'endArrow=none;dashed=1;strokeColor=#000000;exitX=1;exitY=0.8;exitDx=0;exitDy=0;',' source="'+s.box+'"',null,[s.x+s.w,s.y]);
+      case 'lossV': return edge(s.id,'dashed=1;endArrow=classic;endFill=1;strokeColor=#000000;',null,[s.x,s.y],[s.x,s.y2]);
+      case 'bar': case 'tot': return '';   /* hanya untuk pratinjau; di draw.io setiap panah merah sudah menjadi konektor sendiri ke IPAL */
+      case 'ipal': return vtx(s.id,'<b>'+he(s.text)+'</b>'+(s.cap?'<br>Kap. '+s.cap+' m³/hari':''),'rounded=0;whiteSpace=wrap;html=1;strokeColor=#000000;strokeWidth=2;fillColor=#FFFFFF;fontFamily='+FONT+';fontSize=16;',s.x,s.y,s.w,s.h);
+      case 'link': return edge(s.id,'endArrow=classic;endFill=1;strokeColor='+GREEN+';exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;',' source="'+s.box+'" target="'+s.to+'"');
+      case 'outlet': return vtx(s.id,he(s.text),'shape=document;whiteSpace=wrap;html=1;boundedLbl=1;strokeColor=#000000;strokeWidth=2;fillColor=#dae8fc;fontStyle=1;fontFamily='+FONT+';fontSize=16;',s.x,s.y,s.w,s.h);
+      case 'lossLbl': return vtx(s.id,fmtT(s.pct,1)+'% Loss, Evaporation,<br>Consumption, etc.<br>('+fmtD(s.val,d)+' m³/hari)','text;html=1;align=center;verticalAlign=bottom;whiteSpace=wrap;strokeColor=none;fillColor=none;fontStyle=2;fontFamily='+FONT+';fontSize=14;',s.x,s.y,s.w,s.h);
+    }
+    return '';
+  }
+  function diagramXml(ip,opt){
+    var L=layout(ip.id,opt);
+    if(!L.count)return {xml:'',count:0,skipped:L.skipped};
+    var body=L.shapes.map(function(s){return cellXml(s,opt.dec);}).join('');
+    var xml='<diagram id="neraca_'+xe(ip.id)+'" name="'+xe(ip.name||'IPAL')+'"><mxGraphModel dx="1422" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0"><root><mxCell id="0"/><mxCell id="1" parent="0"/>'+body+'</root></mxGraphModel></diagram>';
+    return {xml:xml,count:L.count,skipped:L.skipped};
+  }
+  function buildFile(opt){
+    var list=(opt.scope==='semua'?ipals.slice():[ipalById(activeIpalId)]).filter(Boolean).filter(ipalOn);
+    var parts=[],count=0,skipped=0,pages=0;
+    list.forEach(function(ip){var r=diagramXml(ip,opt);if(r.count){parts.push(r.xml);count+=r.count;pages++;}skipped+=r.skipped;});
+    return {xml:parts.length?'<?xml version="1.0" encoding="UTF-8"?>\n<mxfile host="app.diagrams.net" version="24.7.0">'+parts.join('')+'</mxfile>':'',count:count,pages:pages,skipped:skipped};
+  }
+
+  /* ── Pratinjau (SVG dari model yang sama) ── */
+  function wrapName(t){
+    var w=t.split(/\s+/),L=[''],MAX=24;
+    w.forEach(function(x){var c=L[L.length-1];if(!c)L[L.length-1]=x;else if((c+' '+x).length<=MAX)L[L.length-1]=c+' '+x;else L.push(x);});
+    if(L.length>2){L=[L[0],L.slice(1).join(' ')];}
+    if(L[1]&&L[1].length>MAX+2)L[1]=L[1].slice(0,MAX)+'…';
+    if(L[0].length>MAX+2)L[0]=L[0].slice(0,MAX)+'…';
+    return L;
+  }
+  function lines(arr,cx,cy,extra){
+    var lh=19,y0=cy-(arr.length-1)*lh/2+5;
+    return '<text text-anchor="middle" '+(extra||'')+'>'+arr.map(function(t,i){return '<tspan x="'+cx+'" y="'+(y0+i*lh)+'">'+he(t)+'</tspan>';}).join('')+'</text>';
+  }
+  function previewSvg(opt){
+    var ip=ipalById(activeIpalId);if(!ip)return '';
+    var L=layout(ip.id,opt,8);if(!L.drawn)return '';
+    var W=IPAL_X+IPAL_W+30-(SRC_X-20);
+    var mk=function(id,c){return '<marker id="'+id+'" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="'+c+'"/></marker>';};
+    var o='<svg viewBox="'+(SRC_X-20)+' 0 '+W+' '+L.height+'" xmlns="http://www.w3.org/2000/svg" font-family="'+FONT+',Arial,sans-serif" font-size="16"><defs>'+mk('pdxB',BLUE)+mk('pdxR',RED)+mk('pdxG',GREEN)+mk('pdxK','#000')+'</defs>';
+    var ln=function(x1,y1,x2,y2,c,ex){return '<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="'+c+'" stroke-width="2" '+(ex||'')+'/>';};
+    L.shapes.forEach(function(s){
+      switch(s.k){
+        case 'box': o+='<rect x="'+s.x+'" y="'+s.y+'" width="'+s.w+'" height="'+s.h+'" fill="#fff" stroke="#000" stroke-width="2"/>'+lines(wrapName(s.text),s.x+s.w/2,s.y+s.h/2,'font-weight="700" font-style="italic" font-size="14"');break;
+        case 'hdr': o+='<text x="'+(s.x+s.w/2)+'" y="'+(s.y+26)+'" text-anchor="middle" font-weight="700" font-size="24">'+he(s.text)+'</text>';break;
+        case 'lbl': o+='<text x="'+(s.x+s.w/2)+'" y="'+(s.y+s.h-4)+'" text-anchor="middle" font-weight="700">'+he(fmtD(s.val,opt.dec))+' m³/hari</text>';break;
+        case 'in': o+=ln(s.x,s.y,s.x+s.w,s.y,BLUE,'marker-end="url(#pdxB)"');break;
+        case 'srcL': o+=ln(s.x,s.y,s.x+s.w,s.y,BLUE);break;
+        case 'busB': o+=ln(s.x,s.y,s.x,s.y2,BLUE);break;
+        case 'src': o+='<rect x="'+s.x+'" y="'+s.y+'" width="'+s.w+'" height="'+s.h+'" fill="#dae8fc" stroke="#6c8ebf" stroke-width="2"/>'+lines(['Air Bersih',fmtD(s.val,opt.dec)+' m³/hari'],s.x+s.w/2,s.y+s.h/2,'font-weight="700" font-size="14"');break;
+        case 'out': o+=ln(s.x,s.y,s.x+s.w,s.y,RED);break;
+        case 'lossH': o+=ln(s.x,s.y,s.x+s.w,s.y,'#000','stroke-dasharray="6 4"');break;
+        case 'lossV': o+=ln(s.x,s.y,s.x,s.y2,'#000','stroke-dasharray="6 4" marker-end="url(#pdxK)"');break;
+        case 'bar': o+=ln(s.x,s.y,s.x,s.y2,RED);break;
+        case 'tot': o+=ln(s.x,s.y,s.x+s.w,s.y,RED,'marker-end="url(#pdxR)"');break;
+        case 'ipal': o+='<rect x="'+s.x+'" y="'+s.y+'" width="'+s.w+'" height="'+s.h+'" fill="#fff" stroke="#000" stroke-width="2"/>'+lines(wrapName(s.text).slice(0,2).concat(s.cap?['Kap. '+s.cap+' m³/hari']:[]).slice(-(s.cap?2:2)),s.x+s.w/2,s.y+s.h/2,'font-weight="700" font-size="16"');break;
+        case 'link': o+=ln(s.x,s.y,s.x,s.y2,GREEN,'marker-end="url(#pdxG)"');break;
+        case 'outlet': o+='<path d="M'+s.x+','+s.y+'H'+(s.x+s.w)+'V'+(s.y+s.h-10)+'Q'+(s.x+s.w*.75)+','+(s.y+s.h-24)+' '+(s.x+s.w/2)+','+(s.y+s.h-10)+'T'+s.x+','+(s.y+s.h-10)+'Z" fill="#dae8fc" stroke="#000" stroke-width="2"/>'+lines(wrapName(s.text),s.x+s.w/2,s.y+s.h/2-6,'font-weight="700" font-size="16"');break;
+        case 'lossLbl': o+=lines([fmtT(s.pct,1)+'% Loss, Evaporation,','Consumption, etc.','('+fmtD(s.val,opt.dec)+' m³/hari)'],s.x+s.w/2,s.y+s.h/2-2,'font-style="italic" font-size="14"');break;
+      }
+    });
+    return o+'</svg>';
+  }
+
+  /* ── Modal ── */
+  function opts(){
+    var p=lsGet();
+    return {scope:($('pdxScope')&&$('pdxScope').value)||p.scope||'aktif',
+            dec:$('pdxDec')?parseInt($('pdxDec').value,10):(p.dec!==undefined?p.dec:2),
+            groups:$('pdxGrp')?$('pdxGrp').checked:(p.groups!==undefined?p.groups:true),
+            loss:$('pdxLoss')?$('pdxLoss').checked:(p.loss!==undefined?p.loss:true),
+            outlet:$('pdxOut')?$('pdxOut').value.trim():(p.outlet||'')};
+  }
+  function refresh(){
+    var o=opts();lsSet(o);
+    var f=buildFile(o),pv=$('pdxPrev');
+    var ip=ipalById(activeIpalId);
+    pv.innerHTML=previewSvg(o)||'<div class="ai-empty" style="padding:14px">'+(o.scope==='aktif'?'Belum ada kegiatan/fasilitas bernilai pada <b>'+he(ip?ip.name:'IPAL aktif')+'</b>.':'Belum ada data untuk digambar.')+'</div>';
+    $('pdxCnt').innerHTML=f.count?('Akan digambar: <b>'+f.count+' kegiatan/fasilitas</b> pada <b>'+f.pages+' halaman</b>'+(f.skipped?' · '+f.skipped+' baris dilewati (air baku &amp; air limbah = 0)':'')+'. Pratinjau menampilkan hingga 8 baris pertama dari IPAL aktif (total di IPAL tetap dihitung dari semua baris).'):'';
+    $('pdxGo').disabled=!f.count;$('pdxGo').style.opacity=f.count?'':'.5';
+  }
+  function ensureModal(){
+    if($('pdxOv'))return;
+    var d=document.createElement('div');d.id='pdxOv';d.className='ai-ov';d.style.display='none';
+    d.innerHTML='<div class="ai-modal" role="dialog" aria-modal="true" style="width:min(900px,100%)"><div class="ai-hd"><div><div class="ai-ttl">📐 Diagram Neraca Air (draw.io)</div><div class="ai-sub">Kotak Air Bersih (total air baku) → panah biru ke tiap kegiatan, merah = air limbah (tiap panah tersambung ke kotak IPAL), garis putus-putus = loss (evaporasi, konsumsi, dll). Buka file di app.diagrams.net / draw.io Desktop.</div></div><button class="ai-x" id="pdxX" aria-label="Tutup">✕</button></div><div class="ai-body" id="pdxBody"></div><div class="ai-ft"><button class="ai-b2" id="pdxCancel" type="button">Batal</button><button class="ai-b1" id="pdxGo" type="button">⬇ Unduh .drawio</button></div></div>';
+    document.body.appendChild(d);
+    d.addEventListener('mousedown',function(e){if(e.target===d)close();});
+    $('pdxX').onclick=close;$('pdxCancel').onclick=close;$('pdxGo').onclick=download;
+    document.addEventListener('keydown',function(e){if(e.key==='Escape'&&$('pdxOv').style.display!=='none')close();});
+  }
+  var prevOv='';
+  function close(){$('pdxOv').style.display='none';document.body.style.overflow=prevOv;}
+  function download(){
+    var o=opts(),f=buildFile(o);
+    if(!f.count){alert('Tidak ada data untuk digambar.');return;}
+    var ip=ipalById(activeIpalId),n=new Date(),z=function(v){return String(v).padStart(2,'0');};
+    var nm=o.scope==='semua'?'Semua_IPAL':String(ip?ip.name:'IPAL').replace(/[^\w\-]+/g,'_');
+    var fn='Neraca_Air_'+nm+'_'+n.getFullYear()+z(n.getMonth()+1)+z(n.getDate())+'.drawio';
+    var blob=new Blob([f.xml],{type:'application/vnd.jgraph.mxfile;charset=utf-8'});
+    var url=URL.createObjectURL(blob),a=document.createElement('a');
+    a.href=url;a.download=fn;document.body.appendChild(a);a.click();a.remove();
+    setTimeout(function(){URL.revokeObjectURL(url);},1500);
+    close();
+    toast('Diagram neraca air diunduh: '+fn);
+  }
+  window.paOpenDrawio=function(){
+    if(typeof activeIpalId==='undefined'||!activeIpalId){alert('Tambahkan/pilih IPAL terlebih dahulu.');return;}
+    paRows.forEach(function(r){try{paCaptureRow(r.id);}catch(e){}});   /* ambil isian yang belum tersimpan */
+    ensureModal();
+    var p=lsGet(),ip=ipalById(activeIpalId);
+    $('pdxBody').innerHTML=
+      '<div class="pdx-row2"><div class="fg"><label>Cakupan</label><select id="pdxScope" class="ai-in"><option value="aktif">IPAL aktif — '+he(ip?ip.name:'')+'</option><option value="semua">Semua IPAL ('+ipals.length+' halaman terpisah)</option></select></div>'+
+      '<div class="fg"><label>Angka desimal</label><select id="pdxDec" class="ai-in"><option value="0">0 (1)</option><option value="1">1 (1,0)</option><option value="2">2 (1,00)</option><option value="3">3 (1,000)</option></select></div></div>'+
+      '<label class="pdx-chk"><input type="checkbox" id="pdxGrp"> Tampilkan judul grup di atas kelompok kegiatan</label>'+
+      '<label class="pdx-chk"><input type="checkbox" id="pdxLoss"> Tampilkan garis putus-putus Loss, Evaporation, Consumption, etc. (selisih air baku − air limbah)</label>'+
+      '<div class="fg" style="margin-top:12px"><label>Badan air penerima / outlet (opsional)</label><input type="text" id="pdxOut" class="ai-in" placeholder="mis. Sungai Taluduyunu — kosongkan bila tidak perlu"></div>'+
+      '<div class="pdx-prev" id="pdxPrev"></div><div class="pdx-cnt" id="pdxCnt"></div>';
+    $('pdxScope').value=p.scope||'aktif';$('pdxDec').value=String(p.dec!==undefined?p.dec:2);$('pdxGrp').checked=p.groups!==undefined?p.groups:true;$('pdxLoss').checked=p.loss!==undefined?p.loss:true;$('pdxOut').value=p.outlet||'';
+    ['pdxScope','pdxDec','pdxGrp','pdxLoss'].forEach(function(id){$(id).onchange=refresh;});$('pdxOut').oninput=refresh;
+    prevOv=document.body.style.overflow;document.body.style.overflow='hidden';
+    $('pdxOv').style.display='flex';refresh();
+  };
+})();
+</script>
+
 <!-- ══ SAVE SYSTEM v2 — simpan semua data, input, tampilan, dan riwayat perubahan ══ -->
 <style id="save-system-v2-css">
 .fs-dot{display:none;width:8px;height:8px;border-radius:50%;background:#e8590c;margin-left:6px;flex:none}
 body.fs-dirty .fs-dot{display:inline-block}
+.fs-chip{display:none;align-items:center;gap:6px;max-width:300px;margin-right:6px;padding:4px 6px 4px 9px;border:1px solid var(--line,#dde);border-radius:999px;font-size:.72rem;white-space:nowrap;color:var(--muted,#667)}
+.fs-chip .fs-cd{width:8px;height:8px;border-radius:50%;flex:none;background:#2b8a3e}
+.fs-chip .fs-ct{cursor:pointer;overflow:hidden;text-overflow:ellipsis}
+.fs-chip .fs-cx{cursor:pointer;border:0;background:transparent;color:inherit;font-size:.95rem;line-height:1;padding:0 3px;border-radius:50%}
+.fs-chip .fs-cx:hover{background:rgba(120,130,140,.2)}
+.fs-chip{cursor:pointer}
+/* Ringkas: saat normal (ok/busy) cukup titik status; nama file & jam simpan ada di tooltip. × muncul saat di-hover */
+.fs-chip[data-s="ok"],.fs-chip[data-s="busy"]{padding:6px 8px;gap:0}
+.fs-chip[data-s="ok"] .fs-ct,.fs-chip[data-s="busy"] .fs-ct{display:none}
+.fs-chip[data-s="ok"] .fs-cx,.fs-chip[data-s="busy"] .fs-cx{display:none;margin-left:5px}
+.fs-chip[data-s="ok"]:hover,.fs-chip[data-s="busy"]:hover{padding-right:5px}
+.fs-chip[data-s="ok"]:hover .fs-cx,.fs-chip[data-s="busy"]:hover .fs-cx{display:inline-block}
+.fs-chip[data-s="need"],.fs-chip[data-s="err"]{max-width:150px}
+.fs-chip[data-s="need"] .fs-cx,.fs-chip[data-s="err"] .fs-cx{display:none}
+.fs-chip[data-s="need"] .fs-cd,.fs-chip[data-s="err"] .fs-cd{animation:fsPulse 1.4s ease-in-out infinite}
+@keyframes fsPulse{50%{opacity:.35}}
+.fs-chip[data-s="need"] .fs-cd{background:#e8590c}.fs-chip[data-s="err"] .fs-cd{background:#c92a2a}.fs-chip[data-s="busy"] .fs-cd{background:#1d6fe8}
 </style>
 <script id="save-system-v2">
 (function(){
 'use strict';
 var FORMAT='ipal-checker', VERSION='2.0', LOG_MAX=3000;
-var changeLog=[], dirty=false, quiet=0, beforeVal=new WeakMap();
+var changeLog=[], dirty=false, dirtySeq=0, quiet=0, beforeVal=new WeakMap();
 
 function safe(f,d){try{var v=f();return v===undefined?d:v;}catch(e){return d;}}
 function clone(o){return JSON.parse(JSON.stringify(o===undefined?null:o));}
 function maxId(arr,extra){return Math.max.apply(null,[extra||0].concat((arr||[]).map(function(x){return +x.id||0;})));}
 function currentPage(){return PAGES.filter(function(p){var e=document.getElementById('page_'+p);return e&&e.classList.contains('active');})[0]||'penggunaan_air';}
-function setDirty(v){dirty=v;document.body.classList.toggle('fs-dirty',v);}
+function setDirty(v){dirty=v;if(v)dirtySeq++;document.body.classList.toggle('fs-dirty',v);}
 function flash(text,color,ms){
   var t=document.getElementById('autosaveIndicatorText'),w=document.getElementById('autosaveIndicator');
   if(!t||!w)return; var old='Tersimpan otomatis';
@@ -46303,9 +47186,9 @@ var ACTIONS={
   setQMode:['Ubah mode debit','always'],applySludgeCapture:['Ubah capture lumpur','always'],
   applyParamPreset:['Terapkan preset removal','always'],applyKlorinDosePreset:['Terapkan preset dosis klorin','always'],
   applyKlorinRefPreset:['Terapkan preset referensi klorin','always'],
-  paSetSumberMode:['Ubah mode sumber air','always'],paSetLimbahMode:['Ubah mode limbah','always']
+  paSetSumberMode:['Ubah mode sumber air','always'],paSetLimbahMode:['Ubah mode limbah','always'],paAiApply:['Scan Penggunaan Air (Excel/PDF/gambar)','struct']
 };
-function sig(){return safe(function(){return ipals.length+'|'+ipals.reduce(function(n,i){return n+(i.units||[]).length;},0)+'|'+paRows.length+'|'+paGroups.length+'|'+removalCustomParams.length;},'');}
+function sig(){return safe(function(){return ipals.length+'|'+ipals.reduce(function(n,i){return n+(i.units||[]).length;},0)+'|'+paRows.length+'|'+paGroups.length+'|'+removalCustomParams.length+'|'+ipals.map(function(i){return i.aktif===false?0:1;}).join('');},'');}
 function nameOf(id){return safe(function(){return ipals.filter(function(i){return i.id===id;})[0].name;},'');}
 function wrapAction(n){
   var f=window[n]; if(typeof f!=='function'||f.__fs)return;
@@ -46383,43 +47266,200 @@ function restore(d){
   setDirty(false);
 }
 
-/* ── SIMPAN FILE / BUKA FILE / AUTOSAVE ── */
-window.saveFile=function(){
+/* ── SIMPAN FILE / BUKA FILE / AUTOSAVE ──
+   Chrome/Edge: "Simpan File" memilih lokasi file .ipal SATU KALI (File System Access API). Setelah itu setiap
+   perubahan otomatis ditulis ke file yang sama di laptop. Browser tanpa API ini (Firefox/Safari): unduh biasa. */
+var FSA=typeof window.showSaveFilePicker==='function'&&typeof window.showOpenFilePicker==='function'&&window.isSecureContext!==false;
+var fileHandle=null, fileState='off', fileTimer=null, fileBusy=false, fileAgain=false, FILE_DELAY=1000;
+var PICK_TYPES=[{description:'File IPAL Checker',accept:{'application/json':['.ipal','.json']}}];
+function z2(x){return String(x).length<2?'0'+x:String(x);}
+function hhmmss(){var n=new Date();return z2(n.getHours())+':'+z2(n.getMinutes())+':'+z2(n.getSeconds());}
+function defaultName(){var n=new Date();return 'IPAL_Checker_'+n.getFullYear()+z2(n.getMonth()+1)+z2(n.getDate())+'_'+z2(n.getHours())+z2(n.getMinutes())+'.ipal';}
+function sleep(ms){return new Promise(function(r){setTimeout(r,ms);});}
+
+/* simpan handle file di IndexedDB supaya tetap tersambung setelah halaman di-refresh */
+function idbOpen(){return new Promise(function(res,rej){var r=indexedDB.open('ipalChecker',1);r.onupgradeneeded=function(){r.result.createObjectStore('h');};r.onsuccess=function(){res(r.result);};r.onerror=function(){rej(r.error);};});}
+function idbSet(k,v){return idbOpen().then(function(db){return new Promise(function(res,rej){var tx=db.transaction('h','readwrite');if(v===null)tx.objectStore('h').delete(k);else tx.objectStore('h').put(v,k);tx.oncomplete=function(){res();};tx.onerror=function(){rej(tx.error);};});});}
+function idbGet(k){return idbOpen().then(function(db){return new Promise(function(res,rej){var q=db.transaction('h','readonly').objectStore('h').get(k);q.onsuccess=function(){res(q.result||null);};q.onerror=function(){rej(q.error);};});});}
+
+/* indikator status di toolbar */
+function chip(){
+  var c=document.getElementById('fsChip'); if(c)return c;
+  var ind=document.getElementById('autosaveIndicator'); if(!ind)return null;
+  c=document.createElement('span'); c.id='fsChip'; c.className='fs-chip';
+  c.innerHTML='<span class="fs-cd"></span><span class="fs-ct"></span><button type="button" class="fs-cx" title="Putuskan autosave ke file ini">\u00d7</button>';
+  ind.parentNode.insertBefore(c,ind);
+  c.onclick=function(){
+    if(fileState==='need'||fileState==='err')reconnect(); else if(fileState==='ok')saveToFile(true);
+  };
+  c.querySelector('.fs-cx').onclick=function(ev){
+    ev.stopPropagation();
+    if(confirm('Putuskan autosave ke file "'+(fileHandle?fileHandle.name:'')+'"?\nData tetap tersimpan di browser; klik Simpan File untuk memilih file lagi.'))detach(true);
+  };
+  return c;
+}
+function setFileState(s,extra){
+  fileState=s; var c=chip(); if(!c)return;
+  if(s==='off'){c.style.display='none';return;}
+  var n=fileHandle?fileHandle.name:'', t=c.querySelector('.fs-ct');
+  c.style.display='inline-flex'; c.setAttribute('data-s',s);
+  if(s==='ok'){t.textContent='';c.title='Autosave ke file: '+n+(extra?' \u00b7 '+extra:'')+'. Klik untuk "Simpan Sebagai" file lain; arahkan kursor lalu klik \u00d7 untuk memutuskan.';}
+  else if(s==='need'){t.textContent='Lanjutkan autosave';c.title='Klik untuk melanjutkan autosave ke '+n+' (browser perlu izin tulis ulang setelah halaman dibuka kembali).';}
+  else if(s==='busy'){t.textContent='';c.title='Menyimpan ke '+n+'\u2026';}
+  else{t.textContent='Gagal simpan \u2014 ulangi';c.title='Gagal menyimpan ke '+n+'. File mungkin dipindah/dihapus atau izin dicabut. Klik untuk coba lagi.';}
+}
+function detach(clearStore){
+  clearTimeout(fileTimer); fileHandle=null; fileAgain=false;
+  if(clearStore)idbSet('main',null).catch(function(){});
+  setFileState('off');
+}
+
+/* tulis ke file (ditulis ke file sementara lalu diganti saat close, jadi file lama aman bila gagal di tengah) */
+async function writeNow(){
+  if(!fileHandle)return false;
+  if(fileBusy){fileAgain=true;return false;}
+  fileBusy=true; var seq=dirtySeq, ok=false;
+  try{
+    var perm=await fileHandle.queryPermission({mode:'readwrite'});
+    if(perm!=='granted'){setFileState('need');return false;}
+    var p=collect(true);
+    var w=await fileHandle.createWritable();
+    try{await w.write(JSON.stringify(p));await w.close();}
+    catch(e){try{await w.abort();}catch(_){} throw e;}
+    if(seq===dirtySeq)setDirty(false);
+    setFileState('ok','tersimpan '+hhmmss());
+    ok=true;
+  }catch(e){ setFileState('err'); }
+  finally{ fileBusy=false; if(fileAgain){fileAgain=false;scheduleFile();} }
+  return ok;
+}
+function scheduleFile(){
+  if(!fileHandle)return;
+  clearTimeout(fileTimer); fileTimer=setTimeout(writeNow,FILE_DELAY);
+}
+async function reconnect(){
+  if(!fileHandle)return;
+  try{
+    var perm=await fileHandle.requestPermission({mode:'readwrite'});
+    if(perm!=='granted'){setFileState('need');return;}
+    await syncOnReconnect();
+  }catch(e){setFileState('err');}
+}
+/* setelah refresh: jangan menimpa file yang ternyata lebih baru daripada data di browser */
+async function syncOnReconnect(){
+  try{
+    var f=await fileHandle.getFile(), d=JSON.parse(await f.text());
+    var fileT=Date.parse(d.saved)||0, localT=0;
+    try{localT=Date.parse(JSON.parse(localStorage.getItem(AUTOSAVE_KEY)).saved)||0;}catch(e){}
+    if(d.ipals&&d.ipals.length&&fileT>localT+5000){
+      if(confirm('File "'+fileHandle.name+'" lebih baru daripada data di browser ini.\n\nOK = muat data dari file\nBatal = timpa file dengan data di browser')){
+        restore(d); window.doAutosave(); setFileState('ok','dimuat dari file'); return;
+      }
+    }
+  }catch(e){ /* file kosong / tidak terbaca: lanjut tulis */ }
+  await writeNow();
+}
+
+function downloadSave(){
   var p=collect(false);
   var blob=new Blob([JSON.stringify(p,null,2)],{type:'application/json'});
-  var url=URL.createObjectURL(blob), a=document.createElement('a'), n=new Date();
-  function z(x){return String(x).length<2?'0'+x:String(x);}
-  a.href=url; a.style.display='none';
-  a.download='IPAL_Checker_'+n.getFullYear()+z(n.getMonth()+1)+z(n.getDate())+'_'+z(n.getHours())+z(n.getMinutes())+'.ipal';
+  var url=URL.createObjectURL(blob), a=document.createElement('a');
+  a.href=url; a.style.display='none'; a.download=defaultName();
   document.body.appendChild(a); a.click();
   setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
   setDirty(false);
-  flash('File disimpan: '+p.meta.ipal+' IPAL, '+p.meta.unit+' unit, '+p.meta.barisPenggunaanAir+' baris air','',4000);
-};
-window.openFile=function(){
+  flash('File diunduh: '+p.meta.ipal+' IPAL, '+p.meta.unit+' unit, '+p.meta.barisPenggunaanAir+' baris air','',4000);
+}
+async function saveToFile(forceNew){
+  if(!FSA){downloadSave();return;}
+  try{
+    if(!fileHandle||forceNew){
+      var h=await window.showSaveFilePicker({suggestedName:fileHandle&&forceNew?fileHandle.name:defaultName(),types:PICK_TYPES});
+      fileHandle=h; try{await idbSet('main',h);}catch(e){}
+    }else{
+      var perm=await fileHandle.queryPermission({mode:'readwrite'});
+      if(perm!=='granted'&&(await fileHandle.requestPermission({mode:'readwrite'}))!=='granted'){setFileState('need');return;}
+    }
+    clearTimeout(fileTimer);
+    while(fileBusy)await sleep(40);
+    if(await writeNow())flash('Disimpan ke '+fileHandle.name+' \u2014 perubahan berikutnya otomatis ikut tersimpan','',4500);
+  }catch(e){
+    if(e&&e.name==='AbortError')return;                       // pengguna membatalkan dialog
+    if(e&&e.name==='SecurityError'){downloadSave();return;}   // mis. dibuka di dalam iframe
+    alert('Gagal menyimpan ke file: '+(e&&e.message?e.message:e)+'\n\nData akan diunduh sebagai file biasa.');
+    downloadSave();
+  }
+}
+window.saveFile=function(){var e=window.event;return saveToFile(!!(e&&e.shiftKey));};
+
+function loadText(txt){
+  var d=JSON.parse(txt);
+  if(!d.ipals||!Array.isArray(d.ipals)||!d.ipals.length)throw new Error('Format file tidak valid.');
+  detach(false);                    // putuskan dulu supaya data file lama tidak tertimpa isi file yang baru dibuka
+  restore(d); window.doAutosave();
+  return d;
+}
+window.openFile=async function(){
   if(dirty&&!confirm('Ada perubahan yang belum disimpan ke file. Buka file lain dan menimpa data saat ini?'))return;
+  if(FSA){
+    try{
+      var hs=await window.showOpenFilePicker({types:PICK_TYPES,multiple:false}), h=hs[0];
+      var d=loadText(await (await h.getFile()).text());
+      fileHandle=h; try{await idbSet('main',h);}catch(e){}
+      var perm='prompt'; try{perm=await h.requestPermission({mode:'readwrite'});}catch(e){}
+      if(perm==='granted'){await writeNow();}else{setFileState('need');}
+      alert('File berhasil dibuka'+(d.changeLog?' ('+d.changeLog.length+' riwayat perubahan dimuat).':'.')+
+        (perm==='granted'?'\nPerubahan berikutnya otomatis disimpan kembali ke file ini.':'\nKlik indikator di toolbar untuk mengaktifkan autosave ke file ini.'));
+      return;
+    }catch(err){
+      if(err&&err.name==='AbortError')return;
+      if(!(err&&err.name==='SecurityError')){alert('Gagal membuka file: '+err.message);return;}
+      /* SecurityError → lanjut ke cara lama di bawah */
+    }
+  }
   var input=document.createElement('input'); input.type='file'; input.accept='.ipal,.json';
   input.onchange=function(e){
     var file=e.target.files[0]; if(!file)return;
     var rd=new FileReader();
     rd.onload=function(ev){
-      try{
-        var d=JSON.parse(ev.target.result);
-        if(!d.ipals||!Array.isArray(d.ipals)||!d.ipals.length)throw new Error('Format file tidak valid.');
-        restore(d); window.doAutosave();
-        alert('File berhasil dibuka'+(d.changeLog?' ('+d.changeLog.length+' riwayat perubahan dimuat).':'.'));
-      }catch(err){alert('Gagal membuka file: '+err.message);}
+      try{var d=loadText(ev.target.result);alert('File berhasil dibuka'+(d.changeLog?' ('+d.changeLog.length+' riwayat perubahan dimuat).':'.'));}
+      catch(err){alert('Gagal membuka file: '+err.message);}
     };
     rd.readAsText(file);
   };
   input.click();
 };
+
 window.doAutosave=function(){
   var p; try{p=collect(true);}catch(e){return;}
-  try{localStorage.setItem(AUTOSAVE_KEY,JSON.stringify(p));if(typeof showAutosaveIndicator==='function')showAutosaveIndicator();return;}catch(e){}
-  try{p.changeLog=changeLog.slice(-300);localStorage.setItem(AUTOSAVE_KEY,JSON.stringify(p));if(typeof showAutosaveIndicator==='function')showAutosaveIndicator();}
-  catch(e){flash('Autosave gagal (penyimpanan browser penuh) — klik Simpan File','#c92a2a',7000);}
+  var stored=false;
+  try{localStorage.setItem(AUTOSAVE_KEY,JSON.stringify(p));stored=true;}
+  catch(e){try{p.changeLog=changeLog.slice(-300);localStorage.setItem(AUTOSAVE_KEY,JSON.stringify(p));stored=true;}catch(e2){}}
+  if(stored){if(typeof showAutosaveIndicator==='function')showAutosaveIndicator();}
+  else if(!fileHandle)flash('Autosave gagal (penyimpanan browser penuh) \u2014 klik Simpan File','#c92a2a',7000);
+  scheduleFile();                   // salin juga ke file di laptop bila sudah tersambung
 };
+
+/* Reset menghapus semua data → putuskan dari file supaya file di laptop tidak tertimpa data kosong */
+(function(){
+  var r0=window.resetApp; if(typeof r0!=='function')return;
+  window.resetApp=function(){
+    var before=ipals, res=r0.apply(this,arguments);
+    if(ipals!==before&&fileHandle){detach(true);flash('Reset: autosave ke file diputuskan, file di laptop tidak diubah','',5000);}
+    return res;
+  };
+})();
+/* simpan segera saat tab disembunyikan / ditutup */
+document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden'&&fileHandle&&dirty){clearTimeout(fileTimer);writeNow();}});
+window.addEventListener('pagehide',function(){if(fileHandle&&dirty){clearTimeout(fileTimer);writeNow();}});
+/* sambungkan kembali ke file terakhir setelah halaman dibuka lagi */
+if(FSA)setTimeout(async function(){
+  try{
+    var h=await idbGet('main'); if(!h)return;
+    fileHandle=h;
+    if((await h.queryPermission({mode:'readwrite'}))==='granted')await syncOnReconnect(); else setFileState('need');
+  }catch(e){}
+},900);
 
 window.__fs={collect:collect,restore:restore,flash:flash,isDirty:function(){return dirty;},markSaved:function(){setDirty(false);},doAutosave:function(){window.doAutosave();}};
 /* ── PASANG ── */
@@ -46566,6 +47606,253 @@ badge();
 })();
 </script>
 
+<script>
+(function(){
+  function sortedBase(){
+    return paRows.map(function(r,i){return {r:r,i:i};})
+      .filter(function(x){return String(x.r.ipalId)===String(activeIpalId);})
+      .sort(function(a,b){
+        var av=(a.r.urutTampil==null)?Infinity:a.r.urutTampil, bv=(b.r.urutTampil==null)?Infinity:b.r.urutTampil;
+        var d=av-bv; return (d!==d||d===0)?a.i-b.i:d;
+      }).map(function(x){return x.r;});
+  }
+  function commit(base){
+    base.forEach(function(r,i){r.urutTampil=i+1;});
+    renderPenggunaanAirPage();
+    if(typeof scheduleAutosave==='function') scheduleAutosave();
+  }
+  // targetId null => hanya ganti grup, urutan tetap. gid undefined => ikut grup target.
+  window.paMoveRow=function(dragId,targetId,after,gid){
+    var base=sortedBase();
+    var d=base.filter(function(r){return r.id===dragId;})[0]; if(!d) return;
+    if(targetId!=null){
+      var t=base.filter(function(r){return r.id===targetId;})[0]; if(!t||t===d) return;
+      base=base.filter(function(r){return r!==d;});
+      var ti=base.indexOf(t); base.splice(after?ti+1:ti,0,d);
+      d.groupId=(gid!==undefined)?gid:(t.groupId||null);
+    } else if(gid!==undefined){ d.groupId=gid; }
+    commit(base);
+  };
+  function step(id,dir){
+    var base=sortedBase(), i=base.findIndex(function(r){return r.id===id;}), j=i+dir;
+    if(i<0||j<0||j>=base.length) return;
+    var r=base[i]; base.splice(i,1); base.splice(j,0,r);
+    commit(base);
+    var g=document.querySelector('#paCards .pr-grip[data-rid="'+id+'"]'); if(g) g.focus();
+  }
+
+  var st=null;
+  function scrollParent(el){
+    while(el&&el!==document.body){
+      var o=getComputedStyle(el).overflowY;
+      if((o==='auto'||o==='scroll')&&el.scrollHeight>el.clientHeight) return el;
+      el=el.parentElement;
+    }
+    return document.scrollingElement||document.documentElement;
+  }
+  function cards(){
+    return Array.prototype.filter.call(document.querySelectorAll('#paCards .pa-card.pr'),function(c){
+      return c!==st.card && c.offsetHeight>0;
+    });
+  }
+  // Pindahkan placeholder dgn animasi halus pada baris lain (FLIP)
+  function placeAt(parent,before){
+    var ph=st.ph;
+    if(ph.parentNode===parent && ph.nextSibling===before) return;
+    var list=cards(), first=list.map(function(c){return c.getBoundingClientRect().top;});
+    parent.insertBefore(ph,before);
+    list.forEach(function(c,i){
+      var dy=first[i]-c.getBoundingClientRect().top;
+      if(dy&&c.animate) c.animate([{transform:'translateY('+dy+'px)'},{transform:'none'}],{duration:170,easing:'cubic-bezier(.2,.8,.3,1)'});
+    });
+  }
+  function update(){
+    var s=st, pc=s.pc, pr=pc.getBoundingClientRect();
+    var top=s.y-s.offY;
+    s.card.style.top=(top+s.dy)+'px';
+    var cy=top+s.h/2, list=cards(), ref=null, i;
+    for(i=0;i<list.length;i++){
+      var r=list[i].getBoundingClientRect();
+      if(r.top+r.height/2>cy){ref=list[i];break;}
+    }
+    if(ref){
+      var idx=list.indexOf(ref), prev=idx>0?list[idx-1]:null;
+      if(prev&&prev.parentNode!==ref.parentNode&&cy<ref.getBoundingClientRect().top){
+        placeAt(prev.parentNode,prev.nextSibling);   // ujung grup sebelumnya
+      } else placeAt(ref.parentNode,ref);
+    } else if(list.length){
+      var last=list[list.length-1]; placeAt(last.parentNode,last.nextSibling);
+    }
+  }
+  function startLift(){
+    var s=st, c=s.card, rc=c.getBoundingClientRect(), pr=s.pc.getBoundingClientRect();
+    s.h=rc.height; s.offY=s.y0-rc.top;
+    var ph=document.createElement('div'); ph.className='pr-ph'; ph.style.height=rc.height+'px';
+    c.parentNode.insertBefore(ph,c); s.ph=ph;
+    c.style.width=rc.width+'px';
+    c.style.left=rc.left+'px';
+    c.style.top=rc.top+'px';
+    c.classList.add('pr-lifted');
+    var m=c.getBoundingClientRect();           // koreksi bila ada containing block selain viewport
+    s.dx=rc.left-m.left; s.dy=rc.top-m.top;
+    c.style.left=(rc.left+s.dx)+'px';
+    c.style.top=(rc.top+s.dy)+'px';
+    document.body.classList.add('pr-dragging-on');
+    s.lifted=true;
+  }
+  function loop(){
+    if(!st) return;
+    if(st.lifted){
+      var sp=st.sp, root=(sp===document.scrollingElement||sp===document.documentElement);
+      var t=root?0:sp.getBoundingClientRect().top, b=root?window.innerHeight:sp.getBoundingClientRect().bottom, z=80, v=0;
+      if(st.y<t+z) v=-(t+z-st.y)/4; else if(st.y>b-z) v=(st.y-(b-z))/4;
+      if(v){ sp.scrollTop+=Math.max(-26,Math.min(26,v)); update(); }
+    }
+    st.raf=requestAnimationFrame(loop);
+  }
+  function onMove(e){
+    if(!st) return;
+    st.x=e.clientX; st.y=e.clientY;
+    if(!st.lifted){
+      if(Math.abs(e.clientY-st.y0)<4&&Math.abs(e.clientX-st.x0)<4) return;
+      startLift();
+    }
+    update();
+  }
+  function finish(ok){
+    if(!st) return;
+    var s=st; st=null;
+    cancelAnimationFrame(s.raf);
+    document.removeEventListener('pointermove',onMove);
+    document.removeEventListener('pointerup',onUp);
+    document.removeEventListener('pointercancel',onCancel);
+    document.removeEventListener('keydown',onKey,true);
+    document.body.classList.remove('pr-dragging-on');
+    if(!s.lifted) return;
+    var ph=s.ph, card=s.card, parent=ph.parentNode, args=null;
+    function sib(n,dir){ while(n&&!(n.classList&&n.classList.contains('pa-card')&&n.classList.contains('pr')&&n!==card)) n=n[dir]; return n; }
+    if(ok&&parent){
+      var gid=null;
+      if(parent.dataset&&parent.dataset.gid!==undefined){
+        var g=paGroups.filter(function(x){return String(x.id)===parent.dataset.gid;})[0]; gid=g?g.id:null;
+      }
+      var nx=sib(ph.nextElementSibling,'nextElementSibling'), pv=sib(ph.previousElementSibling,'previousElementSibling');
+      if(nx) args=[s.id,Number(nx.dataset.rid),false,gid];
+      else if(pv) args=[s.id,Number(pv.dataset.rid),true,gid];
+      else args=[s.id,null,false,gid];
+    }
+    ph.remove();
+    card.classList.remove('pr-lifted'); card.style.cssText='';
+    if(args) window.paMoveRow.apply(null,args);
+  }
+  function onUp(){finish(true);}
+  function onCancel(){finish(false);}
+  function onKey(e){ if(e.key==='Escape'){e.preventDefault();finish(false);} }
+
+  document.addEventListener('pointerdown',function(e){
+    var g=e.target.closest&&e.target.closest('#paCards .pr-grip');
+    if(!g||e.button>0) return;
+    e.preventDefault();
+    var card=g.closest('.pa-card.pr'); if(!card) return;
+    st={id:Number(g.dataset.rid),card:card,pc:document.getElementById('paCards'),sp:scrollParent(card),
+        x:e.clientX,y:e.clientY,x0:e.clientX,y0:e.clientY,lifted:false,raf:0};
+    document.addEventListener('pointermove',onMove);
+    document.addEventListener('pointerup',onUp);
+    document.addEventListener('pointercancel',onCancel);
+    document.addEventListener('keydown',onKey,true);
+    st.raf=requestAnimationFrame(loop);
+  });
+  document.addEventListener('keydown',function(e){
+    var g=e.target.closest&&e.target.closest('#paCards .pr-grip');
+    if(!g||!e.altKey) return;
+    if(e.key==='ArrowUp'){e.preventDefault();step(Number(g.dataset.rid),-1);}
+    else if(e.key==='ArrowDown'){e.preventDefault();step(Number(g.dataset.rid),1);}
+  });
+})();
+</script>
+<script>
+(function(){
+  var MAX=100, hist={};
+  function snap(){
+    var id=String(activeIpalId);
+    return JSON.stringify({
+      rows:paRows.filter(function(r){return String(r.ipalId)===id;}),
+      groups:paGroups.filter(function(g){return String(g.ipalId)===id;})
+    });
+  }
+  function H(){
+    var id=String(activeIpalId);
+    return hist[id]||(hist[id]={undo:[],redo:[],cur:null});
+  }
+  function check(){
+    if(typeof paRows==='undefined'||typeof activeIpalId==='undefined'||activeIpalId==null) return;
+    var h=H(), now=snap();
+    if(h.cur===null){h.cur=now;return;}
+    if(now!==h.cur){
+      h.undo.push(h.cur); if(h.undo.length>MAX) h.undo.shift();
+      h.redo=[]; h.cur=now;
+    }
+  }
+  function apply(json){
+    var id=String(activeIpalId), d=JSON.parse(json);
+    paRows=paRows.filter(function(r){return String(r.ipalId)!==id;}).concat(d.rows);
+    paGroups=paGroups.filter(function(g){return String(g.ipalId)!==id;}).concat(d.groups);
+    H().cur=json;
+    renderPenggunaanAirPage();
+    if(typeof scheduleAutosave==='function') scheduleAutosave();
+  }
+  var tt=null;
+  function toast(m){
+    var t=document.querySelector('.pa-ur-toast');
+    if(!t){t=document.createElement('div');t.className='pa-ur-toast';document.body.appendChild(t);}
+    t.textContent=m;t.style.opacity='1';clearTimeout(tt);tt=setTimeout(function(){t.style.opacity='0';},1400);
+  }
+  function undo(){
+    check(); var h=H();
+    if(!h.undo.length){toast('Tidak ada yang bisa dibatalkan');return;}
+    h.redo.push(h.cur); apply(h.undo.pop()); sync(); toast('↶ Dibatalkan');
+  }
+  function redo(){
+    check(); var h=H();
+    if(!h.redo.length){toast('Tidak ada yang bisa diulang');return;}
+    h.undo.push(h.cur); apply(h.redo.pop()); sync(); toast('↷ Diulang');
+  }
+  window.paUndo=undo; window.paRedo=redo;
+
+  // Tombol kecil di samping judul
+  var h2=document.querySelector('#page_penggunaan_air .simple-page-hd h2');
+  var bU,bR;
+  if(h2){
+    var w=document.createElement('span'); w.className='pa-ur';
+    w.innerHTML='<button type="button" id="paUndoBtn" title="Undo (Ctrl+Z)" aria-label="Undo"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button>'+
+                '<button type="button" id="paRedoBtn" title="Redo (Ctrl+Y)" aria-label="Redo"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 14 5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/></svg></button>';
+    h2.appendChild(w);
+    bU=w.querySelector('#paUndoBtn'); bR=w.querySelector('#paRedoBtn');
+    bU.addEventListener('click',undo); bR.addEventListener('click',redo);
+  }
+  function sync(){
+    if(!bU) return;
+    var h=H(); bU.disabled=!h.undo.length; bR.disabled=!h.redo.length;
+  }
+
+  // Deteksi perubahan (ketikan beruntun digabung jadi satu langkah)
+  setInterval(function(){try{check();sync();}catch(e){}},400);
+
+  // Pintasan keyboard — di kolom teks tetap Ctrl+Z bawaan browser
+  document.addEventListener('keydown',function(e){
+    if(!(e.ctrlKey||e.metaKey)||e.altKey) return;
+    var pg=document.getElementById('page_penggunaan_air');
+    if(!pg||!pg.classList.contains('active')) return;
+    var t=e.target, tag=t&&t.tagName;
+    if(tag==='TEXTAREA'||(t&&t.isContentEditable)) return;
+    if(tag==='INPUT'&&!/^(checkbox|radio|button|range|file)$/.test(t.type)) return;
+    if(document.querySelector('.modal-overlay.open,.modal.open,dialog[open]')) return;
+    var k=e.key.toLowerCase();
+    if(k==='z'&&!e.shiftKey){e.preventDefault();undo();}
+    else if(k==='y'||(k==='z'&&e.shiftKey)){e.preventDefault();redo();}
+  });
+})();
+</script>
 </body>
 
 </html>
